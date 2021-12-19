@@ -1,8 +1,17 @@
 // background.js
 
-let color = '#3aa757';
+const recipes = {}
+
+// NB: Is there actually persistent storage for the extension between chrome sessions?
+let existingRecipes = chrome.storage.local.get("recipes");
+if (existingRecipes !== undefined) {
+  Object.entries(existingRecipes).forEach((key, value) => {
+    recipes[key] = value
+  });
+} 
+
 
 chrome.runtime.onInstalled.addListener(() => {
-  chrome.storage.sync.set({ color });
-  console.log('Default background color set to %cgreen', `color: ${color}`);
+  chrome.storage.local.set({ recipes });
+  console.log('Initializing recipes db');
 });
