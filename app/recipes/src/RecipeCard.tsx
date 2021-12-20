@@ -21,7 +21,12 @@ const IngredientList = styled.ul`
   margin: 0px 0px 15px 25px;
   background-color: lightyellow;
   display: inline-block;
-  list-style-position: inside
+  list-style-position: inside;
+  max-width: 50%;
+`
+
+const Ingredient = styled.li`
+  padding-bottom: 3px;
 `
 
 const RecipeStepsList = styled.ol`
@@ -56,7 +61,7 @@ function RecipeCard(props: RecipeProps) {
             /* @ts-expect-error */
             if (recipe.image.url !== undefined) {
                 /* @ts-expect-error */
-                image = <img src={recipe.image.url.toString()} alt="original" style={{ width: "30%", padding: "15px", float: "left" }} />
+                image = <img src={recipe.image.url.toString()} alt="original" style={{ width: "20%", padding: "15px", float: "left" }} />
             }
         }
     }
@@ -66,7 +71,7 @@ function RecipeCard(props: RecipeProps) {
             {title} {image}
             <RecipeBody>
                 <IngredientList>
-                    {Array.prototype.map.call(recipe.recipeIngredient, (ri, id) => <li key={id}>{ri}</li>)}
+                    {Array.prototype.map.call(recipe.recipeIngredient, (ri, id) => <Ingredient key={id}>{ri}</Ingredient>)}
                 </IngredientList>
                 <RecipeStepsList>
                     {Array.prototype.map.call(recipe.recipeInstructions, (ri, id) => <RecipeStep key={id}>{ri.text}</RecipeStep>)}
