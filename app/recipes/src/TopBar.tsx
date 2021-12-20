@@ -10,6 +10,7 @@ const Container = styled.div`
 
 const Title = styled.h1`
   margin: 0px;
+  margin-bottom: 20px;
 `
 
 function TopBar() {
