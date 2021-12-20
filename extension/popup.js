@@ -1,4 +1,8 @@
-
+/* TODO:
+    add content script to enable/disable the download button if a recipe is found.
+      OR 
+    add action into omnibar if recipe is found
+*/
 
 function getPageRecipe() {
   var textFile = null;
@@ -16,8 +20,6 @@ function getPageRecipe() {
     // returns a URL you can use as a href
     return textFile;
   };
-
-
 
   // Pull ld+json metadata from the page and look for a recipe
   let schema = document.querySelector('script[type="application/ld+json"]');
@@ -41,7 +43,7 @@ function getPageRecipe() {
     return
   }
 
-  console.log("found a recipe", recipe)
+  console.debug("found a recipe", recipe)
   
   // Create a download link
   var downloadLink = document.createElement("a");
@@ -49,7 +51,7 @@ function getPageRecipe() {
   downloadLink.innerHTML = "Download File";
 
   // Create a "file" to download
-  downloadLink.href = makeTextFile(JSON.stringify(ldjson))
+  downloadLink.href = makeTextFile(JSON.stringify(recipe))
   document.body.appendChild(downloadLink);
 
   // wait for the link to be added to the document
