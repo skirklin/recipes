@@ -44,6 +44,7 @@ function getPageRecipe() {
   }
 
   console.debug("found a recipe", recipe)
+  recipe.url = document.URL;
   
   // Create a download link
   var downloadLink = document.createElement("a");
