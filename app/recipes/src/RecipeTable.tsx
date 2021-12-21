@@ -25,7 +25,6 @@ function RecipeList() {
             dispatch({ type: 'ADD_ACTIVE_RECIPE', recipe: r })
         }
     }
-    console.log("activeRecipes", activeRecipes)
 
     function tabRemover(r: Recipe) {
         return () => {

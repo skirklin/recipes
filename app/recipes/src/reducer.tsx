@@ -4,7 +4,6 @@ import { StateType, ActionType } from './types'
 export function recipeBoxReducer(state: StateType, action: ActionType): StateType {
     switch (action.type) {
         case 'ADD_RECIPE': {
-            console.log("current recipes", state['recipes'])
             return { ...state, recipes: _.uniq([...state['recipes'], action.recipe!]) }
         }
         case 'REMOVE_RECIPE':

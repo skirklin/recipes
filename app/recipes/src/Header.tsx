@@ -36,7 +36,6 @@ function Header() {
             return false
         }
         let searchResult = recipes.filter(filterFunc)
-        console.log("searchResult", searchResult)
         dispatch({ type: "SET_SEARCH_RESULT", searchResult })
     }
     let title = <Title>Recipe box</Title>
