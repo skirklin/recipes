@@ -11,6 +11,7 @@ export type ActionType = {
   type: string
   recipe?: Recipe
   activeTab?: number
+  searchResult?: Recipe[]
 }
 
 export type ContextType = {

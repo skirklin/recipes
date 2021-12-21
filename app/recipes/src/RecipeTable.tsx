@@ -16,7 +16,7 @@ const RecipeItem = styled.li`
 
 function RecipeList() {
     const { state, dispatch } = useContext(RecipeBoxContext);
-    const { activeRecipes, recipes, activeTab } = state;
+    const { activeRecipes, recipes, activeTab, searchResult } = state;
 
     console.debug("Rendering recipes")
 
@@ -49,7 +49,7 @@ function RecipeList() {
             </TabList>
             <TabPanel>
                 <ul>
-                    {(recipes || []).map((r: Recipe, id) => {
+                    {(searchResult || recipes || []).map((r: Recipe, id) => {
                         return (
                             <RecipeItem key={id} onClick={activeRecipeAdder(r)}><RecipeSummary recipe={r} /></RecipeItem>
                         )

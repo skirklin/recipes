@@ -3,8 +3,10 @@ import { StateType, ActionType } from './types'
 
 export function recipeBoxReducer(state: StateType, action: ActionType): StateType {
     switch (action.type) {
-        case 'ADD_RECIPE':
+        case 'ADD_RECIPE': {
+            console.log("current recipes", state['recipes'])
             return { ...state, recipes: _.uniq([...state['recipes'], action.recipe!]) }
+        }
         case 'REMOVE_RECIPE':
             return { ...state, recipes: _.filter(state['recipes'], x => !Object.is(x, action.recipe)) }
         case 'ADD_ACTIVE_RECIPE':
@@ -17,14 +19,14 @@ export function recipeBoxReducer(state: StateType, action: ActionType): StateTyp
             if (recipeTab <= activeTab) {
                 activeTab -= 1;
             }
-            return { 
-                ...state, 
+            return {
+                ...state,
                 activeTab,
                 activeRecipes: _.filter(state['activeRecipes'], x => !Object.is(x, action.recipe)),
             }
         }
         case 'SET_SEARCH_RESULT':
-            return { ...state }
+            return { ...state, searchResult: action.searchResult }
         case 'SET_ACTIVE_TAB':
             return { ...state, activeTab: action.activeTab! }
     }

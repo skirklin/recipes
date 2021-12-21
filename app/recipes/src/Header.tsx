@@ -1,4 +1,4 @@
-import { useContext } from 'react';
+import { ChangeEvent, useContext } from 'react';
 import styled from 'styled-components';
 import { Recipe } from 'schema-dts';
 import { Upload, Button } from 'antd';
@@ -19,25 +19,35 @@ const Title = styled.h1`
 `
 
 function Header() {
-    const { dispatch } = useContext(RecipeBoxContext)
+    const { dispatch, state } = useContext(RecipeBoxContext)
+    const { recipes } = state;
 
     const dummyRequest = (options: any) => {
-        console.log("dummyRequest", options)
-        if( options.file.type === "application/json") {
-            options.file.text().then(JSON.parse).then((r: Recipe) => dispatch({type: "ADD_RECIPE", recipe: r}))
+        if (options.file.type === "application/json") {
+            options.file.text().then(JSON.parse).then((r: Recipe) => dispatch({ type: "ADD_RECIPE", recipe: r }))
         }
     };
 
-
+    function handleSearch(event: ChangeEvent<HTMLInputElement>): void {
+        function filterFunc(value: Recipe): boolean {
+            if (value!.name!.toString().toLowerCase().match(event.target.value.toLowerCase()) !== null) {
+                return true
+            }
+            return false
+        }
+        let searchResult = recipes.filter(filterFunc)
+        console.log("searchResult", searchResult)
+        dispatch({ type: "SET_SEARCH_RESULT", searchResult })
+    }
     let title = <Title>Recipe box</Title>
     return (
         <Container>
             {title}
             <Upload directory multiple customRequest={dummyRequest} showUploadList={false}>
-                <Button style={{float: "right", display: "inline-block"}} icon={<UploadOutlined />}>Upload Directory</Button>
+                <Button style={{ float: "right", display: "inline-block" }} icon={<UploadOutlined />}>Upload Directory</Button>
             </Upload>
             <label>Search: </label>
-            <input type="text" />
+            <input type="text" onChange={handleSearch} />
         </Container >
     );
 }
