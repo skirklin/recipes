@@ -1,6 +1,8 @@
 import { useReducer } from 'react';
 import RecipeList from './RecipeTable';
-import { RecipeBoxContext, recipeBoxReducer, StateType, ActionType, initState } from './constants';
+import { StateType, ActionType } from './types';
+import { RecipeBoxContext, initState } from './context';
+import { recipeBoxReducer } from './reducer';
 import Header from './Header';
 import styled from 'styled-components';
 

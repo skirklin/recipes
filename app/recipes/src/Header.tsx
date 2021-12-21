@@ -4,7 +4,7 @@ import { Recipe } from 'schema-dts';
 import { Upload, Button } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
 
-import { RecipeBoxContext } from './constants';
+import { RecipeBoxContext } from './context';
 
 const Container = styled.div`
   background-color: transparent;
@@ -24,7 +24,6 @@ function Header() {
     const dummyRequest = (options: any) => {
         console.log("dummyRequest", options)
         if( options.file.type === "application/json") {
-            // these are called asynchronously, so this is always just setting it to the latest one. Need to useReducer instead.
             options.file.text().then(JSON.parse).then((r: Recipe) => dispatch({type: "ADD_RECIPE", recipe: r}))
         }
     };
@@ -35,7 +34,7 @@ function Header() {
         <Container>
             {title}
             <Upload directory multiple customRequest={dummyRequest} showUploadList={false}>
-                <Button icon={<UploadOutlined />}>Upload Directory</Button>
+                <Button style={{float: "right", display: "inline-block"}} icon={<UploadOutlined />}>Upload Directory</Button>
             </Upload>
             <label>Search: </label>
             <input type="text" />

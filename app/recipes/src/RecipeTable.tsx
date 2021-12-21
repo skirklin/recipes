@@ -1,4 +1,4 @@
-import { useContext, useState } from 'react';
+import { useContext } from 'react';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import 'react-tabs/style/react-tabs.css';
 
@@ -6,7 +6,7 @@ import { Recipe } from 'schema-dts';
 
 import RecipeSummary from './RecipeSummary';
 import RecipeCard from './RecipeCard';
-import { RecipeBoxContext } from './constants';
+import { RecipeBoxContext } from './context';
 import styled from 'styled-components';
 
 const RecipeItem = styled.li`
@@ -16,9 +16,8 @@ const RecipeItem = styled.li`
 
 function RecipeList() {
     const { state, dispatch } = useContext(RecipeBoxContext);
-    const { activeRecipes, recipes } = state;
+    const { activeRecipes, recipes, activeTab } = state;
 
-    const [tabIndex, setTabIndex] = useState(0);
     console.debug("Rendering recipes")
 
     function activeRecipeAdder(r: Recipe) {
@@ -38,12 +37,12 @@ function RecipeList() {
     function handleSelect(index: number, lastIndex: number, event: Event) {
         /* @ts-expect-error */
         if (event.target.id !== "tabRemover") {
-            setTabIndex(index)
+            dispatch({ type: 'SET_ACTIVE_TAB', activeTab: index })
         }
         return false
     }
     return (
-        <Tabs selectedIndex={tabIndex} onSelect={handleSelect}>
+        <Tabs selectedIndex={activeTab} onSelect={handleSelect}>
             <TabList>
                 <Tab>Contents</Tab>
                 {activeRecipes.map((r) => (<Tab>{r.name} <button id="tabRemover" onClick={tabRemover(r)}>x</button> </Tab>))}
