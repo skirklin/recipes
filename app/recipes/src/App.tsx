@@ -1,8 +1,7 @@
-import { useState } from 'react';
-import { Recipe } from 'schema-dts';
-import RecipeList from './RecipeList';
-import { RecipeBoxContext } from './constants';
-import TopBar from './TopBar';
+import { useReducer } from 'react';
+import RecipeList from './RecipeTable';
+import { RecipeBoxContext, recipeBoxReducer, StateType, ActionType, initState } from './constants';
+import Header from './Header';
 import styled from 'styled-components';
 
 const Layout = styled.div`
@@ -10,20 +9,13 @@ const Layout = styled.div`
 `
 
 function App() {
-  const [recipes, setRecipes] = useState<Recipe[]>([])
-  const [activeRecipes, setActiveRecipes] = useState<Recipe[]>([])
 
-  let value = {
-    recipes: recipes,
-    setRecipes: setRecipes,
-    activeRecipes: activeRecipes,
-    setActiveRecipes: setActiveRecipes,
-  }
-  
+  const [state, dispatch] = useReducer<React.Reducer<StateType, ActionType>>(recipeBoxReducer, initState())
+
   return (
     <Layout>
-      <RecipeBoxContext.Provider value={value}>
-        <TopBar />
+      <RecipeBoxContext.Provider value={{ state, dispatch }}>
+        <Header />
         <RecipeList />
       </RecipeBoxContext.Provider>
     </Layout>

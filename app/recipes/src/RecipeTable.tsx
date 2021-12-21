@@ -1,4 +1,3 @@
-import _ from 'lodash';
 import { useContext, useState } from 'react';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import 'react-tabs/style/react-tabs.css';
@@ -16,35 +15,29 @@ const RecipeItem = styled.li`
 `
 
 function RecipeList() {
-    const { recipes, activeRecipes, setActiveRecipes } = useContext(RecipeBoxContext);
+    const { state, dispatch } = useContext(RecipeBoxContext);
+    const { activeRecipes, recipes } = state;
+
     const [tabIndex, setTabIndex] = useState(0);
     console.debug("Rendering recipes")
 
     function activeRecipeAdder(r: Recipe) {
         return () => {
-            let newActiveRecipes = _.uniq([r, ...activeRecipes])
-            setActiveRecipes(newActiveRecipes);
-            setTabIndex(1);
+            dispatch({ type: 'ADD_ACTIVE_RECIPE', recipe: r })
         }
     }
     console.log("activeRecipes", activeRecipes)
 
     function tabRemover(r: Recipe) {
         return () => {
-            console.log("Removing", r)
-            let rIndex = _.indexOf(activeRecipes, r)
-            let newActiveRecipes = _.filter(activeRecipes, (r, index) => index !== rIndex)
-            setActiveRecipes(newActiveRecipes);
-            // +1 here because there is a "contents" tab, so the tab index is offset from the array index.
-            if(tabIndex === rIndex+1) {
-                setTabIndex(tabIndex-1)
-            }
+            dispatch({ type: 'REMOVE_ACTIVE_RECIPE', recipe: r })
+
         }
     }
 
     function handleSelect(index: number, lastIndex: number, event: Event) {
         /* @ts-expect-error */
-        if(event.target.id !== "tabRemover") {
+        if (event.target.id !== "tabRemover") {
             setTabIndex(index)
         }
         return false
