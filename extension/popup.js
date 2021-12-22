@@ -22,30 +22,52 @@ function getPageRecipe() {
   };
 
   // Pull ld+json metadata from the page and look for a recipe
-  let schema = document.querySelector('script[type="application/ld+json"]');
-  if (schema === null) {
+  let schemas = document.querySelectorAll('script[type="application/ld+json"]');
+  if (schemas === null) {
     return
   }
-  let ldjson = JSON.parse(schema.innerText);
-  var recipe;
-  if (Array.isArray(ldjson)) {
-    ldjson.forEach(
-      element => {
-        if (element["@type"] === "Recipe" || element["@type"][0] === "Recipe") {
-          recipe = element
+
+  function isRecipe(elt) {
+    if (!(elt.hasOwnProperty("@context") && elt.hasOwnProperty("@type"))) {
+      console.log("no type or context")
+      return false
+    }
+    if (elt["@context"].toString().match(/recipe.org/) || (elt["@type"] !== "Recipe" && elt["@type"][0] !== "Recipe")) {
+      console.log("wrong type or context")
+      return false
+    }
+    console.log("found recipe")
+    return true
+  }
+
+  let recipe;
+
+  for (let index = 0; index < schemas.length; index++) {
+    const schema = schemas[index];
+
+    let ldjson = JSON.parse(schema.innerText);
+    console.log("json", ldjson);
+    if (Array.isArray(ldjson)) {
+      ldjson.forEach(
+        element => {
+          if (isRecipe(element)) {
+            recipe = element
+          }
         }
-      }
-    )
-  } else if (ldjson["@type"] === "Recipe" || ldjson["@type"][0] === "Recipe") {
-    recipe = ldjson;
-  } else {
+      )
+    } else if (isRecipe(ldjson)) {
+      recipe = ldjson;
+    }
+  }
+
+  if (recipe === undefined) {
     alert("Failed to identify a recipe in page metadata")
     return
   }
 
   console.debug("found a recipe", recipe)
   recipe.url = document.URL;
-  
+
   // Create a download link
   var downloadLink = document.createElement("a");
   downloadLink.download = recipe.name + ".json"
