@@ -16,5 +16,6 @@ jobs:
         with:
           repoToken: '${{ secrets.GITHUB_TOKEN }}'
           firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_RECIPE_BOX_335721 }}'
+          entryPoint: app/firebase.json
           channelId: live
           projectId: recipe-box-335721
