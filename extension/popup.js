@@ -27,14 +27,24 @@ function getPageRecipe() {
     return
   }
 
+  function isGraph(elt) {
+    if (elt.hasOwnProperty("@graph")) {
+      /* the "graph" style ld+json puts objects at the root level, but 
+      cross-object references may be represented by simply referencing their ids.
+      */
+      return true
+    }
+    return false
+  }
+
   function isRecipe(elt) {
     if (!(elt.hasOwnProperty("@context") && elt.hasOwnProperty("@type"))) {
-      console.log("no type or context")
-      return false
+      console.log("no type or context");
+      return false;
     }
     if (elt["@context"].toString().match(/recipe.org/) || (elt["@type"] !== "Recipe" && elt["@type"][0] !== "Recipe")) {
-      console.log("wrong type or context")
-      return false
+      console.log("wrong type or context");
+      return false;
     }
     console.log("found recipe")
     return true
@@ -47,6 +57,9 @@ function getPageRecipe() {
 
     let ldjson = JSON.parse(schema.innerText);
     console.log("json", ldjson);
+    if (isGraph(ldjson)) {
+      ldjson = ldjson["@graph"];
+    }
     if (Array.isArray(ldjson)) {
       ldjson.forEach(
         element => {
@@ -74,7 +87,7 @@ function getPageRecipe() {
   downloadLink.innerHTML = "Download File";
 
   // Create a "file" to download
-  downloadLink.href = makeTextFile(JSON.stringify(recipe))
+  downloadLink.href = makeTextFile(JSON.stringify(recipe, null, 2))
   document.body.appendChild(downloadLink);
 
   // wait for the link to be added to the document
