@@ -53,7 +53,7 @@ Run `firebase deploy`.
 
 Something like this:
 
-`
+```
 /boxes/{box_id}/
                /recipes = [ref(recipe_id), ref(recipe_id)]
                /owners = [ref(user_id), ref(user_id)]
@@ -63,4 +63,4 @@ Something like this:
                     /version
                     /creator = ref(user_id)
                     /(recipe data)
-`
+```
