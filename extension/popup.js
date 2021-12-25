@@ -6,7 +6,7 @@
 
 function getPageRecipe() {
   var textFile = null;
-  makeTextFile = function (text) {
+  const makeTextFile = function (text) {
     var data = new Blob([text], { type: 'application/ld+json' });
 
     // If we are replacing a previously generated file we need to
