@@ -1,5 +1,11 @@
 import { createContext } from 'react';
-import { ContextType, ActionType } from './types';
+import { ActionType, StateType } from './types';
+
+
+export type ContextType = {
+  state: StateType
+  dispatch: React.Dispatch<ActionType>
+}
 
 export function initState() {
   return (

@@ -13,8 +13,3 @@ export type ActionType = {
   activeTab?: number
   searchResult?: Recipe[]
 }
-
-export type ContextType = {
-  state: StateType
-  dispatch: React.Dispatch<ActionType>
-}

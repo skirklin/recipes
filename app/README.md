@@ -48,3 +48,19 @@ To learn React, check out the [React documentation](https://reactjs.org/).
 ## Deployment
 
 Run `firebase deploy`.
+
+## Data schema
+
+Something like this:
+
+`
+/boxes/{box_id}/
+               /recipes = [ref(recipe_id), ref(recipe_id)]
+               /owners = [ref(user_id), ref(user_id)]
+/user/{user_id}/
+               /boxes = [ref(box_id), ref(box_id)]
+/recipes/{recipe_id}/
+                    /version
+                    /creator = ref(user_id)
+                    /(recipe data)
+`

@@ -5,7 +5,7 @@ import 'react-tabs/style/react-tabs.css';
 import { Recipe } from 'schema-dts';
 
 import RecipeSummary from './RecipeSummary';
-import RecipeCard from './RecipeCard';
+import RecipeCard from './RecipeCard/RecipeCard';
 import { RecipeBoxContext } from './context';
 import styled from 'styled-components';
 
@@ -14,7 +14,7 @@ const RecipeItem = styled.li`
   cursor: pointer; 
 `
 
-function RecipeList() {
+function RecipeTable() {
     const { state, dispatch } = useContext(RecipeBoxContext);
     const { activeRecipes, recipes, activeTab, searchResult } = state;
 
@@ -44,7 +44,7 @@ function RecipeList() {
         <Tabs selectedIndex={activeTab} onSelect={handleSelect}>
             <TabList>
                 <Tab>Contents</Tab>
-                {activeRecipes.map((r) => (<Tab>{r.name} <button id="tabRemover" onClick={tabRemover(r)}>x</button> </Tab>))}
+                {activeRecipes.map((r, id) => (<Tab key={id}>{r.name} <button id="tabRemover" onClick={tabRemover(r)}>x</button> </Tab>))}
             </TabList>
             <TabPanel>
                 <ul>
@@ -55,9 +55,9 @@ function RecipeList() {
                     })}
                 </ul>
             </TabPanel>
-            {activeRecipes.map((r) => (<TabPanel><RecipeCard recipe={r} /></TabPanel>))}
+            {activeRecipes.map((r, id) => (<TabPanel key={id}><RecipeCard recipe={r} /></TabPanel>))}
         </Tabs>
     );
 }
 
-export default RecipeList;
+export default RecipeTable;
