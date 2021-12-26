@@ -5,6 +5,13 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+    /* CSS HEX */
+  --russian-green: #678d58ff;
+  --spanish-blue: #246eb9ff;
+  --melon: #ffa69eff;
+  --gainsboro: #d1dedeff;
+  --charcoal: #373f47ff;
 }
 
 code {

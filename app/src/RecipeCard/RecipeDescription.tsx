@@ -19,11 +19,7 @@ function RecipeDescription() {
   const [editable, setEditable] = useState(false);
   const { state, dispatch } = useContext(RecipeContext);
 
-  if (!state.recipe.description) {
-    return <div />
-  }
-
-  let description = state.recipe.description!.toString();
+  let description = (state.recipe.description || "Add a description?").toString();
 
   if (editable) {
     return (

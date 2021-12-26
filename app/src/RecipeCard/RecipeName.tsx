@@ -1,6 +1,7 @@
 import React, { useContext, useState } from 'react';
 import { RecipeContext } from './context';
 import styled from 'styled-components';
+import { LinkOutlined } from '@ant-design/icons';
 
 
 const Title = styled.h1`
@@ -25,6 +26,10 @@ function RecipeName() {
 
   let name = state.recipe.name!.toString()
   let handleChange = (e: any) => { dispatch({ type: "SET_NAME", payload: e.target.value }); setEditable(false) }
+  let link = null;
+  if (state.recipe.url) {
+    link = <a href={state.recipe.url.toString()}><LinkOutlined /></a>
+  }
   if (editable) {
     return (
       <EditableTitle type="text"
@@ -38,6 +43,7 @@ function RecipeName() {
     return (
       <Title onDoubleClick={() => setEditable(true)}>
         {name}
+        {link}
       </Title>
     )
   }

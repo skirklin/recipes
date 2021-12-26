@@ -1,6 +1,6 @@
-import { ActionType, StateType } from './context'
+import { RecipeActionType, RecipeStateType } from './context'
 
-export default function recipeReducer(state: StateType, action: ActionType): StateType {
+export default function recipeReducer(state: RecipeStateType, action: RecipeActionType): RecipeStateType {
     let newState = { ...state }
     switch (action.type) {
         case 'SET_NAME':

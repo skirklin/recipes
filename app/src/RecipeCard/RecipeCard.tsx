@@ -31,6 +31,7 @@ const RecipeBody = styled.div`
 `
 
 function RecipeCard(props: RecipeProps) {
+  // TODO: don't pass a whole recipe, just pass boxId + recipeId and get the data from context.
   const { recipe } = props;
   const [state, dispatch] = useReducer(recipeReducer, {recipe: recipe, changed: false});
 

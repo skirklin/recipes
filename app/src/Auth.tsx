@@ -1,17 +1,19 @@
 import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 
-import { GoogleAuthProvider, EmailAuthProvider, onAuthStateChanged, getAuth, signOut } from "firebase/auth";
+import { GoogleAuthProvider, EmailAuthProvider, onAuthStateChanged, getAuth } from "firebase/auth";
 
 import StyledFirebaseAuth from 'react-firebaseui/StyledFirebaseAuth';
+import App from './App';
 
 const SignInCard = styled.div`
   margin: 40px auto;
   max-width: 200px;
   padding: 20px;
-  border-radius: 5px; /* 5px rounded corners */
+  border-radius: 5px;
   box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
 `
+
 
 // Configure FirebaseUI.
 const uiConfig = {
@@ -28,13 +30,8 @@ const uiConfig = {
   },
 };
 
-interface AuthProps {
-    Content: React.ReactNode
-}
-
-function SignInScreen(props: AuthProps) {
+function WrappedApp() {
   const [isSignedIn, setIsSignedIn] = useState(false); // Local signed-in state.
-  let { Content } = props;  
 
   // Listen to the Firebase Auth state and set the local state.
   useEffect(() => {
@@ -54,11 +51,8 @@ function SignInScreen(props: AuthProps) {
     );
   }
   return (
-    <div>
-      <button onClick={() => signOut(getAuth())} style={{ margin: "10px", display: "inline-block", float: "right" }}>Sign-out</button>
-      {Content}
-    </div>
+    <App />
   );
 }
 
-export default SignInScreen;
+export default WrappedApp;

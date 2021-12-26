@@ -1,26 +1,23 @@
 import { createContext } from 'react';
-import { ActionType, StateType } from './types';
+import { RecipeBoxActionType, BoxType, RecipeBoxStateType } from './types';
 
 
 export type ContextType = {
-  state: StateType
-  dispatch: React.Dispatch<ActionType>
+  state: RecipeBoxStateType
+  dispatch: React.Dispatch<RecipeBoxActionType>
 }
 
 export function initState() {
   return (
-
     {
-      recipes: [],
-      activeRecipes: [],
-      searchResult: undefined,
-      activeTab: 0,
+      boxes: new Map<string, BoxType>(),
+      activeBox: undefined,
     }
   )
 }
 
 const initialState = initState()
-const defaultDispatch: React.Dispatch<ActionType> = () => initialState
+const defaultDispatch: React.Dispatch<RecipeBoxActionType> = () => initialState
 
 export const RecipeBoxContext = createContext<ContextType>(
 
