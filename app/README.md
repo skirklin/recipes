@@ -55,12 +55,37 @@ Something like this:
 
 ```
 /boxes/{box_id}/
-               /recipes = [ref(recipe_id), ref(recipe_id)]
+               /name = string
+               /recipes/(recipe_id)/
+                                   /recipe = (recipe data)
+                                   /version = string
                /owners = [ref(user_id), ref(user_id)]
 /user/{user_id}/
                /boxes = [ref(box_id), ref(box_id)]
-/recipes/{recipe_id}/
-                    /version
-                    /creator = ref(user_id)
-                    /(recipe data)
+               /new = bool
+               
+But for representation in js, everything will be resolved, s.t. it looks like:
+{
+  $box_id1: {
+    name: $name,
+    owners: {
+      $owner_id1: (visible personal details),
+      $owner_id2: (visible personal details)
+    },
+    recipes: {
+      $recipe_id1: {
+        version: $version
+        recipe: (recipe details)
+      },
+      $recipe_id2: {
+        ...
+      }
+    }
+  },
+  $box_id2: {
+    ...
+  }
+}
+
+And this shall maintain its reflection of the firestore db by subscriptions on user and boxes.
 ```
