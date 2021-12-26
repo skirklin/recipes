@@ -1,16 +1,17 @@
-import { useMemo, useReducer } from 'react';
-import 'firebase/auth';
+import { useMemo, useReducer, useEffect } from 'react';
+import { initializeApp } from 'firebase/app';
 import { getAuth, connectAuthEmulator } from "firebase/auth";
-import { getFirestore, connectFirestoreEmulator } from "firebase/firestore";
-import firebase from 'firebase/compat/app';
+import { getFirestore, connectFirestoreEmulator, getDoc, onSnapshot, Unsubscribe, doc, setDoc, DocumentReference } from "firebase/firestore";
+import { collection, getDocs } from "firebase/firestore";
+import Modal from 'react-modal';
+import 'antd/dist/antd.css'; // or 'antd/dist/antd.less'
 
-import RecipeTable from './RecipeTable';
-import { StateType, ActionType } from './types';
+import Body from './Body/Body';
+import { RecipeBoxStateType, RecipeBoxActionType, BoxType } from './types';
 import { RecipeBoxContext, initState } from './context';
 import { recipeBoxReducer } from './reducer';
-import Header from './Header';
-import SignInScreen from './Auth';
-
+import Header from './Header/Header';
+import { Recipe } from 'schema-dts';
 
 
 // Configure Firebase.
@@ -24,39 +25,84 @@ const firebaseConfig = {
   // measurementId: "G-ZWWFPLHJHE"
 };
 
-export const app = firebase.initializeApp(firebaseConfig);
+export const app = initializeApp(firebaseConfig);
 
 // setup auth emulator
 const auth = getAuth();
 connectAuthEmulator(auth, "http://localhost:9099");
 
-// firebaseApps previously initialized using initializeApp()
+// setup firestore emulator
 export const db = getFirestore();
 connectFirestoreEmulator(db, 'localhost', 8080);
 
+Modal.setAppElement('#root'); // for accessibility. See: https://reactcommunity.org/react-modal/accessibility/
 
+function App() {
 
-function Content() {
+  const [state, dispatch] = useReducer<React.Reducer<RecipeBoxStateType, RecipeBoxActionType>>(recipeBoxReducer, initState())
 
-  const [state, dispatch] = useReducer<React.Reducer<StateType, ActionType>>(recipeBoxReducer, initState())
-
-  const contextValue = useMemo(() => {
+  const recipesValue = useMemo(() => {
     return { state, dispatch };
   }, [state, dispatch]);
 
-  console.log(getAuth().currentUser)
+  const user = getAuth().currentUser;
+
+  useEffect(
+    () => {
+      // fetch any boxes associated with this user
+      if (user === null) {
+        return
+      }
+
+      let userRef = doc(db, "users", user.uid);
+      getDoc(userRef).then(
+        u => {
+          if (!u.exists()) {
+            let userBoxRef = doc(db, "boxes", user.uid);
+            getDoc(userBoxRef).then(
+              ub => {
+                if (!ub.exists()) {
+                  setDoc(userBoxRef, { owners: [userRef], name: `${user.displayName}'s box` })
+                } else {
+                  alert(`${user.displayName}'s box existed even though the user didn't?`)
+                }
+              }
+            )
+            setDoc(userRef, { "new": false, "boxes": [userBoxRef] })
+          }
+        }
+      )
+
+      let unsubscribes: Unsubscribe[] = [];
+      let unsub = onSnapshot(userRef, (snapshot) => {
+        let d = snapshot.data()
+        let boxes = d!.boxes as DocumentReference[]
+        boxes.forEach(b => {
+          console.log("subbing to", b)
+          unsub = onSnapshot(b, (snapshot) => {
+            console.log("got snapshot for", b)
+            getDocs(collection(db, "boxes", b.id, "recipes")).then(querySnap => {
+              let recipes = new Map(querySnap.docs.map(r => [r.id, r.data() as Recipe]))
+              let box = { recipes, name: snapshot.data()!.name, owners: [] }
+              dispatch({ type: "SET_BOXES", boxes: new Map([[b.id, box as BoxType]]) })
+            })
+          })
+          unsubscribes.push(unsub)
+        })
+      })
+      unsubscribes.push(unsub)
+      return () => unsubscribes.forEach(unsub => unsub())
+    }
+    , [user]
+  )
 
   return (
-    <RecipeBoxContext.Provider value={contextValue}>
+    <RecipeBoxContext.Provider value={recipesValue}>
       <Header />
-      <RecipeTable />
+      <Body />
     </RecipeBoxContext.Provider>
   );
 }
 
-
-function App() {
-  return <SignInScreen Content={<Content />} />
-}
 
 export default App;
