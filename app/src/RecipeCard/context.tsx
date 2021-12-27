@@ -1,19 +1,29 @@
+import _ from 'lodash';
 import { createContext } from 'react';
 import { Recipe } from 'schema-dts';
+import { RecipePointer } from '../types';
 
 export type RecipeStateType = {
+  recipePtr: RecipePointer,
   recipe: Recipe,
+  original: Recipe,
   changed: boolean,
 }
 
 export type RecipeActionType = {
   type: string,
-  payload: any,
+  payload?: any,
 }
 
 
 export function initState(): RecipeStateType {
-  return { recipe: { "@type": "Recipe" }, changed: false }
+  let r: Recipe = { "@type": "Recipe" };
+  return { 
+    recipePtr: {recipeId: "", boxId: ""},
+    recipe: r, 
+    original: _.cloneDeep(r), 
+    changed: false,
+  }
 }
 const initialState = initState()
 

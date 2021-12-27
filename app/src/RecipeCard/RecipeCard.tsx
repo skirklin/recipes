@@ -1,17 +1,23 @@
+import { useReducer } from 'react';
+import styled from 'styled-components';
 import { Recipe } from 'schema-dts';
-import { RecipeContext } from './context';
+import _ from 'lodash';
+
+import { RecipeActionType, RecipeContext, RecipeStateType } from './context';
 import recipeReducer from './reducer';
 import SaveButton from './SaveRecipe';
+import DownloadButton from './DownloadRecipe';
+import ClearButton from './ClearChanges';
 import InstructionList from './InstructionList';
 import IngredientList from './IngredientList';
 import RecipeName from './RecipeName';
 import RecipeDescription from './RecipeDescription';
 import Image from './Image';
-import styled from 'styled-components';
-import { useReducer } from 'react';
+import { RecipePointer } from '../types';
 
 
 interface RecipeProps {
+  recipePtr: RecipePointer
   recipe: Recipe
 }
 
@@ -31,16 +37,25 @@ const RecipeBody = styled.div`
 `
 
 function RecipeCard(props: RecipeProps) {
-  // TODO: don't pass a whole recipe, just pass boxId + recipeId and get the data from context.
-  const { recipe } = props;
-  const [state, dispatch] = useReducer(recipeReducer, {recipe: recipe, changed: false});
-
+  const [state, dispatch] = useReducer<React.Reducer<RecipeStateType, RecipeActionType>>(recipeReducer, {
+    recipePtr: props.recipePtr,
+    recipe: props.recipe,
+    original: _.cloneDeep(props.recipe),
+    changed: false
+  });
 
   return (
     <RecipeContext.Provider value={{ state, dispatch }}>
       <Card>
         <Image />
-        <RecipeName /> <SaveButton />
+        <div>
+          <RecipeName />
+          <DownloadButton />
+        </div>
+        <div>
+          <SaveButton />
+          <ClearButton />
+        </div>
         <RecipeDescription />
         <RecipeBody>
           <IngredientList />

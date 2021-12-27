@@ -3,7 +3,7 @@ import { getKey } from './Tabs/Tab';
 import { ViewerStateType, ViewerActionType } from './types';
 
 export function viewerReducer(state: ViewerStateType, action: ViewerActionType): ViewerStateType {
-    console.log(action)
+    console.log("viewerReducer action:", action)
     switch (action.type) {
         case 'APPEND_TAB':
             let key = getKey(action.payload)!

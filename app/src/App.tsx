@@ -76,15 +76,20 @@ function App() {
       let unsubscribes: Unsubscribe[] = [];
       let unsub = onSnapshot(userRef, (snapshot) => {
         let d = snapshot.data()
+        if (d === undefined) {
+          return
+        }
         let boxes = d!.boxes as DocumentReference[]
         boxes.forEach(b => {
-          console.log("subbing to", b)
           unsub = onSnapshot(b, (snapshot) => {
-            console.log("got snapshot for", b)
             getDocs(collection(db, "boxes", b.id, "recipes")).then(querySnap => {
+              let boxData = snapshot.data()
+              if (boxData === undefined) {
+                return
+              }
               let recipes = new Map(querySnap.docs.map(r => [r.id, r.data() as Recipe]))
-              let box = { recipes, name: snapshot.data()!.name, owners: [] }
-              dispatch({ type: "SET_BOXES", boxes: new Map([[b.id, box as BoxType]]) })
+              let box = { recipes, name: boxData.name, owners: [] }
+              dispatch({ type: "SET_BOXES", payload: new Map([[b.id, box as BoxType]]) })
             })
           })
           unsubscribes.push(unsub)

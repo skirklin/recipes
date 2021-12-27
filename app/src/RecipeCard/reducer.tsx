@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import { RecipeActionType, RecipeStateType } from './context'
 
 export default function recipeReducer(state: RecipeStateType, action: RecipeActionType): RecipeStateType {
@@ -5,20 +6,23 @@ export default function recipeReducer(state: RecipeStateType, action: RecipeActi
     switch (action.type) {
         case 'SET_NAME':
             newState.recipe.name = action.payload; 
-            newState.changed = true
+            newState.changed = true;
             return newState
         case 'SET_INGREDIENTS': 
             newState.recipe.recipeIngredient = action.payload
-            newState.changed = true
+            newState.changed = true;
             return newState
         case 'SET_INSTRUCTIONS':
             newState.recipe.recipeInstructions = action.payload;
-            newState.changed = true
+            newState.changed = true;
             return newState
         case 'SET_DESCRIPTION':
             newState.recipe.description = action.payload;
-            newState.changed = true
+            newState.changed = true;
             return newState
+        case 'RESET_RECIPE':
+            newState.recipe = _.cloneDeep(newState.original);
+            newState.changed = false;
     }
     return newState;
 }

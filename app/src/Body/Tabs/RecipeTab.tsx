@@ -3,6 +3,7 @@ import { useContext } from 'react';
 import { RecipeBoxContext } from '../../context';
 import RecipeCard from '../../RecipeCard/RecipeCard';
 import { RecipePointer } from '../../types';
+import { getRecipe } from '../../utils';
 import { TabType } from '../types';
 
 interface RecipeTabProps {
@@ -25,11 +26,12 @@ export function isRecipeTab(content: TabType) {
 
 export function RecipeTab(props: RecipeTabProps) {
   const { recipePtr } = props;
-  const { state } = useContext(RecipeBoxContext)
-  const { boxId, recipeId } = recipePtr;
-  const recipe = state.boxes.get(boxId)?.recipes.get(recipeId)!
-
+  let { state } = useContext(RecipeBoxContext)
+  let recipe = getRecipe(state, recipePtr)
+  if (recipe === undefined) {
+    return <div>Unable to find recipe.</div>
+  }
   return (
-    <RecipeCard recipe={recipe} />
+    <RecipeCard recipePtr={recipePtr} recipe={recipe} />
   )
 }

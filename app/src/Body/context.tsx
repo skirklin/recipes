@@ -12,7 +12,6 @@ export type ContextType = {
 export function initState(): ViewerStateType {
   let allRecipesTab: AllType = {}
   let key = getAllRecipesTabKey(allRecipesTab)!
-  console.log(key)
   return (
     {
       tabs: new Map([[key, allRecipesTab]]),
