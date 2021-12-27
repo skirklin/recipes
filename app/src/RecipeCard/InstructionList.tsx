@@ -43,13 +43,20 @@ function InstructionList() {
 
   let instructions = state.recipe.recipeInstructions;
 
+  const handleChange = (e: any) => {
+    if (formatInstructionList(instructions) !== e.target.value) {
+      dispatch({ type: "SET_INSTRUCTIONS", payload: strToInstructions(e.target.value) });
+    }
+    setEditable(false)
+  }
+
   if (editable) {
     return (
       <TextareaAutosize
         defaultValue={instructionsToStr(instructions!)}
         autoFocus
         style={{ ...instructionsStyle }}
-        onBlur={(e) => { dispatch({type: "SET_INSTRUCTIONS", payload: strToInstructions(e.target.value)}); setEditable(false) }} />
+        onBlur={handleChange} />
     )
   } else {
     return (

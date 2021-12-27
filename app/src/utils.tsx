@@ -53,7 +53,6 @@ export function ingredientsToStr(ingredients: Recipe["recipeIngredient"]): strin
 }
 
 export function getRecipe(state: RecipeBoxStateType, recipePtr: RecipePointer): Recipe | undefined {
-    console.log({state, recipePtr})
     let box = state.boxes.get(recipePtr.boxId);
     if (box === undefined) {
         return undefined

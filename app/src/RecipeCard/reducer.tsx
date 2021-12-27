@@ -20,9 +20,10 @@ export default function recipeReducer(state: RecipeStateType, action: RecipeActi
             newState.recipe.description = action.payload;
             newState.changed = true;
             return newState
-        case 'RESET_RECIPE':
-            newState.recipe = _.cloneDeep(newState.original);
+        case 'SET_RECIPE':
+            newState.recipe = _.cloneDeep(action.payload);
             newState.changed = false;
+            return newState
     }
     return newState;
 }

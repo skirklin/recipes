@@ -25,11 +25,17 @@ function IngredientList() {
   }
 
   let ingredients = state.recipe.recipeIngredient;
+  const handleChange = (e: any) => {
+    if (formatIngredientList(ingredients) !== e.target.value) {
+      dispatch({ type: "SET_INGREDIENTS", payload: strToIngredients(e.target.value) });
+    }
+    setEditable(false)
+  }
 
   function formatIngredientList(ingredients: Recipe["recipeIngredient"]) {
     let listElts = Array.prototype.map.call(ingredients || [], (ri, id) => <Ingredient key={id}>{ri}</Ingredient>)
     return (
-      <ul style={{...ingredientsStyle, listStylePosition: "outside", listStyleType: "unset"}}>
+      <ul style={{ ...ingredientsStyle, listStylePosition: "outside", listStyleType: "unset" }}>
         {listElts}
       </ul>
     )
@@ -40,7 +46,7 @@ function IngredientList() {
         defaultValue={ingredientsToStr(ingredients!)}
         autoFocus
         style={{ ...ingredientsStyle }}
-        onBlur={(e) => { dispatch({type: "SET_INGREDIENTS", payload: strToIngredients(e.target.value)}); setEditable(false)}} />
+        onBlur={handleChange} />
     )
   } else {
     return (

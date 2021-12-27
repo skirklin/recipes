@@ -1,7 +1,5 @@
-import { useReducer } from 'react';
+import { useContext, useEffect, useReducer } from 'react';
 import styled from 'styled-components';
-import { Recipe } from 'schema-dts';
-import _ from 'lodash';
 
 import { RecipeActionType, RecipeContext, RecipeStateType } from './context';
 import recipeReducer from './reducer';
@@ -14,11 +12,13 @@ import RecipeName from './RecipeName';
 import RecipeDescription from './RecipeDescription';
 import Image from './Image';
 import { RecipePointer } from '../types';
+import { RecipeBoxContext } from '../context';
+import { getRecipe } from '../utils';
+import _ from 'lodash';
 
 
 interface RecipeProps {
   recipePtr: RecipePointer
-  recipe: Recipe
 }
 
 
@@ -37,12 +37,17 @@ const RecipeBody = styled.div`
 `
 
 function RecipeCard(props: RecipeProps) {
+  let recipe = _.cloneDeep(getRecipe(useContext(RecipeBoxContext).state, props.recipePtr)!)
   const [state, dispatch] = useReducer<React.Reducer<RecipeStateType, RecipeActionType>>(recipeReducer, {
     recipePtr: props.recipePtr,
-    recipe: props.recipe,
-    original: _.cloneDeep(props.recipe),
+    recipe: recipe,
     changed: false
   });
+
+  useEffect(
+    () => {console.log("recipe card saw recipe change")},
+    [recipe]
+  )
 
   return (
     <RecipeContext.Provider value={{ state, dispatch }}>

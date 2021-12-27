@@ -4,8 +4,6 @@ import { doc, setDoc } from 'firebase/firestore';
 import { useContext } from 'react';
 import styled from 'styled-components';
 import { db } from '../App';
-import { RecipeBoxContext } from '../context';
-import { getRecipe } from '../utils';
 
 import { RecipeContext } from './context';
 
@@ -15,11 +13,12 @@ const StyledButton = styled(Button)`
 `
 
 function SaveButton() {
-  const { state } = useContext(RecipeContext);
-  const recipe = getRecipe(useContext(RecipeBoxContext).state, state.recipePtr)!
+  const { state, dispatch } = useContext(RecipeContext);
 
-  function save() {
-    setDoc(doc(db, "boxes", state.recipePtr.boxId, "recipes", state.recipePtr.recipeId), recipe)
+  async function save() {
+    let docRef = doc(db, "boxes", state.recipePtr.boxId, "recipes", state.recipePtr.recipeId);
+    dispatch({type: "SET_RECIPE", payload: state.recipe})
+    await setDoc(docRef, state.recipe)
   }
 
   if (state.changed) {

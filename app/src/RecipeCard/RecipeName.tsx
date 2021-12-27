@@ -25,7 +25,12 @@ function RecipeName() {
   const [editable, setEditable] = useState(false);
 
   let name = state.recipe.name!.toString()
-  let handleChange = (e: any) => { dispatch({ type: "SET_NAME", payload: e.target.value }); setEditable(false) }
+  let handleChange = (e: any) => {
+    if (name !== e.target.value) {
+      dispatch({ type: "SET_NAME", payload: e.target.value });
+    }
+    setEditable(false);
+  }
   let link = null;
   if (state.recipe.url) {
     link = <a href={state.recipe.url.toString()}><LinkOutlined /></a>

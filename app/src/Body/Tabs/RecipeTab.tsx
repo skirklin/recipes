@@ -32,6 +32,6 @@ export function RecipeTab(props: RecipeTabProps) {
     return <div>Unable to find recipe.</div>
   }
   return (
-    <RecipeCard recipePtr={recipePtr} recipe={recipe} />
+    <RecipeCard recipePtr={recipePtr} />
   )
 }
