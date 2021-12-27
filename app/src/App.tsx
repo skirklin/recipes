@@ -74,29 +74,36 @@ function App() {
       )
 
       let unsubscribes: Unsubscribe[] = [];
+      // subscription for changes to user
       let unsub = onSnapshot(userRef, (snapshot) => {
+        console.log("got snapshot:", { userRef, snapshot })
         let d = snapshot.data()
         if (d === undefined) {
           return
         }
         let boxes = d!.boxes as DocumentReference[]
+
         boxes.forEach(b => {
-          unsub = onSnapshot(b, (snapshot) => {
-            getDocs(collection(db, "boxes", b.id, "recipes")).then(querySnap => {
-              let boxData = snapshot.data()
-              if (boxData === undefined) {
-                return
-              }
-              let recipes = new Map(querySnap.docs.map(r => [r.id, r.data() as Recipe]))
-              let box = { recipes, name: boxData.name, owners: [] }
-              dispatch({ type: "SET_BOXES", payload: new Map([[b.id, box as BoxType]]) })
+          // subscription for changes to boxes
+          let boxRef = doc(db, "boxes", b.id)
+          let boxRecipesRef = collection(db, "boxes", b.id, "recipes")
+          getDoc(boxRef)
+            .then(boxData => {
+              // subscription for changes to recipes within boxes
+              unsub = onSnapshot(boxRecipesRef, (snapshot) => {
+                console.log("got snapshot:", { boxRecipesRef, snapshot })
+                getDocs(collection(db, "boxes", b.id, "recipes")).then(querySnap => {
+                  let recipes = new Map(snapshot.docs.map(r => [r.id, r.data() as Recipe]))
+                  let box = { recipes, name: boxData.data.name, owners: [] }
+                  dispatch({ type: "SET_BOXES", payload: new Map([[b.id, box as BoxType]]) })
+                })
+              })
+              unsubscribes.push(unsub)
             })
-          })
-          unsubscribes.push(unsub)
         })
       })
       unsubscribes.push(unsub)
-      return () => {console.log("did unsubscribe"); unsubscribes.forEach(unsub => unsub())}
+      return () => { console.log("did unsubscribe"); unsubscribes.forEach(unsub => unsub()) }
     }
     , [user]
   )

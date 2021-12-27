@@ -20,6 +20,12 @@ function RecipeDescription() {
   const { state, dispatch } = useContext(RecipeContext);
 
   let description = (state.recipe.description || "Add a description?").toString();
+  const handleChange = (e: any) => {
+    if (e.target.value !== description) {
+      dispatch({ type: "SET_DESCRIPTION", payload: e.target.value });
+    }
+    setEditable(false)
+  }
 
   if (editable) {
     return (
@@ -27,7 +33,8 @@ function RecipeDescription() {
         defaultValue={description}
         autoFocus
         style={{ display: "inline-flex", fontStyle: "italic", width: "60%", fontFamily: "sans-serif", fontSize: "16px" }}
-        onBlur={(e) => { dispatch({ type: "SET_DESCRIPTION", payload: e.target.value }); setEditable(false) }} />
+        onBlur={handleChange}
+      />
     )
   } else {
     return (

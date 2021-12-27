@@ -1,4 +1,3 @@
-import _ from 'lodash';
 import { createContext } from 'react';
 import { Recipe } from 'schema-dts';
 import { RecipePointer } from '../types';
@@ -6,7 +5,6 @@ import { RecipePointer } from '../types';
 export type RecipeStateType = {
   recipePtr: RecipePointer,
   recipe: Recipe,
-  original: Recipe,
   changed: boolean,
 }
 
@@ -21,7 +19,6 @@ export function initState(): RecipeStateType {
   return { 
     recipePtr: {recipeId: "", boxId: ""},
     recipe: r, 
-    original: _.cloneDeep(r), 
     changed: false,
   }
 }
