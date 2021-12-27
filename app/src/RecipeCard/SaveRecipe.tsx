@@ -1,53 +1,29 @@
+import { SaveOutlined } from '@ant-design/icons';
+import { Button } from 'antd';
+import { doc, setDoc } from 'firebase/firestore';
 import { useContext } from 'react';
 import styled from 'styled-components';
+import { db } from '../App';
+import { RecipeBoxContext } from '../context';
+import { getRecipe } from '../utils';
 
 import { RecipeContext } from './context';
 
-const StyledButton = styled.button`
+const StyledButton = styled(Button)`
   background-color: green;
-  display: inline-flex;
+  display: inline;
 `
 
 function SaveButton() {
   const { state } = useContext(RecipeContext);
-  let recipe = state.recipe;
-  let textFile: string | null;
-
-  function makeTextFile(text: string) {
-    var data = new Blob([text], { type: 'application/ld+json' });
-
-    // If we are replacing a previously generated file we need to
-    // manually revoke the object URL to avoid memory leaks.
-    if (textFile !== null) {
-      window.URL.revokeObjectURL(textFile);
-    }
-
-    textFile = window.URL.createObjectURL(data);
-
-    // returns a URL you can use as a href
-    return textFile;
-  };
+  const recipe = getRecipe(useContext(RecipeBoxContext).state, state.recipePtr)!
 
   function save() {
-    var downloadLink = document.createElement("a");
-    downloadLink.download = recipe.name + ".json"
-    downloadLink.innerHTML = "Download File";
-
-    // Create a "file" to download
-    downloadLink.href = makeTextFile(JSON.stringify(recipe, null, 2))
-    document.body.appendChild(downloadLink);
-
-    // wait for the link to be added to the document
-    window.requestAnimationFrame(function () {
-      var event = new MouseEvent('click');
-      downloadLink.dispatchEvent(event); // synthetically click on it
-      document.body.removeChild(downloadLink);
-    });
-
+    setDoc(doc(db, "boxes", state.recipePtr.boxId, "recipes", state.recipePtr.recipeId), recipe)
   }
 
   if (state.changed) {
-    return <StyledButton onClick={save}>Save</StyledButton>
+    return <StyledButton icon={<SaveOutlined />} onClick={save}>Save</StyledButton>
   } else {
     return null
   }

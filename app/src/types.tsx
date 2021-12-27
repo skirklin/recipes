@@ -33,13 +33,8 @@ export type RecipeBoxStateType = {
 }
 
 export type RecipeBoxActionType = {
-  /// TODO: prune this
   type: string
-  key?: string
-  recipe?: Recipe
-  recipes?: Map<string,Recipe>
   recipeId?: string
-  box?: BoxType
-  boxes?: Map<string,BoxType>
   boxId?: string
+  payload: any
 }

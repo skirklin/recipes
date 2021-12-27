@@ -1,21 +1,18 @@
-import { useState } from 'react';
 import styled from 'styled-components';
-import { Button, Modal } from 'antd';
-// import Modal from 'react-modal';
 
-import { PlusOutlined } from '@ant-design/icons';
-import AddRecipes from './AddRecipes'
+import { Button } from 'antd';
 
 import { getAuth, signOut } from 'firebase/auth';
+import AddBoxModal from './AddBox';
+import AddRecipesModal from './AddRecipes'
+import CreateBoxModal from './CreateBox'
+import { LogoutOutlined } from '@ant-design/icons';
 
-
-const SignOutButton = styled.button`
+const LogoutButton = styled(Button)`
   margin: 0px 5px;
-  outline: none;
 `
 
 const SignOutArea = styled.div`
-  display: inline-block;
   float: right;
   padding: 5px;
   margin: 5px;
@@ -29,36 +26,40 @@ const Container = styled.div`
 
 const Title = styled.h1`
   margin: 0px;
-  margin-bottom: 20px;
   display: inline-block;
 `
 
-const StyledButton = styled(Button)`
-  float: right;
+const SearchArea = styled.div`
+  padding: 5px;
+  margin: 5px;
   display: inline-block;
 `
 
 
 function Header() {
-  const [visible, setIsModalVisible] = useState(false);
-
   let title = <Title>Recipe box</Title>
   return (
     <Container>
-      {title}
-      <SignOutArea>
-        <span>
-          Welcome {getAuth().currentUser?.displayName}
-          <SignOutButton onClick={() => signOut(getAuth())}>Sign-out</SignOutButton>
-        </span>
-      </SignOutArea>
+      <div>
 
-      <StyledButton onClick={() => setIsModalVisible(true)} icon={<PlusOutlined />}>Add recipes</StyledButton>
-      <label>Search: </label>
-      <input type="text" onChange={e => console.log(e)} />
-      <Modal visible={visible} onCancel={() => setIsModalVisible(false)} onOk={() => setIsModalVisible(false)}>
-        <AddRecipes />
-      </Modal>
+        {title}
+        <SignOutArea>
+          <span>
+            Welcome {getAuth().currentUser?.displayName}
+            <LogoutButton icon={<LogoutOutlined />} onClick={() => signOut(getAuth())}>Logout</LogoutButton>
+          </span>
+        </SignOutArea>
+      </div>
+      <div>
+        <SearchArea>
+          <label>Search: </label>
+          <input type="text" onChange={e => console.log(e)} />
+        </SearchArea>
+
+        <AddRecipesModal />
+        <AddBoxModal />
+        <CreateBoxModal />
+      </div>
     </Container >
   );
 }

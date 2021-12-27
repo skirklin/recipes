@@ -1,6 +1,7 @@
 /* helper functions for converting between structured data and text. */
 import _ from 'lodash';
 import { Recipe } from "schema-dts"
+import { RecipeBoxStateType, RecipePointer } from './types';
 
 
 export function strToIngredients(str: string): Recipe["recipeIngredient"] {
@@ -49,4 +50,17 @@ export function instructionsToStr(instructions: Recipe["recipeInstructions"]): s
 export function ingredientsToStr(ingredients: Recipe["recipeIngredient"]): string {
     let steps = Array.prototype.map.call(ingredients, x => x.toString());
     return steps.join("\n")
+}
+
+export function getRecipe(state: RecipeBoxStateType, recipePtr: RecipePointer): Recipe | undefined {
+    console.log({state, recipePtr})
+    let box = state.boxes.get(recipePtr.boxId);
+    if (box === undefined) {
+        return undefined
+    }
+    let recipe = box.recipes.get(recipePtr.recipeId)
+    if (recipe === undefined) {
+        return undefined
+    }
+    return recipe
 }
