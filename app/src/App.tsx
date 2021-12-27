@@ -96,7 +96,7 @@ function App() {
         })
       })
       unsubscribes.push(unsub)
-      return () => unsubscribes.forEach(unsub => unsub())
+      return () => {console.log("did unsubscribe"); unsubscribes.forEach(unsub => unsub())}
     }
     , [user]
   )
