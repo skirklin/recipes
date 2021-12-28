@@ -38,7 +38,7 @@ connectFirestoreEmulator(db, 'localhost', 8080);
 Modal.setAppElement('#root'); // for accessibility. See: https://reactcommunity.org/react-modal/accessibility/
 
 const Background = styled.div`
-  background-color: var(--gainsboro)
+  background-color: var(--mint-cream)
 `
 
 function App() {

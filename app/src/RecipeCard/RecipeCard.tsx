@@ -5,6 +5,7 @@ import { recipeReducer, RecipeActionType, RecipeContext, RecipeStateType } from 
 import SaveButton from './SaveRecipe';
 import DownloadButton from './DownloadRecipe';
 import ForkButton from './ForkRecipe';
+import DeleteButton from './DeleteRecipe';
 import ClearButton from './ClearChanges';
 import InstructionList from './InstructionList';
 import IngredientList from './IngredientList';
@@ -29,13 +30,18 @@ const Card = styled.div`
   margin: 15px;
   font-family: sans-serif;
   outline: solid;
-  padding: 5px 15px;
   border-radius: 5px; /* 5px rounded corners */
   box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
 `
 
 const RecipeBody = styled.div`
   margin: 5px
+`
+
+const IndexCardLine = styled.hr`
+  background-color: var(--cinnabar);
+  border-width: 0px;
+  height: 1px;
 `
 
 function RecipeCard(props: RecipeProps) {
@@ -50,16 +56,18 @@ function RecipeCard(props: RecipeProps) {
   return (
     <RecipeContext.Provider value={{ state, dispatch }}>
       <Card>
-        <Image />
-        <div>
+        <div style={{padding: "2px"}}>
           <RecipeName />
+          <DeleteButton />
           <DownloadButton />
           <ForkButton />
         </div>
+        <IndexCardLine />
         <div>
           <SaveButton />
           <ClearButton />
         </div>
+        <Image />
         <RecipeDescription />
         <RecipeBody>
           <IngredientList />

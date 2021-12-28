@@ -14,11 +14,11 @@ display: inline-block;
 
 
 function CreateBoxModal() {
-  const { readonly } = useContext(Context).state
+  const { writeable } = useContext(Context).state
   const [isVisible, setIsVisible] = useState(false)
   const [newBoxName, setNewBoxName] = useState("")
 
-  if (readonly) { 
+  if (!writeable) { 
     return null
   }
 

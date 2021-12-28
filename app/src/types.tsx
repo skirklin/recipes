@@ -45,7 +45,7 @@ export type RecipeBoxStateType = {
   tabs: Map<string,TabType>
   activeTab: string
   activeBox: string | undefined
-  readonly: boolean
+  writeable: boolean
 }
 
 export type RecipeBoxActionType = {

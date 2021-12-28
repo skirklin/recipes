@@ -19,7 +19,7 @@ export function initState(): RecipeBoxStateType {
       activeBox: undefined,
       tabs: new Map([[key, allRecipesTab]]),
       activeTab: key,
-      readonly: true,
+      writeable: false,
     }
   )
 }
@@ -81,7 +81,7 @@ export function recipeBoxReducer(state: RecipeBoxStateType, action: RecipeBoxAct
     case 'SET_ACTIVE_TAB':
       return { ...state, activeTab: action.payload as string }
     case 'SET_READONLY':
-      return { ...state, readonly: action.payload as boolean }
+      return { ...state, writeable: action.payload as boolean }
     default:
       return state
   }

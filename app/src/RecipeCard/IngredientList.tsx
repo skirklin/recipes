@@ -7,7 +7,7 @@ import { RecipeContext } from './context';
 import { Context } from '../context';
 
 
-const Ingredient = styled.ul`
+const Ingredient = styled.li`
   padding-bottom: 3px;
 `
 
@@ -19,21 +19,21 @@ function IngredientList() {
 
   const setEditable = (value: boolean) => {
     console.log("want to set editable")
-    if (!rbState.readonly) {
+    if (rbState.writeable) {
       console.log("actually setting editable")
       setEditablePrimitive(value)
     } else {
-      console.log(`but couldn't because readonly ${rbState.readonly}`)
+      console.log(`but couldn't because writeable ${rbState.writeable}`)
     }
   }
 
   const ingredientsStyle = {
     outline: "none",
-    padding: "5px",
-    margin: "0px 0px 15px 25px",
+    padding: "10px",
+    margin: "0px 0px 0px 20px",
     backgroundColor: "lightyellow",
     display: "inline-block",
-    width: "50%",
+    width: "60%",
   }
 
   let ingredients = state.recipe.recipeIngredient;

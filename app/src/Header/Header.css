@@ -1,0 +1,7 @@
+.readonly-switch-writeable {
+    background-color: var(--cinnabar)
+}
+
+.readonly-switch-readonly {
+    color: black;
+}

@@ -9,6 +9,7 @@ import CreateBoxModal from './CreateBox'
 import { LogoutOutlined } from '@ant-design/icons';
 import { useContext } from 'react';
 import { Context } from '../context';
+import './Header.css';
 
 const LogoutButton = styled(Button)`
   margin: 0px 5px;
@@ -19,7 +20,7 @@ const SignOutArea = styled.div`
 `
 
 const Container = styled.div`
-  background-color: var(--gainsboro);
+  background-color: var(--mint-cream);
   padding: 10px;
 `
 
@@ -28,15 +29,10 @@ const Title = styled.h1`
   display: inline-block;
 `
 
-const SearchArea = styled.div`
-  padding: 5px;
-  margin: 5px;
-  display: inline-block;
-`
-
 
 function Header() {
-  const { dispatch } = useContext(Context);
+  const { state, dispatch } = useContext(Context);
+  const { writeable } = state;
 
   let title = <Title>Recipe box</Title>
   return (
@@ -44,29 +40,22 @@ function Header() {
       <div>
         {title}
         <SignOutArea>
+          <Switch
+            className={writeable ? 'readonly-switch-writeable' : 'readonly-switch-readonly'}
+            style={{ margin: "7px" }}
+            onChange={e => dispatch({ type: "SET_READONLY", payload: e })}
+            checkedChildren="Edit-mode"
+            unCheckedChildren="Read-only"
+          />
           <span>
             Welcome {getAuth().currentUser?.displayName}
             <LogoutButton icon={<LogoutOutlined />} onClick={() => signOut(getAuth())}>Logout</LogoutButton>
           </span>
         </SignOutArea>
       </div>
-      <div>
-        <SearchArea>
-          <label>Search: </label>
-          <input type="text" onChange={e => console.log(e)} />
-        </SearchArea>
-
-        <AddRecipesModal />
-        <AddBoxModal />
-        <CreateBoxModal />
-        <Switch
-          style={{display:"inline-block", float: "right"}}
-          defaultChecked
-          onChange={e => dispatch({ type: "SET_READONLY", payload: e })}
-          checkedChildren="Readonly"
-          unCheckedChildren="Editable"
-        />
-      </div>
+      <AddRecipesModal />
+      <AddBoxModal />
+      <CreateBoxModal />
     </Container >
   );
 }
