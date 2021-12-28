@@ -8,10 +8,10 @@ import 'antd/dist/antd.css'; // or 'antd/dist/antd.less'
 
 import Body from './Body/Body';
 import { RecipeBoxStateType, RecipeBoxActionType, BoxType } from './types';
-import { RecipeBoxContext, initState } from './context';
-import { recipeBoxReducer } from './reducer';
+import { Context, initState, recipeBoxReducer } from './context';
 import Header from './Header/Header';
 import { Recipe } from 'schema-dts';
+import styled from 'styled-components';
 
 
 // Configure Firebase.
@@ -36,6 +36,10 @@ export const db = getFirestore();
 connectFirestoreEmulator(db, 'localhost', 8080);
 
 Modal.setAppElement('#root'); // for accessibility. See: https://reactcommunity.org/react-modal/accessibility/
+
+const Background = styled.div`
+  background-color: var(--gainsboro)
+`
 
 function App() {
 
@@ -76,7 +80,6 @@ function App() {
       let unsubscribes: Unsubscribe[] = [];
       // subscription for changes to user
       let unsub = onSnapshot(userRef, (snapshot) => {
-        console.log("got snapshot:", { userRef, snapshot })
         let d = snapshot.data()
         if (d === undefined) {
           return
@@ -91,10 +94,9 @@ function App() {
             .then(boxData => {
               // subscription for changes to recipes within boxes
               unsub = onSnapshot(boxRecipesRef, (snapshot) => {
-                console.log("got snapshot:", { boxRecipesRef, snapshot })
                 getDocs(collection(db, "boxes", b.id, "recipes")).then(querySnap => {
                   let recipes = new Map(snapshot.docs.map(r => [r.id, r.data() as Recipe]))
-                  let box = { recipes, name: boxData.data.name, owners: [] }
+                  let box = { recipes, name: boxData.data()!.name, owners: [] }
                   dispatch({ type: "SET_BOXES", payload: new Map([[b.id, box as BoxType]]) })
                 })
               })
@@ -103,16 +105,18 @@ function App() {
         })
       })
       unsubscribes.push(unsub)
-      return () => { console.log("did unsubscribe"); unsubscribes.forEach(unsub => unsub()) }
+      return () => { console.log("Unsubscribed from all."); unsubscribes.forEach(unsub => unsub()) }
     }
     , [user]
   )
 
   return (
-    <RecipeBoxContext.Provider value={recipesValue}>
-      <Header />
-      <Body />
-    </RecipeBoxContext.Provider>
+    <Context.Provider value={recipesValue}>
+      <Background>
+        <Header />
+        <Body />
+      </Background>
+    </Context.Provider>
   );
 }
 

@@ -4,6 +4,7 @@ import TextareaAutosize from 'react-autosize-textarea';
 import { Recipe } from 'schema-dts';
 import { ingredientsToStr, strToIngredients } from '../utils';
 import { RecipeContext } from './context';
+import { Context } from '../context';
 
 
 const Ingredient = styled.ul`
@@ -12,8 +13,19 @@ const Ingredient = styled.ul`
 
 
 function IngredientList() {
-  const [editable, setEditable] = useState(false);
+  const [editable, setEditablePrimitive] = useState(false);
   const { state, dispatch } = useContext(RecipeContext);
+  const rbState = useContext(Context).state;
+
+  const setEditable = (value: boolean) => {
+    console.log("want to set editable")
+    if (!rbState.readonly) {
+      console.log("actually setting editable")
+      setEditablePrimitive(value)
+    } else {
+      console.log(`but couldn't because readonly ${rbState.readonly}`)
+    }
+  }
 
   const ingredientsStyle = {
     outline: "none",

@@ -1,6 +1,7 @@
 import { useContext, useState } from 'react';
 import TextareaAutosize from 'react-autosize-textarea';
 import styled from 'styled-components';
+import { Context } from '../context';
 
 import { RecipeContext } from './context';
 
@@ -16,8 +17,16 @@ const Description = styled.p`
 `
 
 function RecipeDescription() {
-  const [editable, setEditable] = useState(false);
+  const [editable, setEditablePrimitive] = useState(false);
   const { state, dispatch } = useContext(RecipeContext);
+  const rbState = useContext(Context).state;
+
+  const setEditable = (value: boolean) => {
+    if (!rbState.readonly) {
+      setEditablePrimitive(value)
+    }
+  }
+
 
   let description = (state.recipe.description || "Add a description?").toString();
   const handleChange = (e: any) => {

@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import { useContext } from 'react';
-import { RecipeBoxContext } from '../../context';
-import { AllType, RecipePointer } from '../../types';
+import { Context } from '../../context';
+import { AllType, RecipeTabType } from '../../types';
 import RecipeSummary from '../RecipeSummary';
 import { getRecipeTabKey } from './RecipeTab';
 
@@ -18,14 +18,14 @@ export function AllRecipesTabName() {
 }
 
 export function AllRecipesTab() {
-    const { state } = useContext(RecipeBoxContext)
-    let recipePtrs: RecipePointer[] = []
+    const { state } = useContext(Context)
+    let recipePtrs: RecipeTabType[] = []
     for (let [boxId, box] of state.boxes.entries()) {
         for (let recipeId of box.recipes.keys()) {
-            recipePtrs.push({ boxId, recipeId })
+            recipePtrs.push({ boxId: boxId!, recipeId })
         }
     }
-    let summaries = recipePtrs.map(ptr => <RecipeSummary key={getRecipeTabKey(ptr)} recipePointer={ptr} />)
+    let summaries = recipePtrs.map(ptr => <RecipeSummary key={getRecipeTabKey(ptr)} {...ptr} />)
 
     return (
         <ol>

@@ -1,15 +1,13 @@
 import _ from 'lodash';
-import { RecipePointer, SearchResultType } from '../../types';
+import { RecipePointer, SearchResultTabType, TabType  } from '../../types';
 import RecipeSummary from '../RecipeSummary';
-import { TabType } from '../types';
-
 
 interface SearchResultProps {
     recipePtrs: RecipePointer[]
     queryString: string
 }
 
-export function getSearchResultKey(content: SearchResultType) {
+export function getSearchResultKey(content: SearchResultTabType) {
     return content.queryString
 }
 
@@ -25,7 +23,7 @@ export function isSearchResultTab(content: TabType) {
 
 export function SearchResultTab(props: SearchResultProps) {
     const { queryString, recipePtrs } = props;
-    let summaries = recipePtrs.map((ptr) => <RecipeSummary recipePointer={ptr} />)
+    let summaries = recipePtrs.map((ptr) => <RecipeSummary {...ptr} />)
     return (
         <div>
             <p>Search results for: {queryString}</p>

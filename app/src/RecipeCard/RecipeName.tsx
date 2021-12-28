@@ -2,6 +2,7 @@ import React, { useContext, useState } from 'react';
 import { RecipeContext } from './context';
 import styled from 'styled-components';
 import { LinkOutlined } from '@ant-design/icons';
+import { Context } from '../context';
 
 
 const Title = styled.h1`
@@ -21,8 +22,17 @@ const EditableTitle = styled.input`
 `
 
 function RecipeName() {
+  const [editable, setEditablePrimitive] = useState(false);
   const { state, dispatch } = useContext(RecipeContext);
-  const [editable, setEditable] = useState(false);
+  const rbState = useContext(Context).state;
+
+  const setEditable = (value: boolean) => {
+    if (!rbState.readonly) {
+      setEditablePrimitive(value)
+    }
+  }
+
+
 
   let name = state.recipe.name!.toString()
   let handleChange = (e: any) => {

@@ -1,11 +1,11 @@
 import { Recipe } from 'schema-dts';
-import { Button, Modal, Upload } from 'antd';
+import { Button, Modal, Upload, Select } from 'antd';
 import { FileAddOutlined, UploadOutlined } from '@ant-design/icons';
 import { addDoc, collection } from 'firebase/firestore'
 
 import { db } from '../App';
 import { useContext, useState } from 'react';
-import { RecipeBoxContext } from '../context';
+import { Context } from '../context';
 import styled from 'styled-components';
 
 const ModalButton = styled(Button)`
@@ -25,39 +25,60 @@ const UploadButton = styled(Button)`
   font-weight: bold;
 `
 
+const createNewRecipe = () => ({
+  "@type": "Recipe",
+  "name": "New recipe",
+  "recipeInstructions": [{ "@type": "HowToStep", text: "Add instructions" }],
+  "recipeIngredient": ["Add ingredients"],
+  "description": "Add description",
+})
 
 function AddRecipesModal() {
   const [isVisible, setIsVisible] = useState(false)
   const [activeBox, setActiveBox] = useState("")
-  const { state } = useContext(RecipeBoxContext)
+  const { state, dispatch } = useContext(Context)
 
   const interceptUpload = async (options: any) => {
     if (options.file.type === "application/json") {
       let text = await options.file.text()
       let jsonobj = JSON.parse(text) as Recipe
-      addDoc(collection(db, "boxes", activeBox!, "recipes"), jsonobj).then(e => console.log("uploaded", jsonobj))
+      let recipesRef = collection(db, "boxes", activeBox!, "recipes");
+      await addDoc(recipesRef, jsonobj)
+      setIsVisible(false);
     }
   };
+
+  const handleCreateNew = () => {
+    let newRecipe = createNewRecipe();
+    dispatch({ type: "APPEND_TAB", payload: { boxId: activeBox, recipe: newRecipe } });
+    setIsVisible(false);
+  }
 
   let boxNames = [];
   for (let k of state.boxes.keys()) {
     boxNames.push(k)
   }
-  let boxOptions = boxNames.map(bn => <option key={bn} value={bn}>{state.boxes.get(bn)!.name}</option>)
+  let boxOptions;
+  if (boxNames.length > 0) {
+    boxOptions = boxNames.map(bn => ({ label: state.boxes.get(bn)!.name, value: bn }))
+    if (activeBox === "") {
+      setActiveBox(boxOptions[0].value)
+    }
+  } else {
+    boxOptions = [{ label: "", value: "" }]
+  }
   return (
     <>
       <Modal footer={null} visible={isVisible} onCancel={() => setIsVisible(false)} onOk={() => setIsVisible(false)}>
         <div style={{ margin: "5px" }}>
           <label>Add recipes to: </label>
-          <select defaultValue={boxNames[0]} onChange={e => {console.log(e); setActiveBox(e.target.value)}}>
-            {boxOptions}
-          </select>
+          <Select value={activeBox} onChange={e => { console.log(e); setActiveBox(e) }} options={boxOptions} />
         </div>
         <div>
-          <Upload multiple showUploadList={false} customRequest={interceptUpload} disabled={activeBox === undefined}>
+          <Upload multiple showUploadList={false} customRequest={interceptUpload} disabled={activeBox === ""}>
             <UploadButton icon={<UploadOutlined />}>Upload recipes</UploadButton>
           </Upload>
-          <CreateButton icon={<FileAddOutlined />}>Create new</CreateButton>
+          <CreateButton onClick={handleCreateNew} icon={<FileAddOutlined />}>Create new</CreateButton>
         </div>
       </Modal >
       <ModalButton onClick={() => setIsVisible(true)} icon={<FileAddOutlined />}>Add recipes</ModalButton>
