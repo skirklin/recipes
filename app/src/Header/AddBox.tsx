@@ -3,11 +3,12 @@ import { InboxOutlined } from '@ant-design/icons';
 import { arrayUnion, collection, doc, getDoc, getDocs, updateDoc } from 'firebase/firestore'
 
 import { db } from '../App';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { BoxType } from '../types'
 import styled from 'styled-components';
 import { getAuth } from 'firebase/auth';
 import { OptionsType } from 'rc-select/lib/interface';
+import { Context } from '../context';
 
 const StyledButton = styled(Button)`
 display: inline-block;
@@ -15,6 +16,7 @@ display: inline-block;
 
 
 function AddBoxModal() {
+  const { readonly } = useContext(Context).state
   const [isVisible, setIsVisible] = useState(false)
   const [boxes, setBoxes] = useState(new Map<string, BoxType>())
   const [selectedBox, setSelectedBox] = useState<string>()
@@ -31,6 +33,11 @@ function AddBoxModal() {
 
     fetchBoxes()
   }, [])
+
+  if (readonly) { 
+    return null
+  }
+
 
   const handleOk = async () => {
     let user = getAuth().currentUser

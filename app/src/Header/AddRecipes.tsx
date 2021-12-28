@@ -37,6 +37,7 @@ function AddRecipesModal() {
   const [isVisible, setIsVisible] = useState(false)
   const [activeBox, setActiveBox] = useState("")
   const { state, dispatch } = useContext(Context)
+  const { readonly } = useContext(Context).state
 
   const interceptUpload = async (options: any) => {
     if (options.file.type === "application/json") {
@@ -52,6 +53,10 @@ function AddRecipesModal() {
     let newRecipe = createNewRecipe();
     dispatch({ type: "APPEND_TAB", payload: { boxId: activeBox, recipe: newRecipe } });
     setIsVisible(false);
+  }
+
+  if (readonly) { 
+    return null
   }
 
   let boxNames = [];

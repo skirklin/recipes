@@ -32,9 +32,9 @@ function RecipeName() {
     }
   }
 
-
-
   let name = state.recipe.name!.toString()
+  let box = rbState.boxes.get(state.boxId!);
+  let boxName = box === undefined ? "" : box.name
   let handleChange = (e: any) => {
     if (name !== e.target.value) {
       dispatch({ type: "SET_NAME", payload: e.target.value });
@@ -51,13 +51,13 @@ function RecipeName() {
         size={name.length}
         defaultValue={name}
         autoFocus
-        onKeyUp={(e) => { if (e.code === "Escape") { handleChange(e) } }}
+        onKeyUp={(e) => { if (e.code === "Escape" || e.code === "Enter") { handleChange(e) } }}
         onBlur={handleChange} />
     )
   } else {
     return (
       <Title onDoubleClick={() => setEditable(true)}>
-        {name}
+        {name} <span style={{fontStyle: 'italic', marginLeft: "3px"}}>({boxName})</span>
         {link}
       </Title>
     )

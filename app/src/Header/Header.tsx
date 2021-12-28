@@ -16,8 +16,6 @@ const LogoutButton = styled(Button)`
 
 const SignOutArea = styled.div`
   float: right;
-  padding: 5px;
-  margin: 5px;
 `
 
 const Container = styled.div`
@@ -62,6 +60,7 @@ function Header() {
         <AddBoxModal />
         <CreateBoxModal />
         <Switch
+          style={{display:"inline-block", float: "right"}}
           defaultChecked
           onChange={e => dispatch({ type: "SET_READONLY", payload: e })}
           checkedChildren="Readonly"
