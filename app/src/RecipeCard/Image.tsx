@@ -16,7 +16,7 @@ export default function Image() {
     /* @ts-expect-error */
     if (image.url !== undefined) {
       /* @ts-expect-error */
-      return <img src={image.url.toString()} alt="original" style={{ width: "20%", padding: "15px", float: "left" }} />
+      return <img src={image.url.toString()} alt="original" style={{ maxWidth: "30%", padding: "15px", float: "right" }} />
     }
   }
   return null

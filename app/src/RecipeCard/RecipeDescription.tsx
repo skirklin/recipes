@@ -6,13 +6,13 @@ import { Context } from '../context';
 import { RecipeContext } from './context';
 
 
-const Description = styled.p`
+const Description = styled.div`
   font-style: italic;
   display: inline-flex;
   font-family: sans-serif;
   font-size: 16px;
   padding: 0px;
-  margin: 0px;
+  margin: 0px 20px;
   width: 60%;
 `
 
@@ -22,13 +22,13 @@ function RecipeDescription() {
   const rbState = useContext(Context).state;
 
   const setEditable = (value: boolean) => {
-    if (!rbState.readonly) {
+    if (rbState.writeable) {
       setEditablePrimitive(value)
     }
   }
 
 
-  let description = (state.recipe.description || "Add a description?").toString();
+  let description = state.recipe.description
   const handleChange = (e: any) => {
     if (e.target.value !== description) {
       dispatch({ type: "SET_DESCRIPTION", payload: e.target.value });
@@ -36,13 +36,21 @@ function RecipeDescription() {
     setEditable(false)
   }
 
+  let props;
+  if (description !== undefined) {
+    props = {defaultValue: description.toString()}
+  } else {
+    props = {}
+  }
+
   if (editable) {
     return (
       <TextareaAutosize
-        defaultValue={description}
+        placeholder="Add a description?"
         autoFocus
         style={{ display: "inline-flex", fontStyle: "italic", width: "60%", fontFamily: "sans-serif", fontSize: "16px" }}
         onBlur={handleChange}
+        {...props}
       />
     )
   } else {

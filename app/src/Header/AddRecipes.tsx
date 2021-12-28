@@ -37,7 +37,7 @@ function AddRecipesModal() {
   const [isVisible, setIsVisible] = useState(false)
   const [activeBox, setActiveBox] = useState("")
   const { state, dispatch } = useContext(Context)
-  const { readonly } = useContext(Context).state
+  const { writeable } = useContext(Context).state
 
   const interceptUpload = async (options: any) => {
     if (options.file.type === "application/json") {
@@ -55,7 +55,7 @@ function AddRecipesModal() {
     setIsVisible(false);
   }
 
-  if (readonly) { 
+  if (!writeable) { 
     return null
   }
 

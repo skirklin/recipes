@@ -5,13 +5,17 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  overflow-y: scroll; /* Show vertical scrollbar */
+  
 
     /* CSS HEX */
-  --russian-green: #678d58ff;
-  --spanish-blue: #246eb9ff;
-  --melon: #ffa69eff;
-  --gainsboro: #d1dedeff;
-  --charcoal: #373f47ff;
+    --jet: #343330ff;
+    --cinnabar: #e94f37ff;
+    --lavender-gray: #bfbccbff;
+    --pale-spring-bud: #f4f1bbff;
+    --mint-cream: #eff9f0ff;
+    --verdigris: #2ca6a4ff;
+    --selective-yellow: #fcba04ff;
 }
 
 code {

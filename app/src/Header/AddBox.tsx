@@ -16,7 +16,7 @@ display: inline-block;
 
 
 function AddBoxModal() {
-  const { readonly } = useContext(Context).state
+  const { writeable } = useContext(Context).state
   const [isVisible, setIsVisible] = useState(false)
   const [boxes, setBoxes] = useState(new Map<string, BoxType>())
   const [selectedBox, setSelectedBox] = useState<string>()
@@ -34,7 +34,7 @@ function AddBoxModal() {
     fetchBoxes()
   }, [])
 
-  if (readonly) { 
+  if (!writeable) { 
     return null
   }
 
@@ -61,7 +61,7 @@ function AddBoxModal() {
       <Modal visible={isVisible} onOk={handleOk} onCancel={() => setIsVisible(false)}>
         <div>
           <label>Add existing box to your collection:</label>
-          <Select value={selectedBox} onChange={setSelectedBox} options={boxOptions} />
+          <Select style={{width: "300px"}} value={selectedBox} onChange={setSelectedBox} options={boxOptions} />
         </div>
       </Modal >
       <StyledButton onClick={() => setIsVisible(true)} icon={<InboxOutlined />}>Add box</StyledButton>

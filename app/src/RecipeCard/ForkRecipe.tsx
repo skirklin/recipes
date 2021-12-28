@@ -16,7 +16,7 @@ const StyledButton = styled(Button)`
 
 function ForkRecipe() {
   const rbCtx = useContext(Context)
-  const { readonly } = rbCtx.state;
+  const { writeable } = rbCtx.state;
   const { state } = useContext(RecipeContext)
   const [isModalVisible, setIsModalVisible] = useState(false)
   const [tgtBox, setTgtBox] = useState<string | undefined>(undefined)
@@ -45,7 +45,7 @@ function ForkRecipe() {
     box: tgtBox!,
   }
 
-  if (!readonly) {
+  if (writeable) {
     return (
       <SelectBoxContext.Provider value={contextValue}>
         <StyledButton icon={<ForkOutlined />} onClick={() => setIsModalVisible(true)} />

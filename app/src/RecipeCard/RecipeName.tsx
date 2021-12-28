@@ -9,6 +9,8 @@ const Title = styled.h1`
   font-size: 2em;
   outline: none;
   display: inline-flex;
+  padding: 20px 0px 0px 20px;
+  margin-bottom: 0px;
   `
 
 const EditableTitle = styled.input`
@@ -16,8 +18,7 @@ const EditableTitle = styled.input`
   font-weight: bold;
   font-family: sans-serif;
   display: inline-flex;
-  margin: 15px;
-  padding: 5px 15px;
+  padding: 5px   padding: 20px 0px 0px 20px;
   outline: none;
 `
 
@@ -27,7 +28,7 @@ function RecipeName() {
   const rbState = useContext(Context).state;
 
   const setEditable = (value: boolean) => {
-    if (!rbState.readonly) {
+    if (rbState.writeable) {
       setEditablePrimitive(value)
     }
   }
@@ -56,7 +57,7 @@ function RecipeName() {
     )
   } else {
     return (
-      <Title onDoubleClick={() => setEditable(true)}>
+      <Title onDoubleClick={() => setEditable(true)} style={{width: '90%'}}>
         {name} <span style={{fontStyle: 'italic', marginLeft: "3px"}}>({boxName})</span>
         {link}
       </Title>

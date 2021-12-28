@@ -9,8 +9,8 @@ import { Context } from '../context';
 
 
 const RecipeStepsList = styled.ol`
-  margin: 15px;
-  display: inline-block;
+  margin: 20px;
+  padding: 20px;
 `
 
 const RecipeStep = styled.li`
@@ -24,7 +24,7 @@ function InstructionList() {
   const rbState = useContext(Context).state;
 
   const setEditable = (value: boolean) => {
-    if (!rbState.readonly) {
+    if (rbState.writeable) {
       setEditablePrimitive(value)
     }
   }
