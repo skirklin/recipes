@@ -22,7 +22,7 @@ function getUniqueId(rcp: Recipe) {
 
 
 export function getRecipeTabKey(content: RecipeTabType) {
-  if (content.recipe !== undefined) {
+  if (content.recipeId === undefined && content.recipe !== undefined) {
     let id = getUniqueId(content.recipe)
     return `uniqueId=${id.toString()}`
   }

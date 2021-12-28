@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import { recipeReducer, RecipeActionType, RecipeContext, RecipeStateType } from './context';
 import SaveButton from './SaveRecipe';
 import DownloadButton from './DownloadRecipe';
+import ForkButton from './ForkRecipe';
 import ClearButton from './ClearChanges';
 import InstructionList from './InstructionList';
 import IngredientList from './IngredientList';
@@ -53,6 +54,7 @@ function RecipeCard(props: RecipeProps) {
         <div>
           <RecipeName />
           <DownloadButton />
+          <ForkButton />
         </div>
         <div>
           <SaveButton />

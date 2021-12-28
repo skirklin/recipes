@@ -1,11 +1,12 @@
 import { Button, Modal } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import styled from 'styled-components';
 import { addDoc, arrayUnion, collection, doc, updateDoc } from 'firebase/firestore';
 import { db } from '../App';
 import { getAuth } from 'firebase/auth';
+import { Context } from '../context';
 
 const StyledButton = styled(Button)`
 display: inline-block;
@@ -13,8 +14,14 @@ display: inline-block;
 
 
 function CreateBoxModal() {
+  const { readonly } = useContext(Context).state
   const [isVisible, setIsVisible] = useState(false)
   const [newBoxName, setNewBoxName] = useState("")
+
+  if (readonly) { 
+    return null
+  }
+
   const handleOk = async () => {
     if (newBoxName === "") {
       return
