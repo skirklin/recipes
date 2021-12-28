@@ -1,12 +1,14 @@
 import styled from 'styled-components';
 
-import { Button } from 'antd';
+import { Button, Switch } from 'antd';
 
 import { getAuth, signOut } from 'firebase/auth';
 import AddBoxModal from './AddBox';
 import AddRecipesModal from './AddRecipes'
 import CreateBoxModal from './CreateBox'
 import { LogoutOutlined } from '@ant-design/icons';
+import { useContext } from 'react';
+import { Context } from '../context';
 
 const LogoutButton = styled(Button)`
   margin: 0px 5px;
@@ -20,7 +22,6 @@ const SignOutArea = styled.div`
 
 const Container = styled.div`
   background-color: var(--gainsboro);
-  border-bottom: solid;
   padding: 10px;
 `
 
@@ -37,11 +38,12 @@ const SearchArea = styled.div`
 
 
 function Header() {
+  const { dispatch } = useContext(Context);
+
   let title = <Title>Recipe box</Title>
   return (
     <Container>
       <div>
-
         {title}
         <SignOutArea>
           <span>
@@ -59,6 +61,12 @@ function Header() {
         <AddRecipesModal />
         <AddBoxModal />
         <CreateBoxModal />
+        <Switch
+          defaultChecked
+          onChange={e => dispatch({ type: "SET_READONLY", payload: e })}
+          checkedChildren="Readonly"
+          unCheckedChildren="Editable"
+        />
       </div>
     </Container >
   );

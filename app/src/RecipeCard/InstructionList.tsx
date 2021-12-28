@@ -4,6 +4,7 @@ import TextareaAutosize from 'react-autosize-textarea';
 import { Recipe } from 'schema-dts';
 import { instructionsToStr, strToInstructions } from '../utils';
 import { RecipeContext } from './context';
+import { Context } from '../context';
 
 
 
@@ -18,8 +19,15 @@ const RecipeStep = styled.li`
 
 
 function InstructionList() {
-  const [editable, setEditable] = useState(false);
+  const [editable, setEditablePrimitive] = useState(false);
   const { state, dispatch } = useContext(RecipeContext);
+  const rbState = useContext(Context).state;
+
+  const setEditable = (value: boolean) => {
+    if (!rbState.readonly) {
+      setEditablePrimitive(value)
+    }
+  }
 
   const instructionsStyle = {
     outline: "none",

@@ -1,16 +1,15 @@
 import _ from 'lodash';
 import { useContext } from 'react';
-import { RecipeBoxContext } from '../../context';
-import { BoxPointer } from '../../types';
+import { Context } from '../../context';
+import { BoxPointer, TabType } from '../../types';
 import RecipeSummary from '../RecipeSummary';
-import { TabType } from '../types';
 
 interface RecipeBoxTabProps {
     boxPtr: BoxPointer
 }
 
 export function isRecipeBoxTab(content: TabType) {
-    return false
+  return _.isEqual(new Set(_.keys(content)), new Set(["boxId"]))
 }
 
 export function getRecipeBoxTabKey(content: BoxPointer) {
@@ -18,20 +17,26 @@ export function getRecipeBoxTabKey(content: BoxPointer) {
 }
 
 export function RecipeBoxTabName(props: RecipeBoxTabProps) {
-    const { state } = useContext(RecipeBoxContext);
+    const { state } = useContext(Context);
     return <div>{state.boxes.get(props.boxPtr.boxId)!.name}</div>
 }
 
 export function RecipeBoxTab(props: RecipeBoxTabProps) {
-    const { state } = useContext(RecipeBoxContext);
+    const { state } = useContext(Context);
     const { boxPtr } = props;
-    let recipeSummaries = _.map(
-        state.boxes.get(boxPtr.boxId)?.recipes,
-        (value, key) => <RecipeSummary recipePointer={{ ...boxPtr, recipeId: key }} />
+    let box = state.boxes.get(boxPtr.boxId);
+    if (box === undefined) {
+        return <div>Unknown recipe box ID: {boxPtr.boxId}</div>
+    }
+
+    let summaries: JSX.Element[] = [];
+    console.log(summaries)
+    box.recipes.forEach(
+        (value, key) => summaries.push(<RecipeSummary { ...boxPtr} recipeId={key} />)
     )
     return (
         <ol>
-            {recipeSummaries}
+            {summaries}
         </ol>
     )
 }

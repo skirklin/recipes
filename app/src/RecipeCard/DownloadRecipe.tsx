@@ -3,7 +3,7 @@ import { Button } from 'antd';
 import { useContext } from 'react';
 import styled from 'styled-components';
 import { getRecipe } from '../utils';
-import { RecipeBoxContext } from '../context';
+import { Context } from '../context';
 import { RecipeContext } from './context';
 
 const StyledButton = styled(Button)`
@@ -13,7 +13,9 @@ const StyledButton = styled(Button)`
 
 function SaveButton() {
   const { state } = useContext(RecipeContext);
-  const recipe = getRecipe(useContext(RecipeBoxContext).state, state.recipePtr)!
+  const ctx = useContext(Context)
+  let  {recipeId, boxId, recipe} = state;
+  recipe = recipe || getRecipe(ctx.state, {recipeId, boxId})
 
   let textFile: string | null;
 

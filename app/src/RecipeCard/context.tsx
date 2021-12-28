@@ -1,9 +1,11 @@
+import _ from 'lodash';
 import { createContext } from 'react';
 import { Recipe } from 'schema-dts';
-import { RecipePointer } from '../types';
+
 
 export type RecipeStateType = {
-  recipePtr: RecipePointer,
+  recipeId?: string,
+  boxId: string,
   recipe: Recipe,
   changed: boolean,
 }
@@ -11,14 +13,16 @@ export type RecipeStateType = {
 export type RecipeActionType = {
   type: string,
   payload?: any,
+  recipeId?: string,
 }
 
 
 export function initState(): RecipeStateType {
   let r: Recipe = { "@type": "Recipe" };
-  return { 
-    recipePtr: {recipeId: "", boxId: ""},
-    recipe: r, 
+  return {
+    recipeId: "",
+    boxId: "",
+    recipe: r,
     changed: false,
   }
 }
@@ -37,3 +41,33 @@ export const RecipeContext = createContext<ContextType>(
     dispatch: defaultDispatch,
   }
 )
+
+export function recipeReducer(state: RecipeStateType, action: RecipeActionType): RecipeStateType {
+  let newState = { ...state }
+  switch (action.type) {
+    case 'SET_NAME':
+      newState.recipe.name = action.payload;
+      newState.changed = true;
+      return newState
+    case 'SET_INGREDIENTS':
+      newState.recipe.recipeIngredient = action.payload
+      newState.changed = true;
+      return newState
+    case 'SET_INSTRUCTIONS':
+      newState.recipe.recipeInstructions = action.payload;
+      newState.changed = true;
+      return newState
+    case 'SET_DESCRIPTION':
+      newState.recipe.description = action.payload;
+      newState.changed = true;
+      return newState
+    case 'SET_RECIPE':
+      newState.recipe = _.cloneDeep(action.payload);
+      newState.changed = false;
+      if (action.recipeId !== undefined) {
+        newState.recipeId = action.recipeId
+      }
+      return newState
+  }
+  return newState;
+}

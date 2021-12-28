@@ -1,29 +1,17 @@
-import { useMemo, useReducer } from 'react';
+import { useContext, } from 'react';
 
 import { Tabs } from 'antd';
 
 import { Tab, getTabName } from './Tabs/Tab';
-import { initState, ViewerContext } from './context';
-import { ViewerActionType, ViewerStateType } from './types';
-import { viewerReducer } from './reducer';
 import { getAllRecipesTabKey } from './Tabs/AllRecipesTab';
 
 import './Body.css';
-import styled from 'styled-components';
+import { Context } from '../context';
 
 export const { TabPane } = Tabs;
 
-const Container = styled.div`
-  background-color: lightgrey;
-`
-
 function Body() {
-    const [state, dispatch] = useReducer<React.Reducer<ViewerStateType, ViewerActionType>>(viewerReducer, initState())
-
-    const viewerValue = useMemo(() => {
-        return { state, dispatch };
-    }, [state, dispatch]);
-
+    const { state, dispatch } = useContext(Context);
     function handleChange(e: any) {
         dispatch({ type: "SET_ACTIVE_TAB", payload: e })
     }
@@ -52,22 +40,18 @@ function Body() {
     })
 
     return (
-        <ViewerContext.Provider value={viewerValue}>
-            <Container>
-                <div className="card-container">
-                    <Tabs
-                        onChange={handleChange}
-                        onEdit={handleEdit}
-                        activeKey={state.activeTab}
-                        type="editable-card"
-                        hideAdd
-                        size="large"
-                    >
-                        {tabPanes}
-                    </Tabs>
-                </div>
-            </Container>
-        </ViewerContext.Provider>
+        <div className="card-container">
+            <Tabs
+                onChange={handleChange}
+                onEdit={handleEdit}
+                activeKey={state.activeTab}
+                type="editable-card"
+                hideAdd
+                size="large"
+            >
+                {tabPanes}
+            </Tabs>
+        </div>
     );
 }
 

@@ -1,13 +1,10 @@
 import { useContext } from 'react';
 import styled from 'styled-components';
-import { RecipeBoxContext } from '../context';
-import { RecipePointer } from '../types';
-import { ViewerContext } from './context';
+import { Context } from '../context';
+import { RecipeTabType } from '../types';
+import { getRecipe } from '../utils';
 import { getRecipeTabKey } from './Tabs/RecipeTab';
 
-interface RecipeProps {
-  recipePointer: RecipePointer
-}
 
 const RecipeItem = styled.li`
   list-style-type: none;
@@ -20,37 +17,53 @@ const Container = styled.div`
   padding: 2px;
 `
 
-const RecipeName = styled.p`
+const RecipeName = styled.div`
+  display: inline;
   font-weight: bold;
   text-decoration: underline;
   margin-bottom: 2px;
 `
+
+const BoxName = styled.div`
+  display: inline;
+  text-decoration: underline;
+  margin-bottom: 2px;
+  margin-left: 5px;
+`
+
 const RecipeDescription = styled.p`
   font-style: italic;
   margin: 0px 5px;
 
 `
 
-function RecipeSummary(props: RecipeProps) {
-  const { state } = useContext(RecipeBoxContext)
-  const { dispatch } = useContext(ViewerContext)
-  const { boxId, recipeId } = props.recipePointer;
-  const recipe = state.boxes.get(boxId)?.recipes.get(recipeId)!
+function RecipeSummary(props: RecipeTabType) {
+  const missing = <div>Recipe cannot be found</div>
+  const { state, dispatch } = useContext(Context)
+  const box = state.boxes.get(props.boxId!) || {name: 'Missing box'}
+  const recipe = props.recipe || getRecipe(state, props);
+  if (recipe === undefined) {
+    return missing
+  }
 
-  const handleClick = () => {
-    dispatch({ type: "APPEND_TAB", payload: props.recipePointer })
+  const goToBox = () => {
+    dispatch({ type: "APPEND_TAB", payload: {boxId: props.boxId} })
+  }
+
+  const goToRecipe = () => {
+    dispatch({ type: "APPEND_TAB", payload: {...props, recipe} })
   }
   return (
-    <RecipeItem onClick={handleClick} key={getRecipeTabKey(props.recipePointer)}>
+    <RecipeItem key={getRecipeTabKey(props)}>
       <Container>
-        <RecipeName>
-          {recipe.name}
-
-        </RecipeName>
+        <div>
+          <RecipeName onClick={goToRecipe} >{recipe.name}</RecipeName>
+          <BoxName onClick={goToBox}>({box.name})</BoxName>
+        </div>
         <RecipeDescription>
           {recipe.description}
         </RecipeDescription>
-    </Container >
+      </Container >
     </RecipeItem>
   );
 }

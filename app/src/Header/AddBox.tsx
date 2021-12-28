@@ -1,4 +1,4 @@
-import { Button, Modal } from 'antd';
+import { Button, Modal, Select } from 'antd';
 import { InboxOutlined } from '@ant-design/icons';
 import { arrayUnion, collection, doc, getDoc, getDocs, updateDoc } from 'firebase/firestore'
 
@@ -7,6 +7,7 @@ import { useEffect, useState } from 'react';
 import { BoxType } from '../types'
 import styled from 'styled-components';
 import { getAuth } from 'firebase/auth';
+import { OptionsType } from 'rc-select/lib/interface';
 
 const StyledButton = styled(Button)`
 display: inline-block;
@@ -36,7 +37,6 @@ function AddBoxModal() {
     if (user === null) {
       throw new Error('No user signed in')
     }
-    console.log("selectedBox:", selectedBox)
     let boxRef = doc(db, "boxes", selectedBox!)
     let boxDoc = await getDoc(boxRef);
     if (!boxDoc.exists()) {
@@ -47,14 +47,14 @@ function AddBoxModal() {
   }
 
 
-  let boxOptions: JSX.Element[] = []
-  boxes.forEach((value, key) => boxOptions.push(<option key={key} value={value.name}>{value.name}</option>))
+  let boxOptions: OptionsType = [];
+  boxes.forEach((value, key) => boxOptions.push({label: value.name, value: key}))
   return (
     <>
       <Modal visible={isVisible} onOk={handleOk} onCancel={() => setIsVisible(false)}>
         <div>
           <label>Add existing box to your collection:</label>
-          <select value={selectedBox} onChange={e => {console.log(e); setSelectedBox(e.target.value)}}>{boxOptions}</select>
+          <Select value={selectedBox} onChange={setSelectedBox} options={boxOptions} />
         </div>
       </Modal >
       <StyledButton onClick={() => setIsVisible(true)} icon={<InboxOutlined />}>Add box</StyledButton>
