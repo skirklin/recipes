@@ -1,4 +1,4 @@
-import { isAllRecipesTab, AllRecipesTab, getAllRecipesTabKey, AllRecipesTabName } from "./AllRecipesTab";
+import { isContentsTab, ContentsTab, getContentsTabKey, ContentsTabName } from "./Contents";
 import { isSearchResultTab, SearchResultTab, getSearchResultKey, SearchResultTabName } from "./SearchResultTab";
 import { isRecipeTab, RecipeTab, getRecipeTabKey, RecipeTabName } from "./RecipeTab";
 import { isRecipeBoxTab, RecipeBoxTab, getRecipeBoxTabKey, RecipeBoxTabName } from "./RecipeBoxTab";
@@ -16,8 +16,8 @@ interface TabPropsType {
 
 export function getTabName(content: TabType) {
     switch (true) {
-        case isAllRecipesTab(content): {
-            return <AllRecipesTabName />
+        case isContentsTab(content): {
+            return <ContentsTabName />
         }
         case isSearchResultTab(content): {
             let searchResult = content as SearchResultTabType;
@@ -38,7 +38,7 @@ export function getTabName(content: TabType) {
 
 export function getKey(content: TabType) {
     switch (true) {
-        case isAllRecipesTab(content): return getAllRecipesTabKey(content)
+        case isContentsTab(content): return getContentsTabKey(content)
         case isSearchResultTab(content): return getSearchResultKey(content as SearchResultTabType)
         case isRecipeBoxTab(content): return getRecipeBoxTabKey(content as BoxPointer)
         case isRecipeTab(content): return getRecipeTabKey(content as RecipeTabType)
@@ -50,8 +50,8 @@ export function getKey(content: TabType) {
 export function Tab(props: TabPropsType) {
     const { content } = props;
     switch (true) {
-        case isAllRecipesTab(content):
-            return <AllRecipesTab />
+        case isContentsTab(content):
+            return <ContentsTab />
         case isSearchResultTab(content):
             let searchResult = content as SearchResultTabType;
             return <SearchResultTab queryString={searchResult.queryString} recipePtrs={searchResult.recipePtrs} />;
