@@ -29,7 +29,7 @@ function DeleteButton() {
   if (writeable) {
     return (
       <Popconfirm
-        title="Are you sure to delete this task?"
+        title="Are you sure to delete this recipe?"
         onConfirm={del}
         okText="Yes"
         cancelText="No"

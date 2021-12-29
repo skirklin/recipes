@@ -3,7 +3,7 @@ import { useContext, } from 'react';
 import { Tabs } from 'antd';
 
 import { Tab, getTabName } from './Tabs/Tab';
-import { getAllRecipesTabKey } from './Tabs/AllRecipesTab';
+import { getContentsTabKey } from './Tabs/Contents';
 
 import './Body.css';
 import { Context } from '../context';
@@ -18,13 +18,9 @@ function Body() {
 
     function handleEdit(e: any, action: string) {
         switch (action) {
-            // I haven't found a way to remove the close icon, so at least don't let the all recipes tab close.
             case "remove":
-                if (e !== getAllRecipesTabKey({})) {
-                    dispatch({ type: "REMOVE_TAB", payload: e })
-                }
+                dispatch({ type: "REMOVE_TAB", payload: e })
                 break;
-
             default:
                 break;
         }
@@ -33,7 +29,7 @@ function Body() {
     let tabPanes: JSX.Element[] = []
     state.tabs.forEach((value, key) => {
         tabPanes.push(
-            <TabPane key={key} tab={getTabName(value)} >
+            <TabPane key={key} tab={getTabName(value)} closable={key !== getContentsTabKey({})}>
                 <Tab content={value} />
             </TabPane>
         )

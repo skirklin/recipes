@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import { createContext } from 'react';
-import { getAllRecipesTabKey } from './Body/Tabs/AllRecipesTab';
+import { getContentsTabKey } from './Body/Tabs/Contents';
 import { getKey } from './Body/Tabs/Tab';
 import { RecipeBoxActionType, BoxType, RecipeBoxStateType, AllType } from './types';
 
@@ -12,7 +12,7 @@ export type ContextType = {
 
 export function initState(): RecipeBoxStateType {
   let allRecipesTab: AllType = {}
-  let key = getAllRecipesTabKey(allRecipesTab)!
+  let key = getContentsTabKey(allRecipesTab)!
   return (
     {
       boxes: new Map<string, BoxType>(),

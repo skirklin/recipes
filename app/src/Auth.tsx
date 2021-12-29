@@ -8,7 +8,7 @@ import App from './App';
 
 const SignInCard = styled.div`
   margin: 40px auto;
-  max-width: 200px;
+  max-width: 300px;
   padding: 20px;
   border-radius: 5px;
   box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
