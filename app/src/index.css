@@ -8,14 +8,15 @@ body {
   overflow-y: scroll; /* Show vertical scrollbar */
   
 
-    /* CSS HEX */
-    --jet: #343330ff;
-    --cinnabar: #e94f37ff;
-    --lavender-gray: #bfbccbff;
-    --pale-spring-bud: #f4f1bbff;
-    --mint-cream: #eff9f0ff;
-    --verdigris: #2ca6a4ff;
-    --selective-yellow: #fcba04ff;
+  /* CSS HEX */
+  --jet: #343330ff;
+  --cinnabar: #e94f37ff;
+  --lavender-gray: #bfbccbff;
+  --pale-spring-bud: #f4f1bbff;
+  --mint-cream: #eff9f0ff;
+  --verdigris: #2ca6a4ff;
+  --selective-yellow: #fcba04ff;
+
 }
 
 code {

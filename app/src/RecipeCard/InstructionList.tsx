@@ -42,6 +42,13 @@ function InstructionList() {
     } else {
       listElts = Array.prototype.map.call(instructions || [], (ri, id) => <RecipeStep key={id}>{ri.text}</RecipeStep>)
     }
+    if (listElts.length === 0) {
+      return (
+        <RecipeStepsList>
+          {"Add instructions?"}
+        </RecipeStepsList>
+      )
+    }
     return (
       <RecipeStepsList>
         {listElts}
@@ -69,7 +76,7 @@ function InstructionList() {
   } else {
     return (
       <div onDoubleClick={() => setEditable(true)}>
-        {formatInstructionList(instructions)}
+        {formatInstructionList(instructions) || "Add instructions?"}
       </div>
     )
   }

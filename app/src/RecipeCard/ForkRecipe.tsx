@@ -3,11 +3,12 @@ import { Button } from 'antd';
 import { useContext, useState } from 'react';
 import styled from 'styled-components';
 
-import { SelectBoxContext, PickBoxModal } from '../Header/PickBoxModal';
+import { SelectBoxContext, PickBoxModal } from './PickBoxModal';
 import { Context } from '../context';
 import { addDoc, collection } from 'firebase/firestore';
 import { db } from '../App';
 import { RecipeContext } from './context';
+import { useNavigate } from 'react-router-dom';
 
 const StyledButton = styled(Button)`
   display: inline-block;
@@ -16,6 +17,7 @@ const StyledButton = styled(Button)`
 
 function ForkRecipe() {
   const rbCtx = useContext(Context)
+  const navigate = useNavigate()
   const { writeable } = rbCtx.state;
   const { state } = useContext(RecipeContext)
   const [isModalVisible, setIsModalVisible] = useState(false)
@@ -29,13 +31,8 @@ function ForkRecipe() {
     setIsModalVisible(false)
     console.log("forking into", tgtBox)
     let colRef = collection(db, "boxes", tgtBox, "recipes")
-    let docRef = await addDoc(colRef, state.recipe)
-    rbCtx.dispatch({
-      type: "APPEND_TAB",
-      payload: {
-        boxId: tgtBox, recipeId: docRef.id
-      }
-    })
+    let recipeRef = await addDoc(colRef, state.recipe)
+    navigate(`/boxes/${tgtBox}/recipes/${recipeRef.id}`)
   }
 
   let contextValue = {

@@ -6,7 +6,6 @@ import { RecipeContext } from './context';
 import { deleteDoc, doc } from 'firebase/firestore';
 import { db } from '../App';
 import { Context } from '../context';
-import { getKey } from '../Body/Tabs/Tab';
 
 const StyledButton = styled(Button)`
   display: inline;
@@ -16,13 +15,11 @@ const StyledButton = styled(Button)`
 function DeleteButton() {
   const { state } = useContext(RecipeContext);
   const rbCtx = useContext(Context)
-  const { dispatch } = rbCtx;
   const { writeable } = rbCtx.state;
 
-  let { recipeId, boxId, recipe } = state;
+  let { recipeId, boxId } = state;
 
   async function del() {
-    dispatch({ type: "REMOVE_TAB", payload: getKey({ recipeId, boxId, recipe }) })
     await deleteDoc(doc(db, "boxes", boxId, "recipes", recipeId!))
   }
 

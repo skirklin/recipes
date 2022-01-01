@@ -23,27 +23,8 @@ export type UserType = {
   new: boolean,
 }
 
-export type RecipeTabType = {
-  boxId: string,
-  recipeId: string | undefined,
-  recipe?: Recipe,
-}
-
-export type BoxTabType = {
-  boxId: string
-}
-
-export type SearchResultTabType = {
-  queryString: string,
-  recipePtrs: RecipePointer[],
-}
-
-export type TabType = RecipeTabType | BoxTabType | SearchResultTabType | AllType;
-
 export type RecipeBoxStateType = {
   boxes: Map<string,BoxType>
-  tabs: Map<string,TabType>
-  activeTab: string
   activeBox: string | undefined
   writeable: boolean
 }
@@ -52,5 +33,5 @@ export type RecipeBoxActionType = {
   type: string
   recipeId?: string
   boxId?: string
-  payload: any
+  payload?: any
 }
