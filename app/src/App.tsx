@@ -1,17 +1,16 @@
 import { useMemo, useReducer, useEffect } from 'react';
 import { initializeApp } from 'firebase/app';
 import { getAuth, connectAuthEmulator } from "firebase/auth";
-import { getFirestore, connectFirestoreEmulator, getDoc, onSnapshot, Unsubscribe, doc, setDoc, DocumentReference } from "firebase/firestore";
+import { getFirestore, connectFirestoreEmulator, getDoc, onSnapshot, Unsubscribe, doc, setDoc, DocumentReference, DocumentData } from "firebase/firestore";
 import { collection, getDocs } from "firebase/firestore";
 import Modal from 'react-modal';
 import 'antd/dist/antd.css'; // or 'antd/dist/antd.less'
 
-import Body from './Body/Body';
 import { RecipeBoxStateType, RecipeBoxActionType, BoxType } from './types';
 import { Context, initState, recipeBoxReducer } from './context';
 import Header from './Header/Header';
 import { Recipe } from 'schema-dts';
-import styled from 'styled-components';
+import { Outlet } from 'react-router-dom';
 
 
 // Configure Firebase.
@@ -37,9 +36,6 @@ connectFirestoreEmulator(db, 'localhost', 8080);
 
 Modal.setAppElement('#root'); // for accessibility. See: https://reactcommunity.org/react-modal/accessibility/
 
-const Background = styled.div`
-  background-color: var(--mint-cream)
-`
 
 function App() {
 
@@ -84,6 +80,7 @@ function App() {
         if (d === undefined) {
           return
         }
+        dispatch({ type: "CLEAR_BOXES" })
         let boxes = d!.boxes as DocumentReference[]
 
         boxes.forEach(b => {
@@ -91,12 +88,20 @@ function App() {
           let boxRef = doc(db, "boxes", b.id)
           let boxRecipesRef = collection(db, "boxes", b.id, "recipes")
           getDoc(boxRef)
-            .then(boxData => {
+            .then(boxDoc => {
+              if (boxDoc === undefined) {
+                return
+              }
+              const boxData = boxDoc.data() as DocumentData
+              const owners: string[] = boxData.owners.map((o: any) => o.name);
+              let box = { recipes: new Map<string,Recipe>(), name: boxData.name, owners}
+              dispatch({ type: "SET_BOXES", payload: new Map([[b.id, box as BoxType]]) })
+
               // subscription for changes to recipes within boxes
               unsub = onSnapshot(boxRecipesRef, (snapshot) => {
                 getDocs(collection(db, "boxes", b.id, "recipes")).then(querySnap => {
                   let recipes = new Map(snapshot.docs.map(r => [r.id, r.data() as Recipe]))
-                  let box = { recipes, name: boxData.data()!.name, owners: [] }
+                  let box = { recipes, name: boxDoc.data()!.name, owners: owners }
                   dispatch({ type: "SET_BOXES", payload: new Map([[b.id, box as BoxType]]) })
                 })
               })
@@ -112,10 +117,8 @@ function App() {
 
   return (
     <Context.Provider value={recipesValue}>
-      <Background>
-        <Header />
-        <Body />
-      </Background>
+      <Header />
+      <Outlet />
     </Context.Provider>
   );
 }

@@ -56,7 +56,7 @@ function RecipeDescription() {
   } else {
     return (
       <Description onDoubleClick={() => setEditable(true)}>
-        {description}
+        {description || "Add a description?"}
       </Description>
     )
   }

@@ -15,7 +15,7 @@ function ClearButton() {
   const { state, dispatch } = useContext(RecipeContext);
   const ctx = useContext(Context)
   const {recipeId, boxId} = state;
-  const original = state.recipe || _.cloneDeep(getRecipe(ctx.state, {recipeId, boxId}))
+  const original = state.recipe || _.cloneDeep(getRecipe(ctx.state, recipeId, boxId))
 
   function clear() {
     dispatch({type: "SET_RECIPE", payload: original})

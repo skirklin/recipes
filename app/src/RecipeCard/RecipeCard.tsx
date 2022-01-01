@@ -24,8 +24,6 @@ interface RecipeProps {
   boxId: string
 }
 
-
-
 const Card = styled.div`
   margin: 15px;
   font-family: sans-serif;
@@ -47,7 +45,7 @@ const IndexCardLine = styled.hr`
 function RecipeCard(props: RecipeProps) {
   const ctx = useContext(Context)
   let { recipeId, boxId, recipe } = props;
-  recipe = recipe || _.cloneDeep(getRecipe(ctx.state, {recipeId, boxId})!)
+  recipe = recipe || _.cloneDeep(getRecipe(ctx.state, recipeId, boxId)!)
   const [state, dispatch] = useReducer<React.Reducer<RecipeStateType, RecipeActionType>>(recipeReducer, {
     recipe, recipeId, boxId,
     changed: false

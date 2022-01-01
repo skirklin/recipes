@@ -1,31 +1,16 @@
-import _ from 'lodash';
-import { useContext, useState } from 'react';
-import { Button, Table } from 'antd';
+import { useEffect, useState } from 'react';
+import { Button, Popconfirm, Table } from 'antd';
 import { ColumnsType } from 'antd/es/table';
 
-import { Context } from '../../context';
-import { AllType } from '../../types';
 import { Recipe } from 'schema-dts';
-import './Contents.css'
 import { Key } from 'antd/lib/table/interface';
 import { TableRowSelection } from 'antd/es/table/interface';
-import { getRecipeTabKey } from './RecipeTab';
 import { DeleteOutlined, ForkOutlined } from '@ant-design/icons';
 import { deleteDoc, doc } from 'firebase/firestore';
-import { getKey } from './Tab';
-import { db } from '../../App';
-
-export function isContentsTab(content: AllType) {
-  return _.isEqual(content, {})
-}
-
-export function getContentsTabKey(content: AllType) {
-  return "Contents"
-}
-
-export function ContentsTabName() {
-  return <div>Contents</div>
-}
+import { useNavigate } from 'react-router-dom';
+import { db } from '../App';
+import Filterbox from './Filterbox';
+import './RecipeTable.css'
 
 function sortfunc(a: string, b: string) {
   var A = a.toUpperCase(); // ignore upper and lowercase
@@ -40,7 +25,7 @@ function sortfunc(a: string, b: string) {
   return 0;
 }
 
-interface RowType {
+export interface RowType {
   boxName: string
   recipe: Recipe
   boxId: string
@@ -48,18 +33,21 @@ interface RowType {
   key: string
 }
 
+interface RecipeTableProps {
+  recipes: RowType[]
+  writeable: boolean
+}
 
-export function ContentsTab() {
+export function RecipeTable(props: RecipeTableProps) {
   /// https://ant.design/components/table/#components-table-demo-row-selection-and-operation
-  const { state, dispatch } = useContext(Context)
   const [selectedRowKeys, setSelectedRowKeys] = useState<Key[]>([])
   const [selectedRows, setSelectedRows] = useState<RowType[]>([])
-  let data: RowType[] = []
-  for (let [boxId, box] of state.boxes.entries()) {
-    for (let [recipeId, recipe] of box.recipes.entries()) {
-      data.push({ boxName: box.name, recipeId, boxId, recipe, key: getRecipeTabKey({ recipeId, boxId, recipe }) })
-    }
-  }
+  let navigate = useNavigate();
+
+  const { writeable, recipes } = props;
+  const [filteredRows, setFilteredRows] = useState<RowType[]>([])
+
+  useEffect(() => setFilteredRows(recipes), [recipes])
 
   const onSelectChange = (selectedRowKeys: Key[], selectedRows: RowType[]) => {
     setSelectedRowKeys(selectedRowKeys);
@@ -71,13 +59,9 @@ export function ContentsTab() {
     onChange: onSelectChange,
   };
 
-  const goToRecipe = (record: RowType, rowIndex: number | undefined) => {
-    dispatch({ type: "APPEND_TAB", payload: { boxId: record.boxId, recipeId: record.recipeId, recipe: record.recipe } })
-  }
-
   const onRow = (record: RowType, rowIndex: number | undefined) => {
     return {
-      onClick: (e: any) => goToRecipe(record, rowIndex),
+      onClick: () => navigate(`/boxes/${record.boxId}/recipes/${record.recipeId}`),
     }
   }
 
@@ -105,19 +89,35 @@ export function ContentsTab() {
   async function del() {
     selectedRows.forEach(
       (value: RowType) => {
-        dispatch({ type: "REMOVE_TAB", payload: getKey({ recipeId: value.recipeId, boxId: value.boxId }) })
         deleteDoc(doc(db, "boxes", value.boxId, "recipes", value.recipeId))
       }
     )
   }
 
   return (
-    <>
-      <div style={{float: 'right', display: 'inline-flex', padding: '5px'}}>
-        <Button onClick={() => del()} disabled={!hasSelected}><DeleteOutlined /></Button>
+    <div style={{ padding: "10px" }}>
+      <div style={{ display: "inline-flex" }}>
+        <Filterbox data={recipes} setFilteredRows={setFilteredRows} />
+      </div>
+      <div style={{ float: 'right', display: 'inline-flex', padding: '5px' }}>
+        <Popconfirm
+          title={`Are you sure to delete ${selectedRowKeys.length > 1 ? "these recipes" : "this recipe"}s`}
+          onConfirm={del}
+          okText="Yes"
+          cancelText="No"
+        >
+          <Button disabled={!writeable || !hasSelected}><DeleteOutlined /></Button>
+        </Popconfirm>
         <Button onClick={() => { console.log("fork", selectedRowKeys) }} disabled={!hasSelected}><ForkOutlined /></Button>
       </div>
-      <Table<RowType> rowSelection={rowSelection} columns={columns} dataSource={data} onRow={onRow} rowClassName={() => "recipe-row"} />
-    </>
+      <Table<RowType>
+        pagination={false}
+        rowSelection={rowSelection}
+        columns={columns}
+        dataSource={filteredRows}
+        onRow={onRow}
+        rowClassName={() => "recipe-row"}
+      />
+    </div>
   )
 }

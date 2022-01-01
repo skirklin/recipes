@@ -46,6 +46,13 @@ function IngredientList() {
 
   function formatIngredientList(ingredients: Recipe["recipeIngredient"]) {
     let listElts = Array.prototype.map.call(ingredients || [], (ri, id) => <Ingredient key={id}>{ri}</Ingredient>)
+    if (listElts.length === 0) {
+      return (
+        <ul style={{ ...ingredientsStyle, listStylePosition: "outside", listStyleType: "unset"}}>
+          {"Add ingredients?"}
+        </ul>
+      )
+    }
     return (
       <ul style={{ ...ingredientsStyle, listStylePosition: "outside", listStyleType: "unset" }}>
         {listElts}

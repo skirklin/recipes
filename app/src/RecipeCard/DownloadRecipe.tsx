@@ -15,7 +15,7 @@ function SaveButton() {
   const { state } = useContext(RecipeContext);
   const ctx = useContext(Context)
   let  {recipeId, boxId, recipe} = state;
-  recipe = recipe || getRecipe(ctx.state, {recipeId, boxId})
+  recipe = recipe || getRecipe(ctx.state, recipeId, boxId)
 
   let textFile: string | null;
 
