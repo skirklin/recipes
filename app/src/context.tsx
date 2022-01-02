@@ -1,5 +1,6 @@
 import { createContext } from 'react';
 import { RecipeBoxActionType, BoxType, RecipeBoxStateType, RecipeType } from './types';
+import { createNewBox } from './utils';
 
 
 export type ContextType = {
@@ -44,7 +45,7 @@ export function recipeBoxReducer(prevState: RecipeBoxStateType, action: RecipeBo
         console.warn("ADD_RECIPE requires a boxId and recipeId.")
         return prevState
       }
-      newBox = { ...prevState.boxes.get(action.boxId) } as BoxType
+      newBox = { ...(prevState.boxes.get(action.boxId) || createNewBox()) }
       if (action.payload === undefined) {
         console.warn("ADD_RECIPE requires a payload.")
         return prevState

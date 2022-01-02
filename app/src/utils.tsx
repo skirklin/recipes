@@ -4,7 +4,7 @@ import { addDoc, collection, deleteDoc, doc, getDoc, getDocs, setDoc } from 'fir
 import _ from 'lodash';
 import { Recipe } from "schema-dts"
 import { db } from './backend';
-import { RecipeBoxStateType, RecipeType, Visibility } from './types';
+import { BoxType, RecipeBoxStateType, RecipeType, Visibility } from './types';
 
 
 export function strToIngredients(str: string): Recipe["recipeIngredient"] {
@@ -168,6 +168,18 @@ export function createNewRecipe(): RecipeType {
       "recipeInstructions": [],
       "recipeIngredient": [],
       "description": "",
+    },
+    visibility: Visibility.private,
+    owners: [],
+  }
+}
+
+
+export function createNewBox(): BoxType {
+  return {
+    data: {
+      recipes: new Map<string, RecipeType>(),
+      name: "New box",
     },
     visibility: Visibility.private,
     owners: [],

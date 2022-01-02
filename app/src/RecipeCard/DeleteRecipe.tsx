@@ -6,6 +6,7 @@ import { RecipeContext } from './context';
 import { deleteDoc, doc } from 'firebase/firestore';
 import { db } from '../backend';
 import { Context } from '../context';
+import { useNavigate } from 'react-router-dom';
 
 const StyledButton = styled(Button)`
   display: inline;
@@ -15,12 +16,14 @@ const StyledButton = styled(Button)`
 function DeleteButton() {
   const { state } = useContext(RecipeContext);
   const rbCtx = useContext(Context)
+  const navigate = useNavigate()
   const { writeable } = rbCtx.state;
 
   let { recipeId, boxId } = state;
 
   async function del() {
-    await deleteDoc(doc(db, "boxes", boxId, "recipes", recipeId!))
+    deleteDoc(doc(db, "boxes", boxId, "recipes", recipeId!))
+    navigate(`/boxes/${boxId}`)
   }
 
   if (writeable) {
