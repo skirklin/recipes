@@ -36,7 +36,7 @@ function SaveButton() {
 
   function download() {
     var downloadLink = document.createElement("a");
-    downloadLink.download = recipe.name + ".json"
+    downloadLink.download = recipe.data.name + ".json"
     downloadLink.innerHTML = "Download File";
 
     // Create a "file" to download

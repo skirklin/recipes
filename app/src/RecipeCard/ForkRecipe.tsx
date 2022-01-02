@@ -6,7 +6,7 @@ import styled from 'styled-components';
 import { SelectBoxContext, PickBoxModal } from './PickBoxModal';
 import { Context } from '../context';
 import { addDoc, collection } from 'firebase/firestore';
-import { db } from '../App';
+import { db } from '../backend';
 import { RecipeContext } from './context';
 import { useNavigate } from 'react-router-dom';
 
@@ -38,8 +38,8 @@ function ForkRecipe() {
   let contextValue = {
     setIsVisible: setIsModalVisible,
     isVisible: isModalVisible,
-    setBox: setTgtBox,
-    box: tgtBox!,
+    setBoxName: setTgtBox,
+    boxName: tgtBox!,
   }
 
   if (writeable) {

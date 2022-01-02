@@ -1,5 +1,5 @@
 import { createContext } from 'react';
-import { RecipeBoxActionType, BoxType, RecipeBoxStateType } from './types';
+import { RecipeBoxActionType, BoxType, RecipeBoxStateType, RecipeType } from './types';
 
 
 export type ContextType = {
@@ -27,27 +27,73 @@ export const Context = createContext<ContextType>(
   }
 )
 
-export function recipeBoxReducer(state: RecipeBoxStateType, action: RecipeBoxActionType): RecipeBoxStateType {
+
+
+// Actions:
+// SET_USER (user)
+// CLEAR_USER ()
+// REMOVE_BOX (boxId)
+// REMOVE_RECIPE (boxId, recipeId)
+
+export function recipeBoxReducer(prevState: RecipeBoxStateType, action: RecipeBoxActionType): RecipeBoxStateType {
+  console.log({action})
+  let newBox: BoxType, state: RecipeBoxStateType
   switch (action.type) {
     case "ADD_RECIPE":
       if (action.boxId === undefined || (action.recipeId === undefined)) {
-        console.log("failed to add_recipe with action", action)
-        return state
+        console.warn("ADD_RECIPE requires a boxId and recipeId.")
+        return prevState
       }
-      let newBox = { ...state.boxes.get(action.boxId) }
-      if (newBox === undefined || newBox.recipes === undefined) {
-        console.log("failed to add_recipe with payload:", {payload: action.payload, newBox})
-        return state
+      newBox = { ...prevState.boxes.get(action.boxId) } as BoxType
+      if (action.payload === undefined) {
+        console.warn("ADD_RECIPE requires a payload.")
+        return prevState
       }
-      newBox.recipes = new Map([...newBox.recipes, [action.recipeId, action.payload]])
-      return { ...state, boxes: new Map([...state.boxes, [action.boxId, newBox as BoxType]]) }
-    case "SET_BOXES":
-      return { ...state, boxes: new Map([...state.boxes, ...action.payload]) }
-    case "CLEAR_BOXES":
-      return { ...state, boxes: new Map() }
-    case 'SET_READONLY':
-      return { ...state, writeable: action.payload as boolean }
-    default:
+      newBox.data.recipes = new Map([...newBox.data.recipes, [action.recipeId, action.payload]])
+      state = { ...prevState, boxes: new Map([...prevState.boxes, [action.boxId, newBox as BoxType]]) }
       return state
+    case "ADD_BOX":
+      if (action.boxId === undefined) {
+        console.warn("ADD_BOX requires a boxId")
+        return prevState
+      }
+      let oldBox = prevState.boxes.get(action.boxId)
+      if (action.payload === undefined) {
+        console.warn("ADD_BOX requires a payload.")
+        return prevState
+      }
+      newBox = {...action.payload} as BoxType
+      newBox.data.recipes = (oldBox && oldBox.data.recipes) || new Map<string, RecipeType>()
+      state = { ...prevState, boxes: new Map([...prevState.boxes, [action.boxId, newBox as BoxType]]) }
+      return state
+    case "REMOVE_BOX":
+      if (action.boxId === undefined) {
+        console.warn("REMOVE_BOX requires a boxId")
+        return prevState
+      }
+      state = { ...prevState, boxes: new Map(prevState.boxes)}
+      state.boxes.delete(action.boxId)
+      return state
+    case "REMOVE_RECIPE":
+      if (action.boxId === undefined || action.recipeId === undefined) {
+        console.warn("REMOVE_RECIPE requires a boxId and a recipeId")
+        return prevState
+      }
+      state = { ...prevState, boxes: new Map(prevState.boxes)}
+      let box = state.boxes.get(action.boxId)
+      if (box === undefined) {
+        return state
+      } 
+      box.data.recipes = new Map(box.data.recipes)
+      box.data.recipes.delete(action.recipeId)
+      return state
+    case "SET_BOXES":
+      return { ...prevState, boxes: new Map([...prevState.boxes, ...action.payload]) }
+    case "CLEAR_BOXES":
+      return { ...prevState, boxes: new Map() }
+    case 'SET_READONLY':
+      return { ...prevState, writeable: action.payload as boolean }
+    default:
+      return prevState
   }
 }

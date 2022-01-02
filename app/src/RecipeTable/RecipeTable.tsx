@@ -8,7 +8,7 @@ import { TableRowSelection } from 'antd/es/table/interface';
 import { DeleteOutlined, ForkOutlined } from '@ant-design/icons';
 import { deleteDoc, doc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
-import { db } from '../App';
+import { db } from '../backend';
 import Filterbox from './Filterbox';
 import './RecipeTable.css'
 

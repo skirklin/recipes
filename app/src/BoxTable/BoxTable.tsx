@@ -21,7 +21,7 @@ const columns: ColumnsType<RowType> = [
     key: 'owners',
     title: 'Owners',
     dataIndex: ['owners'],
-    render: value => {console.log(value); return <span>{value.join(', ')}</span>},
+    // render: value => {return <span>{value.join(', ')}</span>},
   },
   {
     key: 'numRecipes',

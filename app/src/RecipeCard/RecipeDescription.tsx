@@ -28,7 +28,7 @@ function RecipeDescription() {
   }
 
 
-  let description = state.recipe.description
+  let description = state.recipe.data.description
   const handleChange = (e: any) => {
     if (e.target.value !== description) {
       dispatch({ type: "SET_DESCRIPTION", payload: e.target.value });

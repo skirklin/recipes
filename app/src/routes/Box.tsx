@@ -1,27 +1,26 @@
 import { Button, Space } from "antd";
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Context } from "../context";
 
-import { subscribeToBox, unsubscribeFromBox, uploadRecipes, createNewRecipe } from "../utils";
+import { subscribeToBox, unsubscribeFromBox, uploadRecipes, createNewRecipe, getBox } from "../utils";
 import { RecipeTable, RowType } from "../RecipeTable/RecipeTable"
 import { getAuth } from "firebase/auth";
 import { Recipe } from "schema-dts";
+import { BoxType } from "../types";
 
 interface BoxRecipesProps {
-  boxId: string
+  boxId: string,
+  box: BoxType,
   writeable: boolean
 }
 function BoxRecipes(props: BoxRecipesProps) {
-  const { state } = useContext(Context)
-  const { boxId, writeable } = props;
+  const { box, boxId, writeable } = props;
 
-  const box = state.boxes.get(boxId)
+  const recipes = box.data.recipes;
   let data: RowType[] = []
-  if (box !== undefined) {
-    for (let [recipeId, recipe] of box.recipes.entries()) {
-      data.push({ boxName: box.name, recipeId, boxId, recipe, key: `recipeId=${recipeId}_boxId=${boxId}` })
-    }
+  for (let [recipeId, recipe] of recipes.entries()) {
+    data.push({ boxName: box.data.name, recipeId, boxId: boxId, recipe: recipe.data, key: `recipeId=${recipeId}_boxId=${boxId}` })
   }
   return <RecipeTable recipes={data} writeable={writeable} />
 }
@@ -34,13 +33,23 @@ function getUniqueId(rcp: Recipe) {
 }
 
 function Box() {
+  const [box, setBox] = useState<BoxType>()
   const { state, dispatch } = useContext(Context)
   const { writeable } = state
   const navigate = useNavigate()
   const params = useParams();
   if (params.boxId === undefined) { throw new Error("Must have a boxId.") }
   const boxId = params.boxId
-  const box = state.boxes.get(boxId)
+
+  useEffect(() => {
+    (async () => {
+      let box = await getBox(state, boxId)
+      if (box !== undefined) {
+        setBox(box)
+      }
+    })()
+  }, [state, boxId]
+  )
 
   let toggleSub
   if (!state.boxes.has(boxId)) {
@@ -51,11 +60,10 @@ function Box() {
 
   const addNewRecipe = () => {
     let recipe = createNewRecipe();
-    let recipeId = `uniqueId=${getUniqueId(recipe)}`
+    let recipeId = `uniqueId=${getUniqueId(recipe.data)}`
     dispatch({ type: "ADD_RECIPE", payload: recipe, boxId, recipeId })
     navigate(`/boxes/${boxId}/recipes/${recipeId}`)
   }
-  console.log(box)
 
   let modificationOptions;
   if (writeable) {
@@ -70,11 +78,15 @@ function Box() {
     modificationOptions = <></>
   }
 
+  if (box === undefined) {
+    return <div>Unable to find boxId={boxId}</div>
+  }
+
   return (
     <div>
       {modificationOptions}
-      <div>owners are: {box !== undefined ? box.owners.toString() : ""}</div>
-      <BoxRecipes boxId={boxId} writeable={writeable} />
+      <div>owners are: {box.owners.toString()}</div>
+      <BoxRecipes box={box} boxId={boxId} writeable={writeable} />
     </div>
   )
 }

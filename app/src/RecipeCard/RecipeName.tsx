@@ -33,9 +33,10 @@ function RecipeName() {
     }
   }
 
-  let name = state.recipe.name!.toString()
+  const rd = state.recipe.data
+  let name = rd.name!.toString()
   let box = rbState.boxes.get(state.boxId!);
-  let boxName = box === undefined ? "" : box.name
+  let boxName = box === undefined ? "" : box.data.name
   let handleChange = (e: any) => {
     if (name !== e.target.value) {
       dispatch({ type: "SET_NAME", payload: e.target.value });
@@ -43,8 +44,8 @@ function RecipeName() {
     setEditable(false);
   }
   let link = null;
-  if (state.recipe.url) {
-    link = <a href={state.recipe.url.toString()}><LinkOutlined /></a>
+  if (rd.url) {
+    link = <a href={rd.url.toString()}><LinkOutlined /></a>
   }
   if (editable) {
     return (

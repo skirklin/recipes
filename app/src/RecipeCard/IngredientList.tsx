@@ -18,12 +18,8 @@ function IngredientList() {
   const rbState = useContext(Context).state;
 
   const setEditable = (value: boolean) => {
-    console.log("want to set editable")
     if (rbState.writeable) {
-      console.log("actually setting editable")
       setEditablePrimitive(value)
-    } else {
-      console.log(`but couldn't because writeable ${rbState.writeable}`)
     }
   }
 
@@ -36,7 +32,7 @@ function IngredientList() {
     width: "60%",
   }
 
-  let ingredients = state.recipe.recipeIngredient;
+  let ingredients = state.recipe.data.recipeIngredient;
   const handleChange = (e: any) => {
     if (formatIngredientList(ingredients) !== e.target.value) {
       dispatch({ type: "SET_INGREDIENTS", payload: strToIngredients(e.target.value) });

@@ -1,45 +1,20 @@
 import { useMemo, useReducer, useEffect } from 'react';
-import { initializeApp } from 'firebase/app';
-import { getAuth, connectAuthEmulator } from "firebase/auth";
-import { getFirestore, connectFirestoreEmulator, getDoc, onSnapshot, Unsubscribe, doc, setDoc, DocumentReference, DocumentData } from "firebase/firestore";
-import { collection, getDocs } from "firebase/firestore";
+import { getAuth } from "firebase/auth";
 import Modal from 'react-modal';
 import 'antd/dist/antd.css'; // or 'antd/dist/antd.less'
 
-import { RecipeBoxStateType, RecipeBoxActionType, BoxType } from './types';
+import { RecipeBoxStateType, RecipeBoxActionType, UnsubMap, BoxUnsub } from './types';
 import { Context, initState, recipeBoxReducer } from './context';
 import Header from './Header/Header';
-import { Recipe } from 'schema-dts';
 import { Outlet } from 'react-router-dom';
 
-
-// Configure Firebase.
-const firebaseConfig = {
-  apiKey: "AIzaSyDedu30sRQT4qerzEdts_meMkCM8164sHQ",
-  authDomain: "recipe-box-335721.firebaseapp.com",
-  projectId: "recipe-box-335721",
-  storageBucket: "recipe-box-335721.appspot.com",
-  messagingSenderId: "779965064363",
-  appId: "1:779965064363:web:78d754d6591b130cdb83ee",
-  // measurementId: "G-ZWWFPLHJHE"
-};
-
-export const app = initializeApp(firebaseConfig);
-
-// setup auth emulator
-const auth = getAuth();
-connectAuthEmulator(auth, "http://localhost:9099");
-
-// setup firestore emulator
-export const db = getFirestore();
-connectFirestoreEmulator(db, 'localhost', 8080);
+import { subscribeToUser, unsubscribe } from './subscription';
 
 Modal.setAppElement('#root'); // for accessibility. See: https://reactcommunity.org/react-modal/accessibility/
 
-
 function App() {
-
   const [state, dispatch] = useReducer<React.Reducer<RecipeBoxStateType, RecipeBoxActionType>>(recipeBoxReducer, initState())
+  const { boxes } = state;
 
   const recipesValue = useMemo(() => {
     return { state, dispatch };
@@ -54,66 +29,29 @@ function App() {
         return
       }
 
-      let userRef = doc(db, "users", user.uid);
-      getDoc(userRef).then(
-        u => {
-          if (!u.exists()) {
-            let userBoxRef = doc(db, "boxes", user.uid);
-            getDoc(userBoxRef).then(
-              ub => {
-                if (!ub.exists()) {
-                  setDoc(userBoxRef, { owners: [userRef], name: `${user.displayName}'s box` })
-                } else {
-                  alert(`${user.displayName}'s box existed even though the user didn't?`)
-                }
-              }
-            )
-            setDoc(userRef, { "new": false, "boxes": [userBoxRef] })
-          }
-        }
-      )
+      let unsubMap: UnsubMap = {
+        userUnsub: undefined,
+        boxesUnsub: undefined,
+        boxMap: new Map<string, BoxUnsub>(),
+      }
 
-      let unsubscribes: Unsubscribe[] = [];
-      // subscription for changes to user
-      let unsub = onSnapshot(userRef, (snapshot) => {
-        let d = snapshot.data()
-        if (d === undefined) {
-          return
-        }
-        dispatch({ type: "CLEAR_BOXES" })
-        let boxes = d!.boxes as DocumentReference[]
-
-        boxes.forEach(b => {
-          // subscription for changes to boxes
-          let boxRef = doc(db, "boxes", b.id)
-          let boxRecipesRef = collection(db, "boxes", b.id, "recipes")
-          getDoc(boxRef)
-            .then(boxDoc => {
-              if (boxDoc === undefined) {
-                return
-              }
-              const boxData = boxDoc.data() as DocumentData
-              const owners: string[] = boxData.owners.map((o: any) => o.name);
-              let box = { recipes: new Map<string,Recipe>(), name: boxData.name, owners}
-              dispatch({ type: "SET_BOXES", payload: new Map([[b.id, box as BoxType]]) })
-
-              // subscription for changes to recipes within boxes
-              unsub = onSnapshot(boxRecipesRef, (snapshot) => {
-                getDocs(collection(db, "boxes", b.id, "recipes")).then(querySnap => {
-                  let recipes = new Map(snapshot.docs.map(r => [r.id, r.data() as Recipe]))
-                  let box = { recipes, name: boxDoc.data()!.name, owners: owners }
-                  dispatch({ type: "SET_BOXES", payload: new Map([[b.id, box as BoxType]]) })
-                })
-              })
-              unsubscribes.push(unsub)
-            })
-        })
-      })
-      unsubscribes.push(unsub)
-      return () => { console.log("Unsubscribed from all."); unsubscribes.forEach(unsub => unsub()) }
-    }
-    , [user]
+      // useRef to let this async chain self-terminate if the component unmounts.
+      // errr, okay, another problem is that a part of the tree can fall out of 
+      // interest, but it doesn't get unsubscribed since that is all or nothing.
+      // todo: track the full tree of thing => unsubscriber mappings, and when 
+      // removing stuff also unsubscribe.
+      subscribeToUser(user, dispatch, unsubMap)
+      return () => { console.debug("Unsubscring from all."); unsubscribe(unsubMap) }
+    }, [user]
   )
+
+  useEffect(
+    () => {
+
+    }, [user, boxes],
+  )
+
+
 
   return (
     <Context.Provider value={recipesValue}>
