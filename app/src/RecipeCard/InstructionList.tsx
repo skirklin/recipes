@@ -56,7 +56,7 @@ function InstructionList() {
     )
   }
 
-  let instructions = state.recipe.recipeInstructions;
+  let instructions = state.recipe.data.recipeInstructions;
 
   const handleChange = (e: any) => {
     if (formatInstructionList(instructions) !== e.target.value) {

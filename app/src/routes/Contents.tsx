@@ -10,10 +10,11 @@ function Contents() {
   
   let data: RowType[] = []
   for (let [boxId, box] of state.boxes.entries()) {
-    for (let [recipeId, recipe] of box.recipes.entries()) {
-      data.push({ boxName: box.name, recipeId, boxId, recipe, key: `recipeId=${recipeId}_boxId=${boxId}` })
+    for (let [recipeId, recipe] of box.data.recipes.entries()) {
+      data.push({ boxName: box.data.name, recipeId, boxId, recipe: recipe.data, key: `recipeId=${recipeId}_boxId=${boxId}` })
     }
   }
+  console.log({state})
 
   return (
     <div>

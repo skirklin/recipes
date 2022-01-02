@@ -13,12 +13,12 @@ function Breadcrumbs() {
   if (boxId !== undefined) {
     let box = state.boxes.get(boxId)
     if (box !== undefined) {
-      partMap.set(boxId, box.name)
+      partMap.set(boxId, box.data.name)
 
       if (recipeId !== undefined) {
-        let recipe = box.recipes.get(recipeId)
+        let recipe = box.data.recipes.get(recipeId)
         if (recipe !== undefined) {
-          let rname = recipe.name === undefined ? "" : recipe.name.toString()
+          let rname = recipe.data.name === undefined ? "" : recipe.data.name.toString()
           partMap.set(recipeId, rname)
 
         }

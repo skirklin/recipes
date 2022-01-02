@@ -1,12 +1,14 @@
 import _ from 'lodash';
 import { createContext } from 'react';
-import { Recipe } from 'schema-dts';
+import { RecipeType } from '../types';
+import { createNewRecipe } from '../utils';
 
 
 export type RecipeStateType = {
   recipeId?: string,
   boxId: string,
-  recipe: Recipe,
+  recipe: RecipeType,
+  original: RecipeType,
   changed: boolean,
 }
 
@@ -18,11 +20,12 @@ export type RecipeActionType = {
 
 
 export function initState(): RecipeStateType {
-  let r: Recipe = { "@type": "Recipe" };
+  let r = createNewRecipe()
   return {
     recipeId: "",
     boxId: "",
     recipe: r,
+    original: r,
     changed: false,
   }
 }
@@ -46,19 +49,19 @@ export function recipeReducer(state: RecipeStateType, action: RecipeActionType):
   let newState = { ...state }
   switch (action.type) {
     case 'SET_NAME':
-      newState.recipe.name = action.payload;
+      newState.recipe.data.name = action.payload;
       newState.changed = true;
       return newState
     case 'SET_INGREDIENTS':
-      newState.recipe.recipeIngredient = action.payload
+      newState.recipe.data.recipeIngredient = action.payload
       newState.changed = true;
       return newState
     case 'SET_INSTRUCTIONS':
-      newState.recipe.recipeInstructions = action.payload;
+      newState.recipe.data.recipeInstructions = action.payload;
       newState.changed = true;
       return newState
     case 'SET_DESCRIPTION':
-      newState.recipe.description = action.payload;
+      newState.recipe.data.description = action.payload;
       newState.changed = true;
       return newState
     case 'SET_RECIPE':

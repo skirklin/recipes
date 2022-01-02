@@ -13,9 +13,9 @@ function Boxes() {
   const [newBoxName, setNewBoxName] = useState<string>();
 
   const boxes: RowType[] = Array.from(state.boxes).map(([key, value]) => ({
-    name: value.name,
+    name: value.data.name,
     owners: value.owners,
-    numRecipes: value.recipes.size,
+    numRecipes: value.data.recipes.size,
     boxId: key,
     key: key,
   } as RowType))

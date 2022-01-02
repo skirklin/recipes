@@ -3,7 +3,7 @@ import { Button } from 'antd';
 import { addDoc, collection, doc, setDoc } from 'firebase/firestore';
 import { useContext } from 'react';
 import styled from 'styled-components';
-import { db } from '../App';
+import { db } from '../backend';
 
 import { RecipeContext } from './context';
 

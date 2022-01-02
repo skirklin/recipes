@@ -1,4 +1,4 @@
-import { useContext, useReducer } from 'react';
+import { useReducer } from 'react';
 import styled from 'styled-components';
 
 import { recipeReducer, RecipeActionType, RecipeContext, RecipeStateType } from './context';
@@ -12,14 +12,11 @@ import IngredientList from './IngredientList';
 import RecipeName from './RecipeName';
 import RecipeDescription from './RecipeDescription';
 import Image from './Image';
-import { Context } from '../context';
-import { getRecipe } from '../utils';
 import _ from 'lodash';
-import { Recipe } from 'schema-dts';
-
+import { RecipeType } from '../types';
 
 interface RecipeProps {
-  recipe?: Recipe
+  recipe: RecipeType
   recipeId?: string
   boxId: string
 }
@@ -43,11 +40,10 @@ const IndexCardLine = styled.hr`
 `
 
 function RecipeCard(props: RecipeProps) {
-  const ctx = useContext(Context)
   let { recipeId, boxId, recipe } = props;
-  recipe = recipe || _.cloneDeep(getRecipe(ctx.state, recipeId, boxId)!)
+  const original = _.cloneDeep(recipe)
   const [state, dispatch] = useReducer<React.Reducer<RecipeStateType, RecipeActionType>>(recipeReducer, {
-    recipe, recipeId, boxId,
+    recipe, original, recipeId, boxId,
     changed: false
   });
 

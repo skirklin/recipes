@@ -4,7 +4,7 @@ import { useContext } from 'react';
 import styled from 'styled-components';
 import { RecipeContext } from './context';
 import { deleteDoc, doc } from 'firebase/firestore';
-import { db } from '../App';
+import { db } from '../backend';
 import { Context } from '../context';
 
 const StyledButton = styled(Button)`
