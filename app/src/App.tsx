@@ -1,9 +1,9 @@
 import { useMemo, useReducer, useEffect } from 'react';
-import { getAuth } from "firebase/auth";
+import { getAuth, Unsubscribe } from "firebase/auth";
 import Modal from 'react-modal';
 import 'antd/dist/antd.css'; // or 'antd/dist/antd.less'
 
-import { RecipeBoxStateType, RecipeBoxActionType, UnsubMap, BoxUnsub } from './types';
+import { RecipeBoxStateType, RecipeBoxActionType, UnsubMap } from './types';
 import { Context, initState, recipeBoxReducer } from './context';
 import Header from './Header/Header';
 import { Outlet } from 'react-router-dom';
@@ -32,7 +32,8 @@ function App() {
       let unsubMap: UnsubMap = {
         userUnsub: undefined,
         boxesUnsub: undefined,
-        boxMap: new Map<string, BoxUnsub>(),
+        boxMap: new Map<string, Unsubscribe>(),
+        recipeMap: new Map<string, Unsubscribe>(),
       }
 
       // useRef to let this async chain self-terminate if the component unmounts.

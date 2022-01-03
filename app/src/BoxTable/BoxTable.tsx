@@ -15,7 +15,7 @@ const columns: ColumnsType<RowType> = [
   {
     key: 'name',
     title: 'Name',
-    dataIndex: ['name'],
+    dataIndex: 'name',
   },
   {
     key: 'owners',

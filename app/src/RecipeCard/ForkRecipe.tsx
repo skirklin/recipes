@@ -3,9 +3,9 @@ import { Button } from 'antd';
 import { useContext, useState } from 'react';
 import styled from 'styled-components';
 
-import { SelectBoxContext, PickBoxModal } from './PickBoxModal';
+import { SelectBoxContext, PickBoxModal } from '../Buttons/PickBoxModal';
 import { Context } from '../context';
-import { addDoc, collection } from 'firebase/firestore';
+import { addDoc, arrayUnion, collection, doc, updateDoc } from 'firebase/firestore';
 import { db } from '../backend';
 import { RecipeContext } from './context';
 import { useNavigate } from 'react-router-dom';
@@ -30,8 +30,10 @@ function ForkRecipe() {
     }
     setIsModalVisible(false)
     console.log("forking into", tgtBox)
-    let colRef = collection(db, "boxes", tgtBox, "recipes")
+    let boxRef = doc(db, "boxes", tgtBox)
+    let colRef = collection(db, "recipes")
     let recipeRef = await addDoc(colRef, state.recipe)
+    await updateDoc(boxRef, {'data.recipes': arrayUnion(recipeRef)})
     navigate(`/boxes/${tgtBox}/recipes/${recipeRef.id}`)
   }
 

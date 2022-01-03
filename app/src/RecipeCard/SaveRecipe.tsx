@@ -1,9 +1,10 @@
 import { SaveOutlined } from '@ant-design/icons';
 import { Button } from 'antd';
-import { addDoc, collection, doc, setDoc } from 'firebase/firestore';
+import { doc, setDoc } from 'firebase/firestore';
 import { useContext } from 'react';
 import styled from 'styled-components';
 import { db } from '../backend';
+import { addRecipe } from '../utils';
 
 import { RecipeContext } from './context';
 
@@ -17,16 +18,14 @@ function SaveButton() {
 
   async function save() {
     let docRef;
-    if (state.recipeId !== undefined) {
-      docRef = doc(db, "boxes", state.boxId, "recipes", state.recipeId);
-      await setDoc(docRef, state.recipe)
+    if (state.recipeId === undefined || state.recipeId.startsWith("uniqueId=")) {
+      let docRef = await addRecipe(state.boxId, state.recipe)
       dispatch({ type: "SET_RECIPE", payload: state.recipe, recipeId: docRef.id })
     } else {
-      let colRef = collection(db, "boxes", state.boxId, "recipes")
-      docRef = await addDoc(colRef, state.recipe)
+      docRef = doc(db, "recipes", state.recipeId);
+      await setDoc(docRef, state.recipe)
       dispatch({ type: "SET_RECIPE", payload: state.recipe, recipeId: docRef.id })
     }
-
   }
 
   if (state.changed) {

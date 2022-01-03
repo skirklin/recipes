@@ -11,6 +11,8 @@ import { useNavigate } from 'react-router-dom';
 import { db } from '../backend';
 import Filterbox from './Filterbox';
 import './RecipeTable.css'
+import NewButton from '../Buttons/NewRecipe';
+import UploadButton from '../Buttons/UploadRecipes';
 
 function sortfunc(a: string, b: string) {
   var A = a.toUpperCase(); // ignore upper and lowercase
@@ -36,6 +38,7 @@ export interface RowType {
 interface RecipeTableProps {
   recipes: RowType[]
   writeable: boolean
+  boxId?: string
 }
 
 export function RecipeTable(props: RecipeTableProps) {
@@ -44,7 +47,7 @@ export function RecipeTable(props: RecipeTableProps) {
   const [selectedRows, setSelectedRows] = useState<RowType[]>([])
   let navigate = useNavigate();
 
-  const { writeable, recipes } = props;
+  const { writeable, recipes, boxId } = props;
   const [filteredRows, setFilteredRows] = useState<RowType[]>([])
 
   useEffect(() => setFilteredRows(recipes), [recipes])
@@ -89,7 +92,7 @@ export function RecipeTable(props: RecipeTableProps) {
   async function del() {
     selectedRows.forEach(
       (value: RowType) => {
-        deleteDoc(doc(db, "boxes", value.boxId, "recipes", value.recipeId))
+        deleteDoc(doc(db, "recipes", value.recipeId))
       }
     )
   }
@@ -100,15 +103,18 @@ export function RecipeTable(props: RecipeTableProps) {
         <Filterbox data={recipes} setFilteredRows={setFilteredRows} />
       </div>
       <div style={{ float: 'right', display: 'inline-flex', padding: '5px' }}>
+        <NewButton boxId={boxId} disabled={!writeable}/>
+        <UploadButton boxId={boxId} disabled={!writeable}/>
         <Popconfirm
           title={`Are you sure to delete ${selectedRowKeys.length > 1 ? "these recipes" : "this recipe"}s`}
           onConfirm={del}
           okText="Yes"
+          disabled={!writeable || !hasSelected}
           cancelText="No"
         >
-          <Button disabled={!writeable || !hasSelected}><DeleteOutlined /></Button>
+          <Button disabled={!writeable || !hasSelected} title="Delete recipes"><DeleteOutlined /></Button>
         </Popconfirm>
-        <Button onClick={() => { console.log("fork", selectedRowKeys) }} disabled={!hasSelected}><ForkOutlined /></Button>
+        <Button title="Copy recipes into different box" onClick={() => { console.log("fork", selectedRowKeys) }} disabled={!hasSelected}><ForkOutlined /></Button>
       </div>
       <Table<RowType>
         pagination={false}

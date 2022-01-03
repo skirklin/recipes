@@ -1,10 +1,10 @@
 /* helper functions for converting between structured data and text. */
 import { getAuth, User } from 'firebase/auth';
-import { addDoc, collection, deleteDoc, doc, getDoc, getDocs, setDoc } from 'firebase/firestore';
+import { addDoc, arrayRemove, arrayUnion, collection, doc, getDoc, getDocs, updateDoc } from 'firebase/firestore';
 import _ from 'lodash';
 import { Recipe } from "schema-dts"
 import { db } from './backend';
-import { BoxType, RecipeBoxStateType, RecipeType, Visibility } from './types';
+import { BoxStoreType, BoxType, RecipeBoxStateType, RecipeType, Visibility } from './types';
 
 
 export function strToIngredients(str: string): Recipe["recipeIngredient"] {
@@ -85,17 +85,17 @@ export async function getRecipes(state: RecipeBoxStateType, boxId: string) {
 export async function getBox(state: RecipeBoxStateType, boxId: string) {
   const boxRef = doc(db, "boxes", boxId)
   const boxDoc = await getDoc(boxRef)
-  if (!boxDoc.exists()) {
+  if (!boxDoc.exists() || boxDoc.data() === undefined) {
     return undefined
   }
+  let box = boxDoc.data() as BoxType
   return ({
     data: {
       recipes: await getRecipes(state, boxId),
-      name: "whatever",
+      name: box.data.name,
     },
-    id: boxId,
-    visibility: Visibility.private,
-    owners: [],
+    visibility: box.visibility,
+    owners: box.owners,
   })
 }
 
@@ -109,7 +109,7 @@ export async function subscribeToBox(user: User | null, boxId: string) {
   if (!boxDoc.exists()) {
     return undefined
   }
-  await setDoc(doc(db, "users", user.uid, "boxes", boxId), { box: boxRef })
+  await updateDoc(doc(db, "users", user.uid), { boxes: arrayUnion(boxRef) })
 }
 
 
@@ -117,8 +117,8 @@ export async function unsubscribeFromBox(user: User | null, boxId: string) {
   if (user === null) {
     return undefined
   }
-  let docRef = doc(db, "users", user.uid, "boxes", boxId)
-  await deleteDoc(docRef)
+  const boxRef = doc(db, "boxes", boxId)
+  await updateDoc(doc(db, "users", user.uid), { boxes: arrayRemove(boxRef) })
 }
 
 export async function uploadRecipes(boxId: string) {
@@ -126,42 +126,58 @@ export async function uploadRecipes(boxId: string) {
   let fileHandles: File[] = await window.showOpenFilePicker({
     multiple: true,
   })
-  let recipeIds: string[] = [];
-  fileHandles.forEach(fh => {
+  for (let fh of fileHandles) {
     /* @ts-expect-error */
-    fh.getFile().then(
-      async (f: File) => {
-        let text = await f.text()
-        let jsonobj = JSON.parse(text) as Recipe
-        let recipesRef = collection(db, "boxes", boxId!, "recipes");
-        let user = getAuth().currentUser
-        if (user === null) {
-          return
-        }
-        let fullRecipe: RecipeType = {
-          data: jsonobj,
-          owners: [user.uid],
-          visibility: Visibility.private,
-        }
-        let recipeRef = await addDoc(recipesRef, fullRecipe)
-        recipeIds.push(recipeRef.id)
-      }
-    )
-  })
+    fh.getFile().then(f => {
+      f.text().then(
+        (text: string) => {
+          let jsonobj = JSON.parse(text) as Recipe
+          let user = getAuth().currentUser
+          if (user === null) {
+            return
+          }
+          let fullRecipe: RecipeType = {
+            data: jsonobj,
+            owners: [user.uid],
+            visibility: Visibility.private,
+          }
+          addRecipe(boxId, fullRecipe)
+        })
+    })
+  }
+}
+
+export async function addRecipe(boxId: string, recipe: RecipeType) {
+  let boxRef = doc(db, "boxes", boxId)
+  let colRef = collection(db, "recipes")
+  let recipeRef = await addDoc(colRef, recipe)
+  await updateDoc(boxRef, { 'data.recipes': arrayUnion(recipeRef) })
+  return recipeRef
 }
 
 export async function addBox(user: User | null, name: string) {
   if (user === null) {
     return undefined
   }
-  const boxesCol = collection(db, "users", user.uid, "boxes")
-  const boxRef = await addDoc(collection(db, "boxes"), { name, owners: [user.uid], visibility: Visibility.private })
-  await addDoc(boxesCol, { box: boxRef })
+  const boxesCol = collection(db, "boxes")
+  const boxData: BoxStoreType = {
+    owners: [user.uid],
+    visibility: Visibility.private,
+    data: {
+      name,
+      recipes: [],
+    }
+  }
+  const userRef = doc(db, "users", user.uid)
+  const boxRef = await addDoc(boxesCol, boxData)
+  await updateDoc(userRef, { boxes: arrayUnion(boxRef) })
   return boxRef
 }
 
 export function createNewRecipe(): RecipeType {
   return {
+    visibility: Visibility.private,
+    owners: [],
     data: {
       "@type": "Recipe",
       "name": "New recipe",
@@ -169,8 +185,6 @@ export function createNewRecipe(): RecipeType {
       "recipeIngredient": [],
       "description": "",
     },
-    visibility: Visibility.private,
-    owners: [],
   }
 }
 
@@ -184,4 +198,11 @@ export function createNewBox(): BoxType {
     visibility: Visibility.private,
     owners: [],
   }
+}
+
+const objIdMap = new WeakMap();
+var objectCount = 0;
+export function getUniqueId(rcp: Recipe) {
+  if (!objIdMap.has(rcp)) objIdMap.set(rcp, ++objectCount);
+  return objIdMap.get(rcp);
 }

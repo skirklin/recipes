@@ -1,4 +1,4 @@
-import { Unsubscribe } from 'firebase/firestore';
+import { DocumentReference, Unsubscribe } from 'firebase/firestore';
 import { Recipe } from 'schema-dts';
 
 export type RecipePointer = {
@@ -11,6 +11,15 @@ export type BoxPointer = {
 }
 
 export type AllType = {
+}
+
+export type BoxStoreType = {
+  owners: string[], // user ids
+  visibility: Visibility,
+  data: {
+    name: string,
+    recipes: DocumentReference[],
+  }
 }
 
 export type BoxType = {
@@ -47,15 +56,11 @@ export type RecipeBoxActionType = {
   payload?: any
 }
 
-export type BoxUnsub = {
-  boxUnsub: Unsubscribe | undefined,
-  recipeUnsub: Unsubscribe | undefined,
-}
-
 export type UnsubMap = {
   userUnsub: Unsubscribe | undefined,
   boxesUnsub: Unsubscribe | undefined,
-  boxMap: Map<string, BoxUnsub>
+  boxMap: Map<string, Unsubscribe>
+  recipeMap: Map<string, Unsubscribe>
 }
 
 export enum Visibility {
