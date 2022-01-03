@@ -5,35 +5,33 @@ import styled from 'styled-components';
 
 import { SelectBoxContext, PickBoxModal } from '../Buttons/PickBoxModal';
 import { Context } from '../context';
-import { addDoc, arrayUnion, collection, doc, updateDoc } from 'firebase/firestore';
-import { db } from '../backend';
-import { RecipeContext } from './context';
 import { useNavigate } from 'react-router-dom';
+import { addRecipe } from '../utils';
+import { RecipeType } from '../types';
 
 const StyledButton = styled(Button)`
   display: inline-block;
   float: right;
 `
 
-function ForkRecipe() {
-  const rbCtx = useContext(Context)
+interface ForkProps {
+  recipe: RecipeType
+}
+
+function ForkRecipe(props: ForkProps) {
+  const { recipe } = props;
+  const {state} = useContext(Context)
+  const { writeable } = state;
   const navigate = useNavigate()
-  const { writeable } = rbCtx.state;
-  const { state } = useContext(RecipeContext)
   const [isModalVisible, setIsModalVisible] = useState(false)
   const [tgtBox, setTgtBox] = useState<string | undefined>(undefined)
-
 
   async function fork() {
     if (tgtBox === undefined) {
       return // leave the modal visible until something is selected
     }
     setIsModalVisible(false)
-    console.log("forking into", tgtBox)
-    let boxRef = doc(db, "boxes", tgtBox)
-    let colRef = collection(db, "recipes")
-    let recipeRef = await addDoc(colRef, state.recipe)
-    await updateDoc(boxRef, {'data.recipes': arrayUnion(recipeRef)})
+    let recipeRef = await addRecipe(tgtBox, recipe)
     navigate(`/boxes/${tgtBox}/recipes/${recipeRef.id}`)
   }
 

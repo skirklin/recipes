@@ -56,6 +56,7 @@ function InstructionList() {
     )
   }
 
+  if (state.recipe === undefined)  { return null }
   let instructions = state.recipe.data.recipeInstructions;
 
   const handleChange = (e: any) => {

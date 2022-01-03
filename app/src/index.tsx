@@ -12,7 +12,7 @@ import WrappedApp from './Auth';
 import Contents from './routes/Contents'
 import Box from './routes/Box';
 import Boxes from './routes/Boxes';
-import { RoutedRecipe } from './routes/Recipe';
+import RoutedRecipe from './routes/Recipe';
 import MissingPage from './routes/MissingPage'
 
 ReactDOM.render(
@@ -21,6 +21,7 @@ ReactDOM.render(
       <Routes>
         <Route path="/" element={<WrappedApp />}>
           <Route index element={<Contents />} />
+          <Route path="settings" element={<Boxes />} />
           <Route path="boxes" element={<Boxes />} />
           <Route path="boxes/:boxId" element={<Box />} />
           <Route path="boxes/:boxId/recipes" element={<Box />} />

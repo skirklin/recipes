@@ -28,6 +28,7 @@ function RecipeDescription() {
   }
 
 
+  if (state.recipe === undefined)  { return null }
   let description = state.recipe.data.description
   const handleChange = (e: any) => {
     if (e.target.value !== description) {

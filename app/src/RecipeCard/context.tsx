@@ -7,8 +7,8 @@ import { createNewRecipe } from '../utils';
 export type RecipeStateType = {
   recipeId?: string,
   boxId: string,
-  recipe: RecipeType,
-  original: RecipeType,
+  recipe?: RecipeType,
+  original?: RecipeType,
   changed: boolean,
 }
 
@@ -47,20 +47,25 @@ export const RecipeContext = createContext<ContextType>(
 
 export function recipeReducer(state: RecipeStateType, action: RecipeActionType): RecipeStateType {
   let newState = { ...state }
+  console.log({ action })
   switch (action.type) {
     case 'SET_NAME':
+      if (newState.recipe === undefined) return newState
       newState.recipe.data.name = action.payload;
       newState.changed = true;
       return newState
     case 'SET_INGREDIENTS':
+      if (newState.recipe === undefined) return newState
       newState.recipe.data.recipeIngredient = action.payload
       newState.changed = true;
       return newState
     case 'SET_INSTRUCTIONS':
+      if (newState.recipe === undefined) return newState
       newState.recipe.data.recipeInstructions = action.payload;
       newState.changed = true;
       return newState
     case 'SET_DESCRIPTION':
+      if (newState.recipe === undefined) return newState
       newState.recipe.data.description = action.payload;
       newState.changed = true;
       return newState

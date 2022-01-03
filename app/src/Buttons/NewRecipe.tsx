@@ -40,9 +40,17 @@ export default function NewButton(props: NewProps) {
         addNewRecipe(boxId)
     }
 
+    function newRecipeFlow() {
+        if (boxId === undefined) {
+            setIsModalVisible(true)
+        } else {
+            addNewRecipe(boxId)
+        }
+    }
+
     return (<>
         <SelectBoxContext.Provider value={contextValue}>
-            <Button title="Create new recipe" disabled={disabled} onClick={() => setIsModalVisible(true)}><PlusOutlined /></Button>
+            <Button title="Create new recipe" disabled={disabled} onClick={newRecipeFlow}><PlusOutlined /></Button>
             <PickBoxModal handleOk={newRecipe} />
         </ SelectBoxContext.Provider >
     </>)

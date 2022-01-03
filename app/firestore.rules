@@ -15,13 +15,14 @@ service cloud.firestore {
       allow write: if resource == null || request.auth.uid in resource.data.owners;
 
       match /recipes/{recipe} {
-        allow read: if resource == null || request.auth.uid in get(/databases/$(database)/documents/boxes/$(box)).data.owners || request.auth.uid in resource.data.owners || resource.data.visibility != 'private';
-        allow write: if resource == null || request.auth.uid in get(/databases/$(database)/documents/boxes/$(box)).data.owners || request.auth.uid in resource.data.owners;
+        allow read: if resource == null 
+          || request.auth.uid in resource.data.owners
+          || request.auth.uid in get(/databases/$(database)/documents/boxes/$(box)).data.owners
+          || resource.data.visibility != 'private';
+        allow write: if resource == null 
+          || request.auth.uid in get(/databases/$(database)/documents/boxes/$(box)).data.owners 
+          || request.auth.uid in resource.data.owners;
       }
-    }
-    match /recipes/{recipe} {
-      allow read: if resource == null || request.auth.uid in resource.data.owners || resource.data.visibility != 'private';
-      allow write: if resource == null || request.auth.uid in resource.data.owners;
     }
   }
 }

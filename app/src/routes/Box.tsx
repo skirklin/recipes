@@ -21,7 +21,7 @@ function BoxRecipes(props: BoxRecipesProps) {
   for (let [recipeId, recipe] of recipes.entries()) {
     data.push({ boxName: box.data.name, recipeId, boxId: boxId, recipe: recipe.data, key: `recipeId=${recipeId}_boxId=${boxId}` })
   }
-  return <RecipeTable recipes={data} writeable={writeable} />
+  return <RecipeTable recipes={data} writeable={writeable} boxId={boxId} />
 }
 
 function Box() {
