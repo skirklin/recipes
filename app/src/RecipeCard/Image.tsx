@@ -4,6 +4,9 @@ import { RecipeContext } from "./context";
 export default function Image() {
 
   const { state } = useContext(RecipeContext);
+  if (state.recipe === undefined) {
+    return null
+  }
   let image = state.recipe.data.image;
 
   if (image === undefined) {

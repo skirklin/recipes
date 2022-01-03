@@ -2,27 +2,29 @@ import { DeleteOutlined } from '@ant-design/icons';
 import { Button, Popconfirm } from 'antd';
 import { useContext } from 'react';
 import styled from 'styled-components';
-import { RecipeContext } from './context';
-import { deleteDoc, doc } from 'firebase/firestore';
-import { db } from '../backend';
 import { Context } from '../context';
 import { useNavigate } from 'react-router-dom';
+import { deleteRecipe } from '../utils';
 
 const StyledButton = styled(Button)`
   display: inline;
   float: right;
 `
 
-function DeleteButton() {
-  const { state } = useContext(RecipeContext);
-  const rbCtx = useContext(Context)
-  const navigate = useNavigate()
-  const { writeable } = rbCtx.state;
+interface DeleteProps {
+  recipeId: string
+  boxId: string
+}
 
-  let { recipeId, boxId } = state;
+function DeleteButton(props: DeleteProps) {
+  const { state } = useContext(Context)
+  const { writeable } = state;
+  const navigate = useNavigate()
+
+  let { recipeId, boxId } = props;
 
   async function del() {
-    deleteDoc(doc(db, "recipes", recipeId!))
+    deleteRecipe(state, boxId, recipeId)
     navigate(`/boxes/${boxId}`)
   }
 

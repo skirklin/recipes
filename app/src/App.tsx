@@ -32,8 +32,10 @@ function App() {
       let unsubMap: UnsubMap = {
         userUnsub: undefined,
         boxesUnsub: undefined,
-        boxMap: new Map<string, Unsubscribe>(),
-        recipeMap: new Map<string, Unsubscribe>(),
+        boxMap: new Map<string, {
+          boxUnsub: Unsubscribe,
+          recipesUnsub: Unsubscribe
+        }>(),
       }
 
       // useRef to let this async chain self-terminate if the component unmounts.

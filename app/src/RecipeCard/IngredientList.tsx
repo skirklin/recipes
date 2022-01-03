@@ -32,6 +32,8 @@ function IngredientList() {
     width: "60%",
   }
 
+  if (state.recipe === undefined)  { return null }
+
   let ingredients = state.recipe.data.recipeIngredient;
   const handleChange = (e: any) => {
     if (formatIngredientList(ingredients) !== e.target.value) {

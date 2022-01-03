@@ -1,21 +1,19 @@
 import { DownloadOutlined } from '@ant-design/icons';
 import { Button } from 'antd';
-import { useContext } from 'react';
 import styled from 'styled-components';
-import { getRecipe } from '../utils';
-import { Context } from '../context';
-import { RecipeContext } from './context';
+import { RecipeType } from '../types';
 
 const StyledButton = styled(Button)`
   display: inline;
   float: right;
 `
 
-function SaveButton() {
-  const { state } = useContext(RecipeContext);
-  const ctx = useContext(Context)
-  let  {recipeId, boxId, recipe} = state;
-  recipe = recipe || getRecipe(ctx.state, recipeId, boxId)
+interface DownloadProps {
+  recipe: RecipeType
+}
+
+function DownloadButton(props: DownloadProps) {
+  let { recipe } = props;
 
   let textFile: string | null;
 
@@ -36,7 +34,7 @@ function SaveButton() {
 
   function download() {
     var downloadLink = document.createElement("a");
-    downloadLink.download = recipe.data.name + ".json"
+    downloadLink.download = recipe!.data.name + ".json"
     downloadLink.innerHTML = "Download File";
 
     // Create a "file" to download
@@ -51,7 +49,7 @@ function SaveButton() {
     });
 
   }
-  return <StyledButton icon={<DownloadOutlined />} onClick={download} />
+  return <StyledButton icon={<DownloadOutlined />} disabled={!recipe} onClick={download} />
 }
 
-export default SaveButton;
+export default DownloadButton;

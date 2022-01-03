@@ -19,7 +19,7 @@ function SaveButton() {
   async function save() {
     let docRef;
     if (state.recipeId === undefined || state.recipeId.startsWith("uniqueId=")) {
-      let docRef = await addRecipe(state.boxId, state.recipe)
+      let docRef = await addRecipe(state.boxId, state.recipe!)
       dispatch({ type: "SET_RECIPE", payload: state.recipe, recipeId: docRef.id })
     } else {
       docRef = doc(db, "recipes", state.recipeId);
@@ -29,7 +29,7 @@ function SaveButton() {
   }
 
   if (state.changed) {
-    return <StyledButton icon={<SaveOutlined />} onClick={save}>Save</StyledButton>
+    return <StyledButton icon={<SaveOutlined />} disabled={state.recipe === undefined} onClick={save}>Save</StyledButton>
   } else {
     return null
   }

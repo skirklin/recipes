@@ -54,8 +54,8 @@ async function handleUserSnapshot(
         let boxUnsub = onSnapshot(boxRef, (snapshot) => handleBoxSnapshot(snapshot, dispatch, unsubMap))
 
         let recipesRef = collection(db, "boxes", boxRef.id, "recipes")
-        let recipesUnsub = onSnapshot(recipesRef, (snapshot) => handleRecipesSnapshot(snapshot, dispatch))
-        unsubMap.boxMap.set(boxRef.id, {recipesUnsub, boxUnsub})
+        let recipesUnsub = onSnapshot(recipesRef, (snapshot) => handleRecipesSnapshot(snapshot, dispatch, boxRef.id))
+        unsubMap.boxMap.set(boxRef.id, { recipesUnsub, boxUnsub })
       } else {
         subs.delete(boxRef.id)
       }
@@ -63,15 +63,17 @@ async function handleUserSnapshot(
   )
 }
 
-async function handleRecipesSnapshot(snapshot: QuerySnapshot<DocumentData>, dispatch: React.Dispatch<RecipeBoxActionType>) {
-  let data = snapshot.docChanges()
-  if (data === undefined) {
-    dispatch({ type: "REMOVE_RECIPE", recipeId: snapshot.id, boxId })
-  } else {
-    dispatch({ type: "ADD_RECIPE", recipeId: snapshot.id, boxId, payload: data })
+async function handleRecipesSnapshot(snapshot: QuerySnapshot<DocumentData>, dispatch: React.Dispatch<RecipeBoxActionType>, boxId: string) {
+  let changes = snapshot.docChanges()
+  for (let change of changes) {
+    let doc = change.doc;
+    let data = doc.data()
+    if (change.type === "added" || change.type === "modified") {
+      dispatch({ type: "ADD_RECIPE", recipeId: doc.id, boxId, payload: data })
+    } else {
+      dispatch({ type: "REMOVE_RECIPE", recipeId: doc.id, boxId })
+    }
   }
-}
-
 }
 
 async function handleBoxSnapshot(
@@ -82,7 +84,7 @@ async function handleBoxSnapshot(
   let box = snapshot.data() as BoxStoreType
 
   if (box === undefined) {
-    dispatch({ type: "REMOVE_BOX", boxId: snapshot.id})
+    dispatch({ type: "REMOVE_BOX", boxId: snapshot.id })
     return
   }
 

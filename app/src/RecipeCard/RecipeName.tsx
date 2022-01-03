@@ -32,7 +32,9 @@ function RecipeName() {
       setEditablePrimitive(value)
     }
   }
+  console.log({state})
 
+  if (state.recipe === undefined)  { return null }
   const rd = state.recipe.data
   let name = rd.name!.toString()
   let box = rbState.boxes.get(state.boxId!);

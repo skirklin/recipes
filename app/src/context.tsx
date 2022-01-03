@@ -13,7 +13,7 @@ export function initState(): RecipeBoxStateType {
     {
       boxes: new Map<string, BoxType>(),
       activeBox: undefined,
-      writeable: false,
+      writeable: true,
     }
   )
 }
@@ -28,14 +28,6 @@ export const Context = createContext<ContextType>(
   }
 )
 
-
-
-// Actions:
-// SET_USER (user)
-// CLEAR_USER ()
-// REMOVE_BOX (boxId)
-// REMOVE_RECIPE (boxId, recipeId)
-
 export function recipeBoxReducer(prevState: RecipeBoxStateType, action: RecipeBoxActionType): RecipeBoxStateType {
   console.log({action})
   let newBox: BoxType, state: RecipeBoxStateType
@@ -45,8 +37,6 @@ export function recipeBoxReducer(prevState: RecipeBoxStateType, action: RecipeBo
         console.warn("ADD_RECIPE requires a boxId and recipeId.")
         return prevState
       }
-      let prevBox = prevState.boxes.get(action.boxId)
-      console.log({boxId: action.boxId, prevBox})
       newBox = { ...(prevState.boxes.get(action.boxId) || createNewBox()) }
       if (action.payload === undefined) {
         console.warn("ADD_RECIPE requires a payload.")

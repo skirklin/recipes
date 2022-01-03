@@ -1,6 +1,6 @@
 /* helper functions for converting between structured data and text. */
 import { getAuth, User } from 'firebase/auth';
-import { addDoc, arrayRemove, arrayUnion, collection, doc, getDoc, getDocs, updateDoc } from 'firebase/firestore';
+import { addDoc, arrayRemove, arrayUnion, collection, deleteDoc, doc, getDoc, getDocs, updateDoc } from 'firebase/firestore';
 import _ from 'lodash';
 import { Recipe } from "schema-dts"
 import { db } from './backend';
@@ -195,6 +195,17 @@ export function createNewBox(): BoxType {
     },
     visibility: Visibility.private,
     owners: [],
+  }
+}
+
+export async function deleteRecipe(state: RecipeBoxStateType, boxId: string, recipeId: string) {
+  if (recipeId.startsWith("uniqueId=")) {
+    let box = state.boxes.get(boxId)
+    if (box !== undefined) {
+      box.data.recipes.delete(recipeId)
+    }
+  } else {
+    deleteDoc(doc(db, "boxes", boxId, "recipes", recipeId))
   }
 }
 
