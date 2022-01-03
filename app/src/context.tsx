@@ -29,7 +29,7 @@ export const Context = createContext<ContextType>(
 )
 
 export function recipeBoxReducer(prevState: RecipeBoxStateType, action: RecipeBoxActionType): RecipeBoxStateType {
-  console.log({action})
+  console.log({ action, prevState })
   let newBox: BoxType, state: RecipeBoxStateType
   switch (action.type) {
     case "ADD_RECIPE":
@@ -55,7 +55,7 @@ export function recipeBoxReducer(prevState: RecipeBoxStateType, action: RecipeBo
         console.warn("ADD_BOX requires a payload.")
         return prevState
       }
-      newBox = {...action.payload} as BoxType
+      newBox = { ...action.payload } as BoxType
       newBox.data.recipes = (oldBox && oldBox.data.recipes) || new Map<string, RecipeType>()
       state = { ...prevState, boxes: new Map([...prevState.boxes, [action.boxId, newBox as BoxType]]) }
       return state
@@ -64,7 +64,7 @@ export function recipeBoxReducer(prevState: RecipeBoxStateType, action: RecipeBo
         console.warn("REMOVE_BOX requires a boxId")
         return prevState
       }
-      state = { ...prevState, boxes: new Map(prevState.boxes)}
+      state = { ...prevState, boxes: new Map(prevState.boxes) }
       state.boxes.delete(action.boxId)
       return state
     case "REMOVE_RECIPE":
@@ -72,11 +72,11 @@ export function recipeBoxReducer(prevState: RecipeBoxStateType, action: RecipeBo
         console.warn("REMOVE_RECIPE requires a boxId and a recipeId")
         return prevState
       }
-      state = { ...prevState, boxes: new Map(prevState.boxes)}
+      state = { ...prevState, boxes: new Map(prevState.boxes) }
       let box = state.boxes.get(action.boxId)
       if (box === undefined) {
         return state
-      } 
+      }
       box.data.recipes = new Map(box.data.recipes)
       box.data.recipes.delete(action.recipeId)
       return state

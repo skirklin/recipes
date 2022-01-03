@@ -55,7 +55,24 @@ export function ingredientsToStr(ingredients: Recipe["recipeIngredient"]): strin
   return steps.join("\n")
 }
 
-export async function getRecipe(state: RecipeBoxStateType, recipeId: string | undefined, boxId: string | undefined) {
+export function getRecipeFromState(state: RecipeBoxStateType, boxId: string, recipeId: string) {
+  let box = state.boxes.get(boxId);
+  if (box === undefined) {
+    return
+  }
+  return box.data.recipes.get(recipeId)
+}
+
+export function setRecipeInState(state: RecipeBoxStateType, boxId: string, recipeId: string, recipe: RecipeType) {
+  let box = state.boxes.get(boxId);
+  if (box === undefined) {
+    return
+  }
+  return box.data.recipes.set(recipeId, recipe)
+
+}
+
+export async function getRecipe(state: RecipeBoxStateType, boxId: string | undefined, recipeId: string | undefined) {
   let recipe: RecipeType | undefined
   if (boxId === undefined || recipeId === undefined) {
     return undefined
@@ -99,6 +116,14 @@ export async function getBox(state: RecipeBoxStateType, boxId: string) {
   })
 }
 
+
+export function getBoxFromState(state: RecipeBoxStateType, boxId: string) {
+  return state.boxes.get(boxId);
+}
+
+export function setBoxInState(state: RecipeBoxStateType, boxId: string, box: BoxType) {
+  state.boxes.set(boxId, box);
+}
 
 export async function subscribeToBox(user: User | null, boxId: string) {
   if (user === null) {

@@ -61,6 +61,12 @@ async function handleUserSnapshot(
       }
     }
   )
+  for (let [boxId, sub] of subs.entries()) {
+    dispatch({type: "REMOVE_BOX", boxId})
+    sub.boxUnsub && sub.boxUnsub()
+    sub.recipesUnsub && sub.recipesUnsub()
+    unsubMap.boxMap.delete(boxId)
+  }
 }
 
 async function handleRecipesSnapshot(snapshot: QuerySnapshot<DocumentData>, dispatch: React.Dispatch<RecipeBoxActionType>, boxId: string) {

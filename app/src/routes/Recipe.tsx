@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import { Context } from '../context';
 import DeleteButton from '../Buttons/DeleteRecipe'
 import DownloadButton from '../Buttons/DownloadRecipe';
+import VisibilityControl from '../Buttons/Visibility';
 import ForkButton from '../RecipeCard/ForkRecipe';
 import RecipeCard from '../RecipeCard/RecipeCard';
 import { RecipeType } from '../types';
@@ -33,14 +34,12 @@ export function Recipe(props: RecipeProps) {
       if (props.recipe !== undefined) {
         return
       }
-      let newRecipe = await getRecipe(state, recipeId, boxId);
-      console.log(newRecipe)
+      let newRecipe = await getRecipe(state, boxId, recipeId);
       if (newRecipe !== undefined) {
         dispatch({ type: "SET_RECIPE", payload: newRecipe })
       }
     })()
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [recipeId, boxId]
+  }, [recipeId, boxId, state, props.recipe]
   )
 
   if (recipe === undefined) {
@@ -51,6 +50,7 @@ export function Recipe(props: RecipeProps) {
       <DeleteButton recipeId={recipeId} boxId={boxId} />
       <DownloadButton recipe={recipe} />
       <ForkButton recipe={recipe} />
+      <VisibilityControl boxId={boxId} recipeId={recipeId} recipe={recipe} />
       <RecipeCard />
     </RecipeContext.Provider>
   )
