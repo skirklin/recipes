@@ -39,7 +39,7 @@ export default function UploadButton(props: UploadProps) {
 
     return (<>
         <SelectBoxContext.Provider value={contextValue}>
-            <Button disabled={disabled} onClick={uploadFlow}><UploadOutlined /></Button>
+            <Button title="Upload recipes" disabled={disabled} onClick={uploadFlow}><UploadOutlined /></Button>
             <PickBoxModal handleOk={upload} />
         </ SelectBoxContext.Provider >
     </>)

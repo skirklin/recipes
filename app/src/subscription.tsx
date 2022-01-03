@@ -1,6 +1,6 @@
 import React from 'react';
 import { User } from "firebase/auth";
-import { getDoc, onSnapshot, doc, setDoc, DocumentData, DocumentSnapshot, DocumentReference } from "firebase/firestore";
+import { getDoc, onSnapshot, doc, setDoc, DocumentData, DocumentSnapshot, DocumentReference, collection, QuerySnapshot } from "firebase/firestore";
 import 'antd/dist/antd.css'; // or 'antd/dist/antd.less'
 
 import { BoxStoreType, RecipeBoxActionType, UnsubMap, Visibility } from './types';
@@ -52,20 +52,26 @@ async function handleUserSnapshot(
     (boxRef: DocumentReference) => {
       if (!unsubMap.boxMap.has(boxRef.id)) {
         let boxUnsub = onSnapshot(boxRef, (snapshot) => handleBoxSnapshot(snapshot, dispatch, unsubMap))
-        unsubMap.boxMap.set(boxRef.id, boxUnsub)
+
+        let recipesRef = collection(db, "boxes", boxRef.id, "recipes")
+        let recipesUnsub = onSnapshot(recipesRef, (snapshot) => handleRecipesSnapshot(snapshot, dispatch))
+        unsubMap.boxMap.set(boxRef.id, {recipesUnsub, boxUnsub})
       } else {
         subs.delete(boxRef.id)
       }
     }
   )
-  for (const [boxId, unsub] of subs.entries()) {
-    // any unsubscribe functions not removed in the previous loop should be
-    // called.
-    console.log("unsubscribing:", unsub)
-    dispatch({type: "REMOVE_BOX", boxId })
-    unsub()
-    unsubMap.boxMap.delete(boxId)
+}
+
+async function handleRecipesSnapshot(snapshot: QuerySnapshot<DocumentData>, dispatch: React.Dispatch<RecipeBoxActionType>) {
+  let data = snapshot.docChanges()
+  if (data === undefined) {
+    dispatch({ type: "REMOVE_RECIPE", recipeId: snapshot.id, boxId })
+  } else {
+    dispatch({ type: "ADD_RECIPE", recipeId: snapshot.id, boxId, payload: data })
   }
+}
+
 }
 
 async function handleBoxSnapshot(
@@ -96,42 +102,18 @@ async function handleBoxSnapshot(
     },
   }
   dispatch({ type: "ADD_BOX", boxId: snapshot.id, payload: boxData })
-
-  for (let recipeRef of box.data.recipes) {
-    if (!unsubMap.recipeMap.has(recipeRef.id)) {
-      let recipeUnsub = onSnapshot(recipeRef, (recipeSnapshot) => handleRecipeSnapshot(recipeSnapshot, dispatch, snapshot.id))
-      unsubMap.recipeMap.set(recipeRef.id, recipeUnsub)
-    }
-  }
 }
 
 
-
-async function handleRecipeSnapshot(
-  snapshot: DocumentSnapshot<DocumentData>,
-  dispatch: React.Dispatch<RecipeBoxActionType>,
-  boxId: string,
-) {
-
-  let data = snapshot.data()
-  if (data === undefined) {
-    dispatch({ type: "REMOVE_RECIPE", recipeId: snapshot.id, boxId })
-  } else {
-    dispatch({ type: "ADD_RECIPE", recipeId: snapshot.id, boxId, payload: data })
-  }
-}
 
 export function unsubscribe(unsubMap: UnsubMap) {
   unsubMap.userUnsub && unsubMap.userUnsub();
   unsubMap.boxesUnsub && unsubMap.boxesUnsub();
-  for (const boxUnsub of unsubMap.boxMap.values()) {
-    boxUnsub();
-  }
-  for (const recipeUnsub of unsubMap.recipeMap.values()) {
-    recipeUnsub()
+  for (const box of unsubMap.boxMap.values()) {
+    box.boxUnsub && box.boxUnsub();
+    box.recipesUnsub && box.recipesUnsub();
   }
   unsubMap.userUnsub = undefined;
   unsubMap.boxesUnsub = undefined;
   unsubMap.boxMap.clear();
-  unsubMap.recipeMap.clear();
 }

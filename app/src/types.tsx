@@ -59,8 +59,10 @@ export type RecipeBoxActionType = {
 export type UnsubMap = {
   userUnsub: Unsubscribe | undefined,
   boxesUnsub: Unsubscribe | undefined,
-  boxMap: Map<string, Unsubscribe>
-  recipeMap: Map<string, Unsubscribe>
+  boxMap: Map<string, {
+    boxUnsub: Unsubscribe | undefined,
+    recipesUnsub: Unsubscribe | undefined,
+  }>
 }
 
 export enum Visibility {
