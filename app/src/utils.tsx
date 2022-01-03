@@ -148,10 +148,8 @@ export async function uploadRecipes(boxId: string) {
 }
 
 export async function addRecipe(boxId: string, recipe: RecipeType) {
-  let boxRef = doc(db, "boxes", boxId)
-  let colRef = collection(db, "recipes")
+  let colRef = collection(db, "boxes", boxId, "recipes")
   let recipeRef = await addDoc(colRef, recipe)
-  await updateDoc(boxRef, { 'data.recipes': arrayUnion(recipeRef) })
   return recipeRef
 }
 
