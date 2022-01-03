@@ -12,7 +12,6 @@ export function initState(): RecipeBoxStateType {
   return (
     {
       boxes: new Map<string, BoxType>(),
-      activeBox: undefined,
       writeable: true,
     }
   )

@@ -1,9 +1,11 @@
 import { SaveOutlined } from '@ant-design/icons';
 import { Button } from 'antd';
+import { getAuth } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
 import { useContext } from 'react';
 import styled from 'styled-components';
 import { db } from '../backend';
+import { Context } from '../context';
 import { addRecipe } from '../utils';
 
 import { RecipeContext } from './context';
@@ -15,6 +17,12 @@ const StyledButton = styled(Button)`
 
 function SaveButton() {
   const { state, dispatch } = useContext(RecipeContext);
+  const { recipe } = state;
+  const rbState = useContext(Context).state
+
+  if (recipe === undefined) {
+    return null
+  }
 
   async function save() {
     let docRef;
@@ -28,8 +36,14 @@ function SaveButton() {
     }
   }
 
+  let writeable = false;
+  let user = getAuth().currentUser
+  if (rbState.writeable && user && user.uid in recipe.owners && state.recipe !== undefined) {
+    writeable = true;
+  }
+
   if (state.changed) {
-    return <StyledButton icon={<SaveOutlined />} disabled={state.recipe === undefined} onClick={save}>Save</StyledButton>
+    return <StyledButton icon={<SaveOutlined />} disabled={!writeable} onClick={save}>Save</StyledButton>
   } else {
     return null
   }

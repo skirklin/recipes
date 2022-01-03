@@ -4,7 +4,7 @@ import { Context } from '../context';
 import DeleteButton from '../Buttons/DeleteRecipe'
 import DownloadButton from '../Buttons/DownloadRecipe';
 import VisibilityControl from '../Buttons/Visibility';
-import ForkButton from '../RecipeCard/ForkRecipe';
+import ForkButton from '../Buttons/ForkRecipe';
 import RecipeCard from '../RecipeCard/RecipeCard';
 import { RecipeType } from '../types';
 import { getRecipe } from '../utils';
@@ -22,6 +22,7 @@ export function Recipe(props: RecipeProps) {
   let { recipeId, boxId } = props;
   let { state } = useContext(Context)
   let original = _.cloneDeep(props.recipe)
+  console.log({ state })
 
   const [rState, dispatch] = useReducer<React.Reducer<RecipeStateType, RecipeActionType>>(recipeReducer, {
     recipe: props.recipe, original, recipeId, boxId,
@@ -47,10 +48,12 @@ export function Recipe(props: RecipeProps) {
   }
   return (
     <RecipeContext.Provider value={{ dispatch, state: rState }}>
-      <DeleteButton recipeId={recipeId} boxId={boxId} />
-      <DownloadButton recipe={recipe} />
-      <ForkButton recipe={recipe} />
-      <VisibilityControl boxId={boxId} recipeId={recipeId} recipe={recipe} />
+      <div style={{margin: "3px"}}>
+        <DeleteButton recipeId={recipeId} boxId={boxId} />
+        <DownloadButton recipe={recipe} />
+        <ForkButton recipe={recipe} />
+        <VisibilityControl boxId={boxId} recipeId={recipeId} recipe={recipe} />
+      </div>
       <RecipeCard />
     </RecipeContext.Provider>
   )

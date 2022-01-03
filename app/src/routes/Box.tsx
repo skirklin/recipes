@@ -51,7 +51,7 @@ function Box() {
 
   let modificationOptions;
   if (writeable) {
-    modificationOptions = <div style={{ display: "inline-block" }}>
+    modificationOptions = <div style={{ float: "right" }}>
       <Space>
         {toggleSub}
       </Space>
@@ -66,7 +66,8 @@ function Box() {
 
   return (
     <div>
-      {modificationOptions}
+      <div> {modificationOptions} </div>
+
       <BoxRecipes box={box} boxId={boxId} writeable={writeable} />
     </div>
   )

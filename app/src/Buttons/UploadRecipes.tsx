@@ -3,6 +3,13 @@ import { Button } from "antd";
 import { useState } from "react";
 import { PickBoxModal, SelectBoxContext } from "./PickBoxModal";
 import { uploadRecipes } from "../utils";
+import styled from "styled-components";
+
+const StyledButton = styled(Button)`
+  display: inline;
+  float: right;
+`
+
 
 interface UploadProps {
     boxId?: string
@@ -39,7 +46,7 @@ export default function UploadButton(props: UploadProps) {
 
     return (<>
         <SelectBoxContext.Provider value={contextValue}>
-            <Button title="Upload recipes" disabled={disabled} onClick={uploadFlow}><UploadOutlined /></Button>
+            <StyledButton title="Upload recipes" disabled={disabled} onClick={uploadFlow}><UploadOutlined /></StyledButton>
             <PickBoxModal handleOk={upload} />
         </ SelectBoxContext.Provider >
     </>)

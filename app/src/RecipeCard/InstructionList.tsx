@@ -5,6 +5,7 @@ import { Recipe } from 'schema-dts';
 import { instructionsToStr, strToInstructions } from '../utils';
 import { RecipeContext } from './context';
 import { Context } from '../context';
+import { getAuth } from 'firebase/auth';
 
 
 
@@ -22,12 +23,6 @@ function InstructionList() {
   const [editable, setEditablePrimitive] = useState(false);
   const { state, dispatch } = useContext(RecipeContext);
   const rbState = useContext(Context).state;
-
-  const setEditable = (value: boolean) => {
-    if (rbState.writeable) {
-      setEditablePrimitive(value)
-    }
-  }
 
   const instructionsStyle = {
     outline: "none",
@@ -56,8 +51,16 @@ function InstructionList() {
     )
   }
 
-  if (state.recipe === undefined)  { return null }
-  let instructions = state.recipe.data.recipeInstructions;
+  const recipe = state.recipe
+  if (recipe === undefined)  { return null }
+  const setEditable = (value: boolean) => {
+    let user = getAuth().currentUser
+    if (rbState.writeable && user && recipe.owners.includes(user.uid)  ) {
+      setEditablePrimitive(value)
+    }
+  }
+
+  let instructions = recipe.data.recipeInstructions;
 
   const handleChange = (e: any) => {
     if (formatInstructionList(instructions) !== e.target.value) {

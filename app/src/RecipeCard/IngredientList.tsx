@@ -5,6 +5,7 @@ import { Recipe } from 'schema-dts';
 import { ingredientsToStr, strToIngredients } from '../utils';
 import { RecipeContext } from './context';
 import { Context } from '../context';
+import { getAuth } from 'firebase/auth';
 
 
 const Ingredient = styled.li`
@@ -17,12 +18,6 @@ function IngredientList() {
   const { state, dispatch } = useContext(RecipeContext);
   const rbState = useContext(Context).state;
 
-  const setEditable = (value: boolean) => {
-    if (rbState.writeable) {
-      setEditablePrimitive(value)
-    }
-  }
-
   const ingredientsStyle = {
     outline: "none",
     padding: "10px",
@@ -32,9 +27,16 @@ function IngredientList() {
     width: "60%",
   }
 
-  if (state.recipe === undefined)  { return null }
+  const recipe = state.recipe
+  if (recipe === undefined)  { return null }
+  const setEditable = (value: boolean) => {
+    let user = getAuth().currentUser
+    if (rbState.writeable && user && recipe.owners.includes(user.uid)  ) {
+      setEditablePrimitive(value)
+    }
+  }
 
-  let ingredients = state.recipe.data.recipeIngredient;
+  let ingredients = recipe.data.recipeIngredient;
   const handleChange = (e: any) => {
     if (formatIngredientList(ingredients) !== e.target.value) {
       dispatch({ type: "SET_INGREDIENTS", payload: strToIngredients(e.target.value) });
