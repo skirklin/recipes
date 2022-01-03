@@ -49,7 +49,7 @@ function DownloadButton(props: DownloadProps) {
     });
 
   }
-  return <StyledButton icon={<DownloadOutlined />} disabled={!recipe} onClick={download} />
+  return <StyledButton title="Download recipe" icon={<DownloadOutlined />} disabled={!recipe} onClick={download} />
 }
 
 export default DownloadButton;

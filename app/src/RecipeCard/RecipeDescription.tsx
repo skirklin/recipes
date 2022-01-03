@@ -1,3 +1,4 @@
+import { getAuth } from 'firebase/auth';
 import { useContext, useState } from 'react';
 import TextareaAutosize from 'react-autosize-textarea';
 import styled from 'styled-components';
@@ -21,15 +22,16 @@ function RecipeDescription() {
   const { state, dispatch } = useContext(RecipeContext);
   const rbState = useContext(Context).state;
 
+  const recipe = state.recipe
+  if (recipe === undefined)  { return null }
   const setEditable = (value: boolean) => {
-    if (rbState.writeable) {
+    let user = getAuth().currentUser
+    if (rbState.writeable && user && recipe.owners.includes(user.uid)  ) {
       setEditablePrimitive(value)
     }
   }
 
-
-  if (state.recipe === undefined)  { return null }
-  let description = state.recipe.data.description
+  let description = recipe.data.description
   const handleChange = (e: any) => {
     if (e.target.value !== description) {
       dispatch({ type: "SET_DESCRIPTION", payload: e.target.value });

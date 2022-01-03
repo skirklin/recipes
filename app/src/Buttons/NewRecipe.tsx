@@ -5,6 +5,12 @@ import { useNavigate } from "react-router-dom";
 import { Context } from "../context";
 import { PickBoxModal, SelectBoxContext } from "./PickBoxModal";
 import { createNewRecipe, getUniqueId } from "../utils";
+import styled from "styled-components";
+
+const StyledButton = styled(Button)`
+  display: inline;
+  float: right;
+`
 
 interface NewProps {
     boxId?: string
@@ -50,7 +56,7 @@ export default function NewButton(props: NewProps) {
 
     return (<>
         <SelectBoxContext.Provider value={contextValue}>
-            <Button title="Create new recipe" disabled={disabled} onClick={newRecipeFlow}><PlusOutlined /></Button>
+            <StyledButton title="Create new recipe" disabled={disabled} onClick={newRecipeFlow}><PlusOutlined /></StyledButton>
             <PickBoxModal handleOk={newRecipe} />
         </ SelectBoxContext.Provider >
     </>)

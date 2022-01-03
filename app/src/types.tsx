@@ -45,7 +45,6 @@ export type UserType = {
 
 export type RecipeBoxStateType = {
   boxes: Map<string, BoxType>
-  activeBox: string | undefined
   writeable: boolean
 }
 

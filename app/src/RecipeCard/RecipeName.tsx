@@ -3,12 +3,13 @@ import { RecipeContext } from './context';
 import styled from 'styled-components';
 import { LinkOutlined } from '@ant-design/icons';
 import { Context } from '../context';
+import { getAuth } from 'firebase/auth';
 
 
 const Title = styled.h1`
   font-size: 2em;
   outline: none;
-  display: inline-flex;
+  display: inline;
   padding: 20px 0px 0px 20px;
   margin-bottom: 0px;
   `
@@ -17,7 +18,7 @@ const EditableTitle = styled.input`
   font-size: 2em;
   font-weight: bold;
   font-family: sans-serif;
-  display: inline-flex;
+  display: inline;
   padding: 5px   padding: 20px 0px 0px 20px;
   outline: none;
 `
@@ -26,15 +27,17 @@ function RecipeName() {
   const [editable, setEditablePrimitive] = useState(false);
   const { state, dispatch } = useContext(RecipeContext);
   const rbState = useContext(Context).state;
+  const recipe = state.recipe
+  if (recipe === undefined)  { return null }
 
   const setEditable = (value: boolean) => {
-    if (rbState.writeable) {
+    let user = getAuth().currentUser
+    if (rbState.writeable && user && recipe.owners.includes(user.uid)  ) {
       setEditablePrimitive(value)
     }
   }
 
-  if (state.recipe === undefined)  { return null }
-  const rd = state.recipe.data
+  const rd = recipe.data
   let name = rd.name!.toString()
   let box = rbState.boxes.get(state.boxId!);
   let boxName = box === undefined ? "" : box.data.name

@@ -31,12 +31,12 @@ function DeleteButton(props: DeleteProps) {
   if (writeable) {
     return (
       <Popconfirm
-        title="Are you sure to delete this recipe?"
+        title="Are you sure you want to delete this recipe?"
         onConfirm={del}
         okText="Yes"
         cancelText="No"
       >
-        <StyledButton icon={<DeleteOutlined />} disabled={recipeId === undefined} />
+        <StyledButton title="Delete this recipe" icon={<DeleteOutlined />} disabled={recipeId === undefined} />
       </Popconfirm>
     )
   } else {
