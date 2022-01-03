@@ -45,6 +45,8 @@ export function recipeBoxReducer(prevState: RecipeBoxStateType, action: RecipeBo
         console.warn("ADD_RECIPE requires a boxId and recipeId.")
         return prevState
       }
+      let prevBox = prevState.boxes.get(action.boxId)
+      console.log({boxId: action.boxId, prevBox})
       newBox = { ...(prevState.boxes.get(action.boxId) || createNewBox()) }
       if (action.payload === undefined) {
         console.warn("ADD_RECIPE requires a payload.")

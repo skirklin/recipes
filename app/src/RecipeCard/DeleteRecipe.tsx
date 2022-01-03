@@ -22,7 +22,7 @@ function DeleteButton() {
   let { recipeId, boxId } = state;
 
   async function del() {
-    deleteDoc(doc(db, "boxes", boxId, "recipes", recipeId!))
+    deleteDoc(doc(db, "recipes", recipeId!))
     navigate(`/boxes/${boxId}`)
   }
 

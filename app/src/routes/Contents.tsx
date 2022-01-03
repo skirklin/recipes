@@ -14,11 +14,10 @@ function Contents() {
       data.push({ boxName: box.data.name, recipeId, boxId, recipe: recipe.data, key: `recipeId=${recipeId}_boxId=${boxId}` })
     }
   }
-  console.log({state})
 
   return (
     <div>
-      <RecipeTable recipes={data} writeable={writeable} />
+      <RecipeTable recipes={data} writeable={writeable}/>
     </div>
   )
 }
