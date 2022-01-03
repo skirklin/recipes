@@ -47,7 +47,7 @@ export const RecipeContext = createContext<ContextType>(
 
 export function recipeReducer(state: RecipeStateType, action: RecipeActionType): RecipeStateType {
   let newState = { ...state }
-  console.log({ action })
+  console.debug({ action })
   switch (action.type) {
     case 'SET_NAME':
       if (newState.recipe === undefined) return newState

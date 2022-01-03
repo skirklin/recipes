@@ -32,7 +32,6 @@ function RecipeName() {
       setEditablePrimitive(value)
     }
   }
-  console.log({state})
 
   if (state.recipe === undefined)  { return null }
   const rd = state.recipe.data
