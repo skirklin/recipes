@@ -28,10 +28,10 @@ function IngredientList() {
   }
 
   const recipe = state.recipe
-  if (recipe === undefined)  { return null }
+  if (recipe === undefined) { return null }
   const setEditable = (value: boolean) => {
     let user = getAuth().currentUser
-    if (rbState.writeable && user && recipe.owners.includes(user.uid)  ) {
+    if (rbState.writeable && user && recipe.owners.includes(user.uid)) {
       setEditablePrimitive(value)
     }
   }
@@ -48,7 +48,7 @@ function IngredientList() {
     let listElts = Array.prototype.map.call(ingredients || [], (ri, id) => <Ingredient key={id}>{ri}</Ingredient>)
     if (listElts.length === 0) {
       return (
-        <ul style={{ ...ingredientsStyle, listStylePosition: "outside", listStyleType: "unset"}}>
+        <ul style={{ ...ingredientsStyle, listStylePosition: "outside", listStyleType: "unset" }}>
           {"Add ingredients?"}
         </ul>
       )
@@ -64,6 +64,7 @@ function IngredientList() {
       <TextareaAutosize
         defaultValue={ingredientsToStr(ingredients!)}
         autoFocus
+        onKeyUp={(e) => { if (e.code === "Escape") { handleChange(e) } }}
         style={{ ...ingredientsStyle }}
         onBlur={handleChange} />
     )

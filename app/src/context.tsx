@@ -85,6 +85,18 @@ export function recipeBoxReducer(prevState: RecipeBoxStateType, action: RecipeBo
       return { ...prevState, boxes: new Map() }
     case 'SET_READONLY':
       return { ...prevState, writeable: action.payload as boolean }
+    case 'SET_ACTIVE_RECIPE':
+      if (action.boxId === undefined || action.recipeId === undefined || action.recipe === undefined) {
+        console.warn("SET_ACTIVE_RECIPE requires a boxId and recipeId.")
+        return prevState
+      }
+      return { ...prevState, activeRecipe: action.payload, activeRecipeId: action.recipeId, activeBoxId: action.boxId }
+    case 'SET_ACTIVE_BOX':
+      if (action.boxId === undefined || action.box === undefined) {
+        console.warn("SET_ACTIVE_BOX requires a boxId.")
+        return prevState
+      }
+      return { ...prevState, activeBox: action.box, activeBoxId: action.boxId }
     default:
       return prevState
   }

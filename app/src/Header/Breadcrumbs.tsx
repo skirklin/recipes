@@ -2,6 +2,7 @@ import { Breadcrumb } from 'antd';
 import { useContext } from 'react';
 import { Link, useLocation, useParams } from 'react-router-dom';
 import { Context } from '../context';
+import './Header.css';
 
 function Breadcrumbs() {
   const location = useLocation();
@@ -31,20 +32,20 @@ function Breadcrumbs() {
   const extraBreadcrumbItems = pathParts.map((part, index) => {
     const url = `/${pathParts.slice(0, index + 1).join('/')}`;
     return (
-      <Breadcrumb.Item key={url}>
+      <Breadcrumb.Item className="recipes-breadcrumb" key={url}>
         <Link to={url}>{partMap.get(part) || part}</Link>
       </Breadcrumb.Item>
     );
   });
 
   const breadcrumbItems = [
-    <Breadcrumb.Item key="home">
-      <Link to="/">Recipe box</Link>
+    <Breadcrumb.Item className="recipes-breadcrumb" key="home">
+      <Link  to="/">Recipe box</Link>
     </Breadcrumb.Item>,
   ].concat(extraBreadcrumbItems);
 
 
-  return <Breadcrumb style={{ fontSize: "24px", display: "inline-block" }}>{breadcrumbItems}</Breadcrumb>
+  return <Breadcrumb className="recipes-breadcrumb" >{breadcrumbItems}</Breadcrumb>
 }
 
 export default Breadcrumbs;

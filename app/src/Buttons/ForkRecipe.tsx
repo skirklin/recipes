@@ -36,7 +36,7 @@ export default function ForkButton(props: ForkProps) {
   }
 
   const addNewRecipe = async (boxId: string) => {
-    let recipeRef = await addRecipe(boxId, recipe)
+    let recipeRef = await addRecipe(boxId, recipe, dispatch)
     // todo: evaluate the impact of this kind of optimization
     dispatch({ type: "ADD_RECIPE", payload: _.cloneDeep(recipe), boxId, recipeId: recipeRef.id }) 
     navigate(`/boxes/${boxId}/recipes/${recipeRef.id}`)

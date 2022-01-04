@@ -9,11 +9,12 @@ import { db } from './backend'
 import { addBox, subscribeToBox } from './utils';
 
 async function initializeUser(user: User) {
+  console.log(user)
   let userRef = doc(db, "users", user.uid);
   let userDoc = await getDoc(userRef)
-  if (!userDoc.exists()) {
+  if (!userDoc.exists() && !user.isAnonymous) {
     await setDoc(userRef, { "new": false, "name": user.displayName });
-    const userBoxRef = await addBox(user, `${user.displayName}'s box`);
+    const userBoxRef = await addBox(user, `${user.displayName}'s box`, null);
     if (userBoxRef !== undefined) {
       await subscribeToBox(user, userBoxRef.id)
     }

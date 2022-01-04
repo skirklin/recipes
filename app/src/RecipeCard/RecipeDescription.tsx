@@ -51,6 +51,7 @@ function RecipeDescription() {
       <TextareaAutosize
         placeholder="Add a description?"
         autoFocus
+        onKeyUp={(e) => { if (e.code === "Escape") { handleChange(e) } }}
         style={{ display: "inline-flex", fontStyle: "italic", width: "60%", fontFamily: "sans-serif", fontSize: "16px" }}
         onBlur={handleChange}
         {...props}

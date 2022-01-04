@@ -74,6 +74,7 @@ function InstructionList() {
       <TextareaAutosize
         defaultValue={instructionsToStr(instructions!)}
         autoFocus
+        onKeyUp={(e) => { if (e.code === "Escape") { handleChange(e) } }}
         style={{ ...instructionsStyle }}
         onBlur={handleChange} />
     )

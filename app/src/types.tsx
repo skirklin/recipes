@@ -45,6 +45,10 @@ export type UserType = {
 
 export type RecipeBoxStateType = {
   boxes: Map<string, BoxType>
+  activeRecipe?: RecipeType
+  activeBox?: BoxType
+  activeRecipeId?: string
+  activeBoxId?: string
   writeable: boolean
 }
 
@@ -52,6 +56,8 @@ export type RecipeBoxActionType = {
   type: string
   recipeId?: string
   boxId?: string
+  recipe?: RecipeType
+  box?: BoxType
   payload?: any
 }
 

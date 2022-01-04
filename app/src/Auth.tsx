@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 
-import { GoogleAuthProvider, EmailAuthProvider, onAuthStateChanged, getAuth } from "firebase/auth";
+import { GoogleAuthProvider, EmailAuthProvider, onAuthStateChanged, getAuth, signInAnonymously } from "firebase/auth";
 
 import StyledFirebaseAuth from 'react-firebaseui/StyledFirebaseAuth';
 import App from './App';
