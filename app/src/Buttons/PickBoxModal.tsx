@@ -2,6 +2,7 @@ import { Modal, Select } from 'antd';
 
 import { createContext, useContext, useEffect } from 'react';
 import { Context } from '../context';
+import NewBoxModal from './NewBoxModal';
 
 const defaultValue = {
   isVisible: false,
@@ -32,7 +33,7 @@ function SelectBox() {
       setBoxName(boxNames[0])
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [state])
   return <Select value={boxName} onChange={setBoxName} options={boxOptions} />
 }
 
@@ -40,15 +41,15 @@ interface PickBoxModalProps {
   handleOk: () => void
 }
 
-
 export function PickBoxModal(props: PickBoxModalProps) {
   const { handleOk } = props;
   const { isVisible, setIsVisible } = useContext(SelectBoxContext)
 
   return (
     <>
-      <Modal visible={isVisible} onOk={handleOk} onCancel={() => setIsVisible(false)}>
+      <Modal destroyOnClose={true} visible={isVisible} onOk={handleOk} onCancel={() => setIsVisible(false)}>
         <SelectBox />
+        <NewBoxModal />
       </Modal >
     </>
   );

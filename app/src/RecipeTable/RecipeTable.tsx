@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { Button, Popconfirm, Table } from 'antd';
 import { ColumnsType } from 'antd/es/table';
 
@@ -6,13 +6,13 @@ import { Recipe } from 'schema-dts';
 import { Key } from 'antd/lib/table/interface';
 import { TableRowSelection } from 'antd/es/table/interface';
 import { DeleteOutlined, ForkOutlined } from '@ant-design/icons';
-import { deleteDoc, doc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
-import { db } from '../backend';
 import Filterbox from './Filterbox';
 import './RecipeTable.css'
 import NewButton from '../Buttons/NewRecipe';
 import UploadButton from '../Buttons/UploadRecipes';
+import { deleteRecipe } from '../utils';
+import { Context } from '../context';
 
 function sortfunc(a: string, b: string) {
   var A = a.toUpperCase(); // ignore upper and lowercase
@@ -48,6 +48,7 @@ export function RecipeTable(props: RecipeTableProps) {
   let navigate = useNavigate();
 
   const { writeable, recipes, boxId } = props;
+  const {state} = useContext(Context)
   const [filteredRows, setFilteredRows] = useState<RowType[]>([])
 
   useEffect(() => setFilteredRows(recipes), [recipes])
@@ -92,7 +93,7 @@ export function RecipeTable(props: RecipeTableProps) {
   async function del() {
     selectedRows.forEach(
       (value: RowType) => {
-        deleteDoc(doc(db, "recipes", value.recipeId))
+        deleteRecipe(state, value.boxId, value.recipeId)
       }
     )
   }

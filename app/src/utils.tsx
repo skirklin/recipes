@@ -197,10 +197,16 @@ export async function addBox(user: User | null, name: string) {
   return boxRef
 }
 
-export function createNewRecipe(): RecipeType {
+export function createNewRecipe(user: User | null): RecipeType {
+  let owners: string[]
+  if (user === null) {
+    owners = [];
+  } else {
+    owners = [user.uid];
+  }
   return {
     visibility: Visibility.private,
-    owners: [],
+    owners,
     data: {
       "@type": "Recipe",
       "name": "New recipe",
