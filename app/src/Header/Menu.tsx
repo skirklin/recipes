@@ -3,21 +3,13 @@ import styled from 'styled-components';
 import { Button } from 'antd';
 
 import { getAuth, signOut } from 'firebase/auth';
-import { LogoutOutlined, SettingOutlined } from '@ant-design/icons';
-import './Header.css';
+import { InboxOutlined, LogoutOutlined } from '@ant-design/icons';
 import { Link } from 'react-router-dom';
+import './Header.css';
 
 const MenuArea = styled.div`
   float: right;
   margin: 5px;
-`
-
-const ClearButton = styled(Button)`
-  background-color: transparent;
-  border: none;
-  color: var(--jet);
-  font-size: 18px;
-  display: inline-block;
 `
 
 function Header() {
@@ -28,9 +20,11 @@ function Header() {
 
   return (
     <MenuArea>
-      <div style={{ marginRight: "10px", display: "inline-block" }}><h3>{user.displayName}</h3></div>
-      <Link to='/settings'><SettingOutlined style={{ display: "inline-block", fontSize: "18px", color: "var(--jet)" }} /></Link>
-      <ClearButton onClick={() => signOut(getAuth())} ><LogoutOutlined /></ClearButton>
+      <div style={{ marginRight: "10px", display: "inline-block" }}>{user.displayName}</div>
+      <Link title="Manage boxes" className="recipes-btn" to='/boxes'><InboxOutlined className="recipes-icon" /></Link>
+      <Button title="Logout" className="recipes-btn" style={{}} onClick={() => signOut(getAuth())} >
+        <LogoutOutlined className="recipes-icon" />
+      </Button>
     </MenuArea>
   );
 }

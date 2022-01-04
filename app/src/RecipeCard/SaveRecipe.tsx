@@ -18,7 +18,7 @@ const StyledButton = styled(Button)`
 function SaveButton() {
   const { state, dispatch } = useContext(RecipeContext);
   const { recipe } = state;
-  const rbState = useContext(Context).state
+  const { state: rbState, dispatch: rbDispatch} = useContext(Context)
 
   if (recipe === undefined) {
     return null
@@ -27,7 +27,7 @@ function SaveButton() {
   async function save() {
     let docRef;
     if (state.recipeId === undefined || state.recipeId.startsWith("uniqueId=")) {
-      let docRef = await addRecipe(state.boxId, state.recipe!)
+      let docRef = await addRecipe(state.boxId, state.recipe!, rbDispatch)
       dispatch({ type: "SET_RECIPE", payload: state.recipe, recipeId: docRef.id })
     } else {
       docRef = doc(db, "boxes", state.boxId, "recipes", state.recipeId);

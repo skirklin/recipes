@@ -4,7 +4,7 @@ import { addDoc, arrayRemove, arrayUnion, collection, deleteDoc, doc, getDoc, ge
 import _ from 'lodash';
 import { Recipe } from "schema-dts"
 import { db } from './backend';
-import { BoxStoreType, BoxType, RecipeBoxStateType, RecipeType, Visibility } from './types';
+import { BoxStoreType, BoxType, RecipeBoxActionType, RecipeBoxStateType, RecipeType, Visibility } from './types';
 
 
 export function strToIngredients(str: string): Recipe["recipeIngredient"] {
@@ -166,19 +166,19 @@ export async function uploadRecipes(boxId: string) {
             owners: [user.uid],
             visibility: Visibility.private,
           }
-          addRecipe(boxId, fullRecipe)
+          addRecipe(boxId, fullRecipe, null)
         })
     })
   }
 }
 
-export async function addRecipe(boxId: string, recipe: RecipeType) {
+export async function addRecipe(boxId: string, recipe: RecipeType, dispatch: React.Dispatch<RecipeBoxActionType> | null) {
   let colRef = collection(db, "boxes", boxId, "recipes")
   let recipeRef = await addDoc(colRef, recipe)
   return recipeRef
 }
 
-export async function addBox(user: User | null, name: string) {
+export async function addBox(user: User | null, name: string, dispatch: React.Dispatch<RecipeBoxActionType> | null) {
   if (user === null) {
     return undefined
   }
