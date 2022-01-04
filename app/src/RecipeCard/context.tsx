@@ -1,3 +1,4 @@
+import { User } from 'firebase/auth';
 import _ from 'lodash';
 import { createContext } from 'react';
 import { RecipeType } from '../types';
@@ -19,8 +20,8 @@ export type RecipeActionType = {
 }
 
 
-export function initState(): RecipeStateType {
-  let r = createNewRecipe()
+export function initState(user: User | null): RecipeStateType {
+  let r = createNewRecipe(user)
   return {
     recipeId: "",
     boxId: "",
@@ -29,7 +30,7 @@ export function initState(): RecipeStateType {
     changed: false,
   }
 }
-const initialState = initState()
+const initialState = initState(null)
 
 const defaultDispatch: React.Dispatch<RecipeActionType> = () => initialState
 

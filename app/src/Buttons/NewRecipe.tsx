@@ -6,6 +6,7 @@ import { Context } from "../context";
 import { PickBoxModal, SelectBoxContext } from "./PickBoxModal";
 import { createNewRecipe, getUniqueId } from "../utils";
 import styled from "styled-components";
+import { getAuth } from "firebase/auth";
 
 const StyledButton = styled(Button)`
   display: inline;
@@ -32,7 +33,11 @@ export default function NewButton(props: NewProps) {
     }
 
     const addNewRecipe = (boxId: string) => {
-        let recipe = createNewRecipe();
+        let user = getAuth().currentUser
+        if (user === null) {
+            return
+        }
+        let recipe = createNewRecipe(user);
         let recipeId = `uniqueId=${getUniqueId(recipe.data)}`
         dispatch({ type: "ADD_RECIPE", payload: recipe, boxId, recipeId })
         navigate(`/boxes/${boxId}/recipes/${recipeId}`)

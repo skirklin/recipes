@@ -1,11 +1,9 @@
 import styled from 'styled-components';
 
-import { Dropdown, Menu, Switch } from 'antd';
+import { Button } from 'antd';
 
 import { getAuth, signOut } from 'firebase/auth';
-import { LogoutOutlined, MenuOutlined } from '@ant-design/icons';
-import { useContext } from 'react';
-import { Context } from '../context';
+import { LogoutOutlined, SettingOutlined } from '@ant-design/icons';
 import './Header.css';
 import { Link } from 'react-router-dom';
 
@@ -14,30 +12,25 @@ const MenuArea = styled.div`
   margin: 5px;
 `
 
+const ClearButton = styled(Button)`
+  background-color: transparent;
+  border: none;
+  color: var(--jet);
+  font-size: 18px;
+  display: inline-block;
+`
 
 function Header() {
-  const { state, dispatch } = useContext(Context);
-  const { writeable } = state;
-
-  const menu = (<Menu>
-    <Menu.Item key="0">
-      <Switch
-        className={writeable ? 'readonly-switch-writeable' : 'readonly-switch-readonly'}
-        onChange={e => dispatch({ type: "SET_READONLY", payload: e })}
-        checkedChildren="Edit-mode"
-        unCheckedChildren="Read-only"
-      />
-    </Menu.Item>
-    <Menu.Item key="2" ><Link to='/boxes'>Manage boxes</Link></Menu.Item>
-    <Menu.Item key="4" onClick={() => signOut(getAuth())} ><LogoutOutlined />  Logout</Menu.Item>
-  </Menu>)
-
+  const user = getAuth().currentUser
+  if (user === null) {
+    return null
+  }
 
   return (
     <MenuArea>
-      <Dropdown overlay={menu} trigger={["click"]} >
-        <MenuOutlined style={{ fontSize: "24px" }} />
-      </Dropdown>
+      <div style={{ marginRight: "10px", display: "inline-block" }}><h3>{user.displayName}</h3></div>
+      <Link to='/settings'><SettingOutlined style={{ display: "inline-block", fontSize: "18px", color: "var(--jet)" }} /></Link>
+      <ClearButton onClick={() => signOut(getAuth())} ><LogoutOutlined /></ClearButton>
     </MenuArea>
   );
 }
