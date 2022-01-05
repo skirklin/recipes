@@ -1,2 +1,2 @@
-*.zip
-*.zip:Zone.Identifier
+/node_modules
+/build

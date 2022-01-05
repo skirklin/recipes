@@ -10,8 +10,9 @@ const StyledButton = styled(Button)`
 
 function ClearButton() {
   const { state, dispatch } = useContext(RecipeContext);
-
+  console.log("button mount:", state)
   function clear() {
+    console.log("clear!", state)
     dispatch({type: "SET_RECIPE", payload: state.original})
   }
 
