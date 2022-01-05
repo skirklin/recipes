@@ -72,6 +72,7 @@ export function recipeReducer(state: RecipeStateType, action: RecipeActionType):
       return newState
     case 'SET_RECIPE':
       newState.recipe = _.cloneDeep(action.payload);
+      newState.original = _.cloneDeep(action.payload);
       newState.changed = false;
       if (action.recipeId !== undefined) {
         newState.recipeId = action.recipeId
