@@ -1,6 +1,7 @@
 import { initializeApp } from 'firebase/app';
 import { getAuth, connectAuthEmulator } from "firebase/auth";
 import { getFirestore, connectFirestoreEmulator } from "firebase/firestore";
+import { getFunctions, connectFunctionsEmulator, httpsCallable } from "firebase/functions";
 
 
 // Configure Firebase.
@@ -17,9 +18,14 @@ const firebaseConfig = {
 export const app = initializeApp(firebaseConfig);
 
 // setup auth emulator
-const auth = getAuth();
+const auth = getAuth(app);
 connectAuthEmulator(auth, "http://localhost:9099");
 
 // setup firestore emulator
-export const db = getFirestore();
+export const db = getFirestore(app);
 connectFirestoreEmulator(db, 'localhost', 8080);
+
+const functions = getFunctions(app);
+connectFunctionsEmulator(functions, "localhost", 5001);
+
+export const getRecipes = httpsCallable(functions, 'getRecipes');

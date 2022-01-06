@@ -11,6 +11,7 @@ import Filterbox from './Filterbox';
 import './RecipeTable.css'
 import NewButton from '../Buttons/NewRecipe';
 import UploadButton from '../Buttons/UploadRecipes';
+import ImportButton from '../Buttons/ImportRecipes';
 import { deleteRecipe } from '../utils';
 import { Context } from '../context';
 
@@ -48,7 +49,7 @@ export function RecipeTable(props: RecipeTableProps) {
   let navigate = useNavigate();
 
   const { writeable, recipes, boxId } = props;
-  const {state} = useContext(Context)
+  const { state } = useContext(Context)
   const [filteredRows, setFilteredRows] = useState<RowType[]>([])
 
   useEffect(() => setFilteredRows(recipes), [recipes])
@@ -104,8 +105,9 @@ export function RecipeTable(props: RecipeTableProps) {
         <Filterbox data={recipes} setFilteredRows={setFilteredRows} />
       </div>
       <div style={{ float: 'right', display: 'inline-flex', padding: '5px' }}>
-        <NewButton boxId={boxId} disabled={!writeable}/>
-        <UploadButton boxId={boxId} disabled={!writeable}/>
+        <NewButton boxId={boxId} disabled={!writeable} />
+        <UploadButton boxId={boxId} disabled={!writeable} />
+        <ImportButton boxId={boxId} disabled={!writeable} />
         <Popconfirm
           title={`Are you sure to delete ${selectedRowKeys.length > 1 ? "these recipes" : "this recipe"}s`}
           onConfirm={del}
