@@ -3,7 +3,7 @@ import { Button } from "antd";
 import { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Context } from "../context";
-import { PickBoxModal, SelectBoxContext } from "./PickBoxModal";
+import { PickBoxModal } from "../Modals/PickBoxModal";
 import { createNewRecipe, getUniqueId } from "../utils";
 import styled from "styled-components";
 import { getAuth } from "firebase/auth";
@@ -19,18 +19,11 @@ interface NewProps {
 }
 
 export default function NewButton(props: NewProps) {
-    const { boxId: inputBoxId, disabled } = props;
+    const { boxId, disabled } = props;
     const { dispatch } = useContext(Context)
     const navigate = useNavigate()
-    const [boxId, setBoxId] = useState(inputBoxId)
     const [isModalVisible, setIsModalVisible] = useState(false)
 
-    let contextValue = {
-        setIsVisible: setIsModalVisible,
-        isVisible: isModalVisible,
-        setBoxName: setBoxId,
-        boxName: boxId!,
-    }
 
     const addNewRecipe = (boxId: string) => {
         let user = getAuth().currentUser
@@ -43,7 +36,7 @@ export default function NewButton(props: NewProps) {
         navigate(`/boxes/${boxId}/recipes/${recipeId}`)
     }
 
-    async function newRecipe() {
+    function newRecipe(boxId: string) {
         if (boxId === undefined) {
             return // leave the modal visible until something is selected
         }
@@ -60,10 +53,8 @@ export default function NewButton(props: NewProps) {
     }
 
     return (<>
-        <SelectBoxContext.Provider value={contextValue}>
-            <StyledButton title="Create new recipe" disabled={disabled} onClick={newRecipeFlow}><PlusOutlined /></StyledButton>
-            <PickBoxModal handleOk={newRecipe} />
-        </ SelectBoxContext.Provider >
+            <StyledButton title="Create new recipe" disabled={disabled} onClick={newRecipeFlow} icon={<PlusOutlined />} />
+            <PickBoxModal handleOk={newRecipe} isVisible={isModalVisible} setIsVisible={setIsModalVisible}/>
     </>)
 
 }
