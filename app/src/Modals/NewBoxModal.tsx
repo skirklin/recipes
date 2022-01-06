@@ -1,6 +1,5 @@
-import { Button, Input, Modal } from "antd"
+import { Input, Modal } from "antd"
 import { useContext, useState } from "react"
-import { PlusOutlined } from "@ant-design/icons";
 import { addBox } from '../utils';
 import { getAuth } from "firebase/auth";
 import { Context } from "../context";
@@ -20,17 +19,14 @@ function NewBoxModal() {
   }
 
   return (
-    <div>
-      <Modal visible={isVisible} onOk={handleOk} onCancel={() => setIsVisible(false)}>
-        <Input
-          autoFocus
-          title="Name"
-          value={newBoxName} onChange={e => setNewBoxName(e.target.value)}
-          onKeyUp={(e) => { if (e.code === "Enter") { handleOk() } }}
-        />
-      </Modal >
-      <Button onClick={() => setIsVisible(true)}><PlusOutlined />New box</Button>
-    </div>
+    <Modal visible={isVisible} onOk={handleOk} onCancel={() => setIsVisible(false)}>
+      <Input
+        autoFocus
+        title="Name"
+        value={newBoxName} onChange={e => setNewBoxName(e.target.value)}
+        onKeyUp={(e) => { if (e.code === "Enter") { handleOk() } }}
+      />
+    </Modal >
   )
 }
 

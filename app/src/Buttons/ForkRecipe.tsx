@@ -2,7 +2,7 @@ import { ForkOutlined } from '@ant-design/icons';
 import { Button } from 'antd';
 import { useContext, useState } from 'react';
 
-import { SelectBoxContext, PickBoxModal } from './PickBoxModal';
+import { PickBoxModal } from '../Modals/PickBoxModal';
 import { Context } from '../context';
 import { useNavigate } from 'react-router-dom';
 import { addRecipe } from '../utils';
@@ -22,18 +22,11 @@ interface ForkProps {
 }
 
 export default function ForkButton(props: ForkProps) {
-  const { boxId: inputBoxId, recipe } = props;
+  const { boxId, recipe } = props;
   const { dispatch } = useContext(Context)
   const navigate = useNavigate()
-  const [boxId, setBoxId] = useState(inputBoxId)
   const [isModalVisible, setIsModalVisible] = useState(false)
 
-  let contextValue = {
-    setIsVisible: setIsModalVisible,
-    isVisible: isModalVisible,
-    setBoxName: setBoxId,
-    boxName: boxId!,
-  }
 
   const addNewRecipe = async (boxId: string) => {
     let recipeRef = await addRecipe(boxId, recipe, dispatch)
@@ -42,7 +35,7 @@ export default function ForkButton(props: ForkProps) {
     navigate(`/boxes/${boxId}/recipes/${recipeRef.id}`)
   }
 
-  async function newRecipe() {
+  async function newRecipe(boxId: string) {
     if (boxId === undefined) {
       return // leave the modal visible until something is selected
     }
@@ -59,10 +52,8 @@ export default function ForkButton(props: ForkProps) {
   }
 
   return (<>
-    <SelectBoxContext.Provider value={contextValue}>
       <StyledButton title="Create new recipe" disabled={!recipe} onClick={newRecipeFlow}><ForkOutlined /></StyledButton>
-      <PickBoxModal handleOk={newRecipe} />
-    </ SelectBoxContext.Provider >
+      <PickBoxModal handleOk={newRecipe} isVisible={isModalVisible} setIsVisible={setIsModalVisible}/>
   </>)
 
 }

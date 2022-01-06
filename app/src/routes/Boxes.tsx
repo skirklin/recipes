@@ -2,7 +2,7 @@ import { useContext } from "react"
 import { Context } from "../context"
 import { RowType, BoxTable } from '../BoxTable/BoxTable'
 import styled from "styled-components";
-import NewBoxModal from "../Buttons/NewBoxModal";
+import NewBoxModal from "../Modals/NewBoxModal";
 
 const TableButtons = styled.div`
   float: right;

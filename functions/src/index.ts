@@ -1,19 +1,14 @@
 import * as functions from "firebase-functions";
-
-// // Start writing Firebase Functions
-// // https://firebase.google.com/docs/functions/typescript
-//
-// export const helloWorld = functions.https.onRequest((request, response) => {
-//   functions.logger.info("Hello logs!", {structuredData: true});
-//   response.send("Hello from Firebase!");
-// });
+import { HttpsError } from "firebase-functions/v1/https";
+import { Recipe } from "schema-dts";
 
 
-export function getPageRecipe(doc: Document) {
+export function getRecipesFromPage(doc: Document, url: string): Recipe[] {
+  let recipes: Recipe[] = [];
   // Pull ld+json metadata from the page and look for a recipe
   let schemas = doc.querySelectorAll('script[type="application/ld+json"]');
   if (schemas === null) {
-    return
+    return recipes
   }
 
   function isGraph(elt: Object) {
@@ -39,8 +34,6 @@ export function getPageRecipe(doc: Document) {
     return true
   }
 
-  let recipe;
-
   for (let index = 0; index < schemas.length; index++) {
     const schema = schemas[index];
 
@@ -52,32 +45,30 @@ export function getPageRecipe(doc: Document) {
       ldjson.forEach(
         (element: any) => {
           if (isRecipe(element)) {
-            recipe = element
+            element.url = url
+            recipes.push(element)
           }
         }
       )
     } else if (isRecipe(ldjson)) {
-      recipe = ldjson;
+      ldjson.url = url // maybe get rid of this
+      recipes.push(ldjson);
     }
   }
 
-  if (recipe === undefined) {
-    alert("Failed to identify a recipe in page metadata")
-    return
-  }
-
-  return recipe
+  return recipes
 
 }
 
 export const getRecipes = functions.https.onCall(async (data, context) => {
   const axios = require("axios")
-  console.log(data)
+  let url = data.url;
+  if (url === undefined) {
+    return new HttpsError("internal", "must specify url")
+  }
   let tpc = await axios.get(data.url)
   const jsdom = require("jsdom")
   var htmlDom = new jsdom.JSDOM(tpc.data);
-  let recipe = getPageRecipe(htmlDom.window.document)
-  recipe.url = data.url
-  console.log(recipe)
-  return {recipe: JSON.stringify(recipe)}
+  let recipes = getRecipesFromPage(htmlDom.window.document, url)
+  return { recipes: JSON.stringify(recipes) }
 })

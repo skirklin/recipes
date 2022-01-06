@@ -1,7 +1,7 @@
 import { UploadOutlined } from "@ant-design/icons";
 import { Button } from "antd";
 import { useState } from "react";
-import { PickBoxModal, SelectBoxContext } from "./PickBoxModal";
+import { PickBoxModal } from "../Modals/PickBoxModal";
 import { uploadRecipes } from "../utils";
 import styled from "styled-components";
 
@@ -17,18 +17,10 @@ interface UploadProps {
 }
 
 export default function UploadButton(props: UploadProps) {
-    const { boxId: inputBoxId, disabled } = props;
-    const [boxId, setBoxId] = useState(inputBoxId)
+    const { boxId, disabled } = props;
     const [isModalVisible, setIsModalVisible] = useState(false)
 
-    let contextValue = {
-        setIsVisible: setIsModalVisible,
-        isVisible: isModalVisible,
-        setBoxName: setBoxId,
-        boxName: boxId!,
-    }
-
-    async function upload() {
+    async function upload(boxId: string | undefined) {
         if (boxId === undefined) {
             return // leave the modal visible until something is selected
         }
@@ -40,15 +32,13 @@ export default function UploadButton(props: UploadProps) {
         if (boxId === undefined) {
             setIsModalVisible(true)
         } else {
-            upload()
+            upload(boxId)
         }
     }
 
     return (<>
-        <SelectBoxContext.Provider value={contextValue}>
-            <StyledButton title="Upload recipes" disabled={disabled} onClick={uploadFlow}><UploadOutlined /></StyledButton>
-            <PickBoxModal handleOk={upload} />
-        </ SelectBoxContext.Provider >
+        <StyledButton title="Upload recipes" disabled={disabled} onClick={uploadFlow} icon={<UploadOutlined />} />
+        <PickBoxModal handleOk={upload} isVisible={isModalVisible} setIsVisible={setIsModalVisible} />
     </>)
 
 }
