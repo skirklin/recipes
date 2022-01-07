@@ -1,17 +1,14 @@
 import { useContext } from "react"
 import { Context } from "../context"
 import { RowType, BoxTable } from '../BoxTable/BoxTable'
-import styled from "styled-components";
-import NewBoxModal from "../Modals/NewBoxModal";
+import { Title } from "../StyledComponents";
 
-const TableButtons = styled.div`
-  float: right;
-`
 
 function Boxes() {
   const { state } = useContext(Context)
+  const { boxes } = state;
 
-  const boxes: RowType[] = Array.from(state.boxes).map(([key, value]) => ({
+  const rows: RowType[] = Array.from(boxes).map(([key, value]) => ({
     name: value.data.name,
     owners: value.owners,
     numRecipes: value.data.recipes.size,
@@ -19,13 +16,10 @@ function Boxes() {
     key: key,
   } as RowType))
 
-
   return (
     <div>
-      <TableButtons>
-        <NewBoxModal />
-      </TableButtons>
-      <BoxTable boxes={boxes} />
+      <Title>Saved Boxes</Title>
+      <BoxTable rows={rows} />
     </div>
   )
 }

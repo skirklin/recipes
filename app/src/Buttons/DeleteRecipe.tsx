@@ -1,15 +1,11 @@
 import { DeleteOutlined } from '@ant-design/icons';
-import { Button, Popconfirm } from 'antd';
+import { Popconfirm } from 'antd';
 import { useContext } from 'react';
-import styled from 'styled-components';
 import { Context } from '../context';
 import { useNavigate } from 'react-router-dom';
 import { deleteRecipe } from '../utils';
+import { ActionButton } from '../StyledComponents';
 
-const StyledButton = styled(Button)`
-  display: inline;
-  float: right;
-`
 
 interface DeleteProps {
   recipeId: string
@@ -36,7 +32,7 @@ function DeleteButton(props: DeleteProps) {
         okText="Yes"
         cancelText="No"
       >
-        <StyledButton title="Delete this recipe" icon={<DeleteOutlined />} disabled={recipeId === undefined} />
+        <ActionButton title="Delete this recipe" icon={<DeleteOutlined />} disabled={recipeId === undefined} />
       </Popconfirm>
     )
   } else {

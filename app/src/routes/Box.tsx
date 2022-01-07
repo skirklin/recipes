@@ -1,4 +1,3 @@
-import { Button, Space } from "antd";
 import { useContext, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Context } from "../context";
@@ -7,19 +6,21 @@ import { subscribeToBox, unsubscribeFromBox, getBox } from "../utils";
 import { RecipeTable, RowType } from "../RecipeTable/RecipeTable"
 import { getAuth } from "firebase/auth";
 import { BoxType } from "../types";
+import { ActionButton, Title } from "../StyledComponents";
 
 interface BoxRecipesProps {
   boxId: string,
   box: BoxType,
   writeable: boolean
 }
+
 function BoxRecipes(props: BoxRecipesProps) {
   const { box, boxId, writeable } = props;
 
   const recipes = box.data.recipes;
   let data: RowType[] = []
   for (let [recipeId, recipe] of recipes.entries()) {
-    data.push({ boxName: box.data.name, recipeId, boxId: boxId, recipe: recipe.data, key: `recipeId=${recipeId}_boxId=${boxId}` })
+    data.push({ boxName: box.data.name, recipeId, boxId, recipe, key: `recipeId=${recipeId}_boxId=${boxId}` })
   }
   return <RecipeTable recipes={data} writeable={writeable} boxId={boxId} />
 }
@@ -44,20 +45,17 @@ function Box() {
 
   let toggleSub
   if (!state.boxes.has(boxId)) {
-    toggleSub = <Button onClick={() => subscribeToBox(getAuth().currentUser, boxId)} disabled={!writeable}>Add to collection.</Button>
+    toggleSub = <ActionButton
+      style={{ marginLeft: "5px" }}
+      onClick={() => subscribeToBox(getAuth().currentUser, boxId)}
+      disabled={!writeable}
+    >Add</ActionButton>
   } else {
-    toggleSub = <Button onClick={() => unsubscribeFromBox(getAuth().currentUser, boxId)} disabled={!writeable}>Remove from collection</Button>
-  }
-
-  let modificationOptions;
-  if (writeable) {
-    modificationOptions = <div style={{ float: "right" }}>
-      <Space>
-        {toggleSub}
-      </Space>
-    </div>
-  } else {
-    modificationOptions = <></>
+    toggleSub = <ActionButton
+      style={{ marginLeft: "5px" }}
+      onClick={() => unsubscribeFromBox(getAuth().currentUser, boxId)}
+      disabled={!writeable}
+    >Remove</ActionButton>
   }
 
   if (box === undefined) {
@@ -66,8 +64,8 @@ function Box() {
 
   return (
     <div>
-      <div> {modificationOptions} </div>
-
+      <Title>{box.data.name}</Title>
+      {toggleSub}
       <BoxRecipes box={box} boxId={boxId} writeable={writeable} />
     </div>
   )

@@ -8,10 +8,6 @@ import RecipeName from './RecipeName';
 import RecipeDescription from './RecipeDescription';
 import Image from './Image';
 
-const Card = styled.div`
-  font-family: sans-serif;
-`
-
 const RecipeBody = styled.div`
   margin: 5px
 `
@@ -24,10 +20,10 @@ const IndexCardLine = styled.hr`
 
 function RecipeCard() {
   return (
-    <Card>
+    <div>
       <RecipeName />
       <IndexCardLine />
-      <div>
+      <div >
         <SaveButton />
         <ClearButton />
       </div>
@@ -37,7 +33,7 @@ function RecipeCard() {
         <IngredientList />
         <InstructionList />
       </RecipeBody>
-    </Card>
+    </div>
   );
 }
 

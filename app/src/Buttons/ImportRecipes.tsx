@@ -1,15 +1,8 @@
-import { Button } from "antd";
 import { useState } from "react";
 import { PickBoxModal } from "../Modals/PickBoxModal";
 import ImportModal from "../Modals/ImportModal";
-import styled from "styled-components";
 import { ImportOutlined } from "@ant-design/icons";
-
-
-const StyledButton = styled(Button)`
-  display: inline;
-  float: right;
-`
+import { ActionButton } from "../StyledComponents";
 
 interface ImportProps {
     boxId?: string
@@ -39,7 +32,7 @@ export default function ImportButton(props: ImportProps) {
     return (<>
         <PickBoxModal setIsVisible={setIsPickBoxVisible} isVisible={isPickBoxVisible} handleOk={handlePickBox} />
         <ImportModal boxId={boxId} setIsVisible={setIsImportVisible} isVisible={isImportVisible} />
-        <StyledButton onClick={importFlow} disabled={disabled} icon={<ImportOutlined />}/>
+        <ActionButton onClick={importFlow} disabled={disabled} icon={<ImportOutlined />}/>
     </>
     )
 }

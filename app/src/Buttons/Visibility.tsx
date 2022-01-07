@@ -1,14 +1,9 @@
 import { BookOutlined, GlobalOutlined, LinkOutlined } from "@ant-design/icons";
-import { Button, Dropdown, Menu } from "antd";
+import { Dropdown, Menu } from "antd";
 import { doc, updateDoc } from "firebase/firestore";
-import styled from "styled-components";
 import { db } from "../backend";
+import { ActionButton } from "../StyledComponents";
 import { BoxType, RecipeType, Visibility } from "../types";
-
-const StyledButton = styled(Button)`
-  display: inline;
-  float: right;
-`
 
 
 interface VisibilityProps {
@@ -73,9 +68,7 @@ export default function VisibilityControl(props: VisibilityProps) {
 
     return (
         <Dropdown overlay={menu}>
-            <StyledButton title="Change sharing level" style={{ float: "right" }}>
-                {icon}
-            </StyledButton>
+            <ActionButton title="Change sharing level" style={{ float: "right" }} icon={icon}/>
         </Dropdown>
     )
 }

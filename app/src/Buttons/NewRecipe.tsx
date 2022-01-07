@@ -1,17 +1,12 @@
 import { PlusOutlined } from "@ant-design/icons";
-import { Button } from "antd";
 import { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Context } from "../context";
 import { PickBoxModal } from "../Modals/PickBoxModal";
 import { createNewRecipe, getUniqueId } from "../utils";
-import styled from "styled-components";
 import { getAuth } from "firebase/auth";
+import { ActionButton } from "../StyledComponents";
 
-const StyledButton = styled(Button)`
-  display: inline;
-  float: right;
-`
 
 interface NewProps {
     boxId?: string
@@ -53,7 +48,7 @@ export default function NewButton(props: NewProps) {
     }
 
     return (<>
-            <StyledButton title="Create new recipe" disabled={disabled} onClick={newRecipeFlow} icon={<PlusOutlined />} />
+            <ActionButton title="Create new recipe" disabled={disabled} onClick={newRecipeFlow} icon={<PlusOutlined />} />
             <PickBoxModal handleOk={newRecipe} isVisible={isModalVisible} setIsVisible={setIsModalVisible}/>
     </>)
 

@@ -10,16 +10,16 @@ interface FilterboxProps {
 function filterFunc(value: RowType, str: string): boolean {
   let recipe = value.recipe;
   let re = new RegExp(str.toLowerCase())
-  if (recipe.name && recipe.name!.toString().toLowerCase().match(re) !== null) {
+  if (recipe.data.name && recipe.data.name!.toString().toLowerCase().match(re) !== null) {
     return true
   }
 
-  let matches = Array.prototype.filter.call(recipe.recipeIngredient, ri => ri.toString().toLowerCase().match(re))
+  let matches = Array.prototype.filter.call(recipe.data.recipeIngredient, ri => ri.toString().toLowerCase().match(re))
   if (matches.length > 0) {
     return true
   }
 
-  matches = Array.prototype.filter.call(recipe.recipeInstructions, ri => (ri.text && ri.text!.toString().toLowerCase().match(re)))
+  matches = Array.prototype.filter.call(recipe.data.recipeInstructions, ri => (ri.text && ri.text!.toString().toLowerCase().match(re)))
   if (matches.length > 0) {
     return true
   }
