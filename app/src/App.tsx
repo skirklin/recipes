@@ -29,7 +29,7 @@ function App() {
         return
       }
 
-      let unsubMap: UnsubMap = {
+      const unsubMap: UnsubMap = {
         userUnsub: undefined,
         boxesUnsub: undefined,
         boxMap: new Map<string, {

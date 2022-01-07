@@ -25,13 +25,13 @@ function RecipeDescription() {
   const recipe = state.recipe
   if (recipe === undefined)  { return null }
   const setEditable = (value: boolean) => {
-    let user = getAuth().currentUser
+    const user = getAuth().currentUser
     if (rbState.writeable && user && recipe.owners.includes(user.uid)  ) {
       setEditablePrimitive(value)
     }
   }
 
-  let description = recipe.data.description
+  const description = recipe.data.description
   const handleChange = (e: any) => {
     if (e.target.value !== description) {
       dispatch({ type: "SET_DESCRIPTION", payload: e.target.value });

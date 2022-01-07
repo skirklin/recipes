@@ -20,9 +20,9 @@ interface RecipeProps {
 
 
 export function Recipe(props: RecipeProps) {
-  let { recipeId, boxId } = props;
-  let { state } = useContext(Context)
-  let original = _.cloneDeep(props.recipe)
+  const { recipeId, boxId } = props;
+  const { state } = useContext(Context)
+  const original = _.cloneDeep(props.recipe)
 
   const [rState, dispatch] = useReducer<React.Reducer<RecipeStateType, RecipeActionType>>(recipeReducer, {
     recipe: props.recipe, original, recipeId, boxId,
@@ -35,7 +35,7 @@ export function Recipe(props: RecipeProps) {
       if (props.recipe !== undefined) {
         return
       }
-      let newRecipe = await getRecipe(state, boxId, recipeId);
+      const newRecipe = await getRecipe(state, boxId, recipeId);
       if (newRecipe !== undefined) {
         dispatch({ type: "SET_RECIPE", payload: newRecipe })
       }
@@ -60,6 +60,6 @@ export function Recipe(props: RecipeProps) {
 }
 
 export default function RoutedRecipe() {
-  let params = useParams();
+  const params = useParams();
   return <Recipe recipeId={params.recipeId!} boxId={params.boxId!} />
 }

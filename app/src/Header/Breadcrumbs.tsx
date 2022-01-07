@@ -6,20 +6,20 @@ import './Header.css';
 
 function Breadcrumbs() {
   const location = useLocation();
-  let params = useParams();
+  const params = useParams();
   const { state } = useContext(Context);
 
-  let partMap = new Map<string, string>()
+  const partMap = new Map<string, string>()
   const { boxId, recipeId } = params;
   if (boxId !== undefined) {
-    let box = state.boxes.get(boxId)
+    const box = state.boxes.get(boxId)
     if (box !== undefined) {
       partMap.set(boxId, box.data.name)
 
       if (recipeId !== undefined) {
-        let recipe = box.data.recipes.get(recipeId)
+        const recipe = box.data.recipes.get(recipeId)
         if (recipe !== undefined) {
-          let rname = recipe.data.name === undefined ? "" : recipe.data.name.toString()
+          const rname = recipe.data.name === undefined ? "" : recipe.data.name.toString()
           partMap.set(recipeId, rname)
 
         }

@@ -21,12 +21,12 @@ export default function NewButton(props: NewProps) {
 
 
     const addNewRecipe = (boxId: string) => {
-        let user = getAuth().currentUser
+        const user = getAuth().currentUser
         if (user === null) {
             return
         }
-        let recipe = createNewRecipe(user);
-        let recipeId = `uniqueId=${getUniqueId(recipe.data)}`
+        const recipe = createNewRecipe(user);
+        const recipeId = `uniqueId=${getUniqueId(recipe.data)}`
         dispatch({ type: "ADD_RECIPE", payload: recipe, boxId, recipeId })
         navigate(`/boxes/${boxId}/recipes/${recipeId}`)
     }

@@ -18,8 +18,8 @@ function BoxRecipes(props: BoxRecipesProps) {
   const { box, boxId, writeable } = props;
 
   const recipes = box.data.recipes;
-  let data: RowType[] = []
-  for (let [recipeId, recipe] of recipes.entries()) {
+  const data: RowType[] = []
+  for (const [recipeId, recipe] of recipes.entries()) {
     data.push({ boxName: box.data.name, recipeId, boxId, recipe, key: `recipeId=${recipeId}_boxId=${boxId}` })
   }
   return <RecipeTable recipes={data} writeable={writeable} boxId={boxId} />
@@ -35,7 +35,7 @@ function Box() {
 
   useEffect(() => {
     (async () => {
-      let box = await getBox(state, boxId)
+      const box = await getBox(state, boxId)
       if (box !== undefined) {
         setBox(box)
       }

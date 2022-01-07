@@ -21,7 +21,7 @@ export type RecipeActionType = {
 
 
 export function initState(user: User | null): RecipeStateType {
-  let r = createNewRecipe(user)
+  const r = createNewRecipe(user)
   return {
     recipeId: "",
     boxId: "",
@@ -47,7 +47,7 @@ export const RecipeContext = createContext<ContextType>(
 )
 
 export function recipeReducer(state: RecipeStateType, action: RecipeActionType): RecipeStateType {
-  let newState = { ...state }
+  const newState = { ...state }
   console.debug({ action })
   switch (action.type) {
     case 'SET_NAME':

@@ -9,8 +9,8 @@ import { db } from './backend'
 import { addBox, subscribeToBox } from './utils';
 
 async function initializeUser(user: User) {
-  let userRef = doc(db, "users", user.uid);
-  let userDoc = await getDoc(userRef)
+  const userRef = doc(db, "users", user.uid);
+  const userDoc = await getDoc(userRef)
   if (!userDoc.exists() && !user.isAnonymous) {
     await setDoc(userRef, { "new": false, "name": user.displayName });
     const userBoxRef = await addBox(user, `${user.displayName}'s box`, null);
@@ -40,28 +40,28 @@ async function handleUserSnapshot(
   dispatch: React.Dispatch<RecipeBoxActionType>,
   unsubMap: UnsubMap,
 ) {
-  let data = snapshot.data()
+  const data = snapshot.data()
   if (data === undefined) {
     return
   }
 
   dispatch({ type: "SET_USER", payload: data })
-  let subs = new Map(unsubMap.boxMap)
+  const subs = new Map(unsubMap.boxMap)
 
   data.boxes.forEach(
     (boxRef: DocumentReference) => {
       if (!unsubMap.boxMap.has(boxRef.id)) {
-        let boxUnsub = onSnapshot(boxRef, (snapshot) => handleBoxSnapshot(snapshot, dispatch, unsubMap))
+        const boxUnsub = onSnapshot(boxRef, (snapshot) => handleBoxSnapshot(snapshot, dispatch, unsubMap))
 
-        let recipesRef = collection(db, "boxes", boxRef.id, "recipes")
-        let recipesUnsub = onSnapshot(recipesRef, (snapshot) => handleRecipesSnapshot(snapshot, dispatch, boxRef.id))
+        const recipesRef = collection(db, "boxes", boxRef.id, "recipes")
+        const recipesUnsub = onSnapshot(recipesRef, (snapshot) => handleRecipesSnapshot(snapshot, dispatch, boxRef.id))
         unsubMap.boxMap.set(boxRef.id, { recipesUnsub, boxUnsub })
       } else {
         subs.delete(boxRef.id)
       }
     }
   )
-  for (let [boxId, sub] of subs.entries()) {
+  for (const [boxId, sub] of subs.entries()) {
     dispatch({type: "REMOVE_BOX", boxId})
     sub.boxUnsub && sub.boxUnsub()
     sub.recipesUnsub && sub.recipesUnsub()
@@ -70,10 +70,10 @@ async function handleUserSnapshot(
 }
 
 async function handleRecipesSnapshot(snapshot: QuerySnapshot<DocumentData>, dispatch: React.Dispatch<RecipeBoxActionType>, boxId: string) {
-  let changes = snapshot.docChanges()
-  for (let change of changes) {
-    let doc = change.doc;
-    let data = doc.data()
+  const changes = snapshot.docChanges()
+  for (const change of changes) {
+    const doc = change.doc;
+    const data = doc.data()
     if (change.type === "added" || change.type === "modified") {
       dispatch({ type: "ADD_RECIPE", recipeId: doc.id, boxId, payload: data })
     } else {
@@ -87,22 +87,22 @@ async function handleBoxSnapshot(
   dispatch: React.Dispatch<RecipeBoxActionType>,
   unsubMap: UnsubMap,
 ) {
-  let box = snapshot.data() as BoxStoreType
+  const box = snapshot.data() as BoxStoreType
 
   if (box === undefined) {
     dispatch({ type: "REMOVE_BOX", boxId: snapshot.id })
     return
   }
 
-  let owners = []
-  for (let owner of box.owners) {
-    let ownerDoc = await getDoc(doc(db, "users", owner))
+  const owners = []
+  for (const owner of box.owners) {
+    const ownerDoc = await getDoc(doc(db, "users", owner))
     if (ownerDoc.exists() && ownerDoc.data().name) {
       owners.push(ownerDoc.data().name)
     }
   }
 
-  let boxData = {
+  const boxData = {
     owners: owners,
     visibility: Visibility.private,
     data: {

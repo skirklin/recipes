@@ -43,17 +43,17 @@ function ImportModal(props: ImportProps) {
     if (boxId === undefined || value === "") {
       return
     }
-    let user = getAuth().currentUser
+    const user = getAuth().currentUser
     if (user === null) {
       return
     }
-    let response = (await getRecipes({ url: value }))
+    const response = (await getRecipes({ url: value }))
     const data = response.data as any
 
     if (data.error) {
       alert(data.error)
     }
-    let recipes = JSON.parse(data.recipes)
+    const recipes = JSON.parse(data.recipes)
     const fullRecipes = recipes.map(
       (recipe: Recipe) => {
         return {
@@ -68,7 +68,7 @@ function ImportModal(props: ImportProps) {
   }
 
   function makeRemover(i: number) {
-    let remover = () => {
+    const remover = () => {
       setDiscovered(_.filter(discovered, (x, id) => id !== i))
     }
     return remover

@@ -12,8 +12,8 @@ function SelectBox(props: SelectBoxProps) {
   const { setBoxId } = props;
   const { state } = useContext(Context)
 
-  let boxIds: string[] = [];
-  for (let k of state.boxes.keys()) {
+  const boxIds: string[] = [];
+  for (const k of state.boxes.keys()) {
     boxIds.push(k)
   }
 
@@ -23,7 +23,7 @@ function SelectBox(props: SelectBoxProps) {
   } else {
     boxOptions = [{ label: "", value: "" }]
   }
-  let defaultBoxId = boxOptions[0].value
+  const defaultBoxId = boxOptions[0].value
   useEffect(() => {
     setBoxId(defaultBoxId)
   }, [state, defaultBoxId, setBoxId]

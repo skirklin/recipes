@@ -17,7 +17,7 @@ function DeleteButton(props: DeleteProps) {
   const { writeable } = state;
   const navigate = useNavigate()
 
-  let { recipeId, boxId } = props;
+  const { recipeId, boxId } = props;
 
   async function del() {
     deleteRecipe(state, boxId, recipeId)

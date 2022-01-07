@@ -8,8 +8,8 @@ interface FilterboxProps {
 }
 
 function filterFunc(value: RowType, str: string): boolean {
-  let recipe = value.recipe;
-  let re = new RegExp(str.toLowerCase())
+  const recipe = value.recipe;
+  const re = new RegExp(str.toLowerCase())
   if (recipe.data.name && recipe.data.name!.toString().toLowerCase().match(re) !== null) {
     return true
   }

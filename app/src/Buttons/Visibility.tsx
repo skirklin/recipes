@@ -20,7 +20,7 @@ export default function VisibilityControl(props: VisibilityProps) {
         if (boxId === undefined) {
             return
         }
-        let newPrivacy = e.key
+        const newPrivacy = e.key
         // dispatch({ type: "SET_VISIBILITY", payload: newPrivacy, recipeId, boxId })
         if (recipeId === undefined) {
             updateDoc(doc(db, "boxes", boxId), { visibility: newPrivacy })
