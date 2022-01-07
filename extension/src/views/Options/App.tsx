@@ -13,7 +13,7 @@ import { getFirestore, connectFirestoreEmulator } from "firebase/firestore";
 
 // Configure Firebase.
 const firebaseConfig = {
-  apiKey: "AIzaSyDedu30sRQT4qerzEdts_meMkCM8164sHQ",
+  apiKey: "AIzaSyDnTpynPmWemzfi-AHzPEgu2TqZ0e-8UUA",
   authDomain: "recipe-box-335721.firebaseapp.com",
   projectId: "recipe-box-335721",
   storageBucket: "recipe-box-335721.appspot.com",
