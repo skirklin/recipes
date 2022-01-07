@@ -23,17 +23,17 @@ function RecipeName() {
   if (recipe === undefined)  { return null }
 
   const setEditable = (value: boolean) => {
-    let user = getAuth().currentUser
+    const user = getAuth().currentUser
     if (rbState.writeable && user && recipe.owners.includes(user.uid)  ) {
       setEditablePrimitive(value)
     }
   }
 
   const rd = recipe.data
-  let name = rd.name!.toString()
-  let box = rbState.boxes.get(state.boxId!);
-  let boxName = box === undefined ? "" : box.data.name
-  let handleChange = (e: any) => {
+  const name = rd.name!.toString()
+  const box = rbState.boxes.get(state.boxId!);
+  const boxName = box === undefined ? "" : box.data.name
+  const handleChange = (e: any) => {
     if (name !== e.target.value) {
       dispatch({ type: "SET_NAME", payload: e.target.value });
     }

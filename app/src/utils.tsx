@@ -17,7 +17,7 @@ export function strToIngredients(str: string): Recipe["recipeIngredient"] {
 
   ["ingredient blah blah", "ingredient 2 blah blah blah"]
   */
-  let lines = str.split("\n")
+  const lines = str.split("\n")
   return lines
 }
 
@@ -35,7 +35,7 @@ export function strToInstructions(str: string): Recipe["recipeInstructions"] {
       {"@type": "HowToStep", "text": "ingredient 2 blah blah blah"}
   ]
   */
-  let lines = _.filter(str.split("\n"))
+  const lines = _.filter(str.split("\n"))
   return lines.map(s => ({ "@type": "HowToStep", text: s }))
 }
 
@@ -46,17 +46,17 @@ export function instructionsToStr(instructions: Recipe["recipeInstructions"]): s
   if (typeof instructions === "string") {
     return instructions.toString()
   }
-  let steps = Array.prototype.map.call(instructions, (x: any) => x.text);
+  const steps = Array.prototype.map.call(instructions, (x: any) => x.text);
   return steps.join("\n\n")
 }
 
 export function ingredientsToStr(ingredients: Recipe["recipeIngredient"]): string {
-  let steps = Array.prototype.map.call(ingredients, x => x.toString());
+  const steps = Array.prototype.map.call(ingredients, x => x.toString());
   return steps.join("\n")
 }
 
 export function getRecipeFromState(state: RecipeBoxStateType, boxId: string, recipeId: string) {
-  let box = state.boxes.get(boxId);
+  const box = state.boxes.get(boxId);
   if (box === undefined) {
     return
   }
@@ -64,7 +64,7 @@ export function getRecipeFromState(state: RecipeBoxStateType, boxId: string, rec
 }
 
 export function setRecipeInState(state: RecipeBoxStateType, boxId: string, recipeId: string, recipe: RecipeType) {
-  let box = state.boxes.get(boxId);
+  const box = state.boxes.get(boxId);
   if (box === undefined) {
     return
   }
@@ -77,7 +77,7 @@ export async function getRecipe(state: RecipeBoxStateType, boxId: string | undef
   if (boxId === undefined || recipeId === undefined) {
     return undefined
   }
-  let box = state.boxes.get(boxId);
+  const box = state.boxes.get(boxId);
   if (box !== undefined) {
     recipe = box.data.recipes.get(recipeId)
   } else {
@@ -87,11 +87,11 @@ export async function getRecipe(state: RecipeBoxStateType, boxId: string | undef
 }
 
 export async function getRecipes(state: RecipeBoxStateType, boxId: string) {
-  let box = state.boxes.get(boxId)
+  const box = state.boxes.get(boxId)
   let recipes = new Map<string, RecipeType>()
   if (box === undefined) {
-    let querySnapshot = await getDocs(collection(db, "boxes", boxId, "recipes"))
-    let pairs: [string, RecipeType][] = querySnapshot.docs.map(doc => [doc.id, doc.data() as RecipeType])
+    const querySnapshot = await getDocs(collection(db, "boxes", boxId, "recipes"))
+    const pairs: [string, RecipeType][] = querySnapshot.docs.map(doc => [doc.id, doc.data() as RecipeType])
     recipes = new Map<string, RecipeType>(pairs)
   } else {
     recipes = box.data.recipes
@@ -105,7 +105,7 @@ export async function getBox(state: RecipeBoxStateType, boxId: string) {
   if (!boxDoc.exists() || boxDoc.data() === undefined) {
     return undefined
   }
-  let box = boxDoc.data() as BoxType
+  const box = boxDoc.data() as BoxType
   return ({
     data: {
       recipes: await getRecipes(state, boxId),
@@ -148,20 +148,20 @@ export async function unsubscribeFromBox(user: User | null, boxId: string) {
 
 export async function uploadRecipes(boxId: string) {
   /* @ts-expect-error */
-  let fileHandles: File[] = await window.showOpenFilePicker({
+  const fileHandles: File[] = await window.showOpenFilePicker({
     multiple: true,
   })
-  for (let fh of fileHandles) {
+  for (const fh of fileHandles) {
     /* @ts-expect-error */
     fh.getFile().then(f => {
       f.text().then(
         (text: string) => {
-          let jsonobj = JSON.parse(text) as Recipe
-          let user = getAuth().currentUser
+          const jsonobj = JSON.parse(text) as Recipe
+          const user = getAuth().currentUser
           if (user === null) {
             return
           }
-          let fullRecipe: RecipeType = {
+          const fullRecipe: RecipeType = {
             data: jsonobj,
             owners: [user.uid],
             visibility: Visibility.private,
@@ -173,8 +173,8 @@ export async function uploadRecipes(boxId: string) {
 }
 
 export async function addRecipe(boxId: string, recipe: RecipeType, dispatch: React.Dispatch<RecipeBoxActionType> | null) {
-  let colRef = collection(db, "boxes", boxId, "recipes")
-  let recipeRef = await addDoc(colRef, recipe)
+  const colRef = collection(db, "boxes", boxId, "recipes")
+  const recipeRef = await addDoc(colRef, recipe)
   return recipeRef
 }
 
@@ -231,7 +231,7 @@ export function createNewBox(): BoxType {
 
 export async function deleteRecipe(state: RecipeBoxStateType, boxId: string, recipeId: string) {
   if (recipeId.startsWith("uniqueId=")) {
-    let box = state.boxes.get(boxId)
+    const box = state.boxes.get(boxId)
     if (box !== undefined) {
       box.data.recipes.delete(recipeId)
     }
@@ -245,7 +245,7 @@ export async function deleteBox(state: RecipeBoxStateType, boxId: string) {
 }
 
 const objIdMap = new WeakMap();
-var objectCount = 0;
+let objectCount = 0;
 export function getUniqueId(rcp: Recipe) {
   if (!objIdMap.has(rcp)) objIdMap.set(rcp, ++objectCount);
   return objIdMap.get(rcp);

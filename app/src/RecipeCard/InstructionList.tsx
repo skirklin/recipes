@@ -54,13 +54,13 @@ function InstructionList() {
   const recipe = state.recipe
   if (recipe === undefined)  { return null }
   const setEditable = (value: boolean) => {
-    let user = getAuth().currentUser
+    const user = getAuth().currentUser
     if (rbState.writeable && user && recipe.owners.includes(user.uid)  ) {
       setEditablePrimitive(value)
     }
   }
 
-  let instructions = recipe.data.recipeInstructions;
+  const instructions = recipe.data.recipeInstructions;
 
   const handleChange = (e: any) => {
     if (formatInstructionList(instructions) !== e.target.value) {

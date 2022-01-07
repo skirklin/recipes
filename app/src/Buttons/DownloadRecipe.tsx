@@ -7,12 +7,12 @@ interface DownloadProps {
 }
 
 function DownloadButton(props: DownloadProps) {
-  let { recipe } = props;
+  const { recipe } = props;
 
   let textFile: string | null;
 
   function makeTextFile(text: string) {
-    var data = new Blob([text], { type: 'application/ld+json' });
+    const data = new Blob([text], { type: 'application/ld+json' });
 
     // If we are replacing a previously generated file we need to
     // manually revoke the object URL to avoid memory leaks.
@@ -24,10 +24,10 @@ function DownloadButton(props: DownloadProps) {
 
     // returns a URL you can use as a href
     return textFile;
-  };
+  }
 
   function download() {
-    var downloadLink = document.createElement("a");
+    const downloadLink = document.createElement("a");
     downloadLink.download = recipe!.data.name + ".json"
     downloadLink.innerHTML = "Download File";
 
@@ -37,7 +37,7 @@ function DownloadButton(props: DownloadProps) {
 
     // wait for the link to be added to the document
     window.requestAnimationFrame(function () {
-      var event = new MouseEvent('click');
+      const event = new MouseEvent('click');
       downloadLink.dispatchEvent(event); // synthetically click on it
       document.body.removeChild(downloadLink);
     });

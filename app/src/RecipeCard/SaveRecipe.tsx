@@ -27,7 +27,7 @@ function SaveButton() {
   async function save() {
     let docRef;
     if (state.recipeId === undefined || state.recipeId.startsWith("uniqueId=")) {
-      let docRef = await addRecipe(state.boxId, state.recipe!, rbDispatch)
+      const docRef = await addRecipe(state.boxId, state.recipe!, rbDispatch)
       dispatch({ type: "SET_RECIPE", payload: state.recipe, recipeId: docRef.id })
     } else {
       docRef = doc(db, "boxes", state.boxId, "recipes", state.recipeId);
@@ -37,7 +37,7 @@ function SaveButton() {
   }
 
   let writeable = false;
-  let user = getAuth().currentUser
+  const user = getAuth().currentUser
   if (rbState.writeable && user && recipe.owners.includes(user.uid) && recipe !== undefined) {
     writeable = true;
   }

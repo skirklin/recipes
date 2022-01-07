@@ -48,7 +48,7 @@ export function BoxTable(props: BoxTableProps) {
   const { writeable } = state;
 
   const { rows } = props;
-  let navigate = useNavigate();
+  const navigate = useNavigate();
 
   const onRow = (record: RowType, rowIndex: number | undefined) => {
     return {

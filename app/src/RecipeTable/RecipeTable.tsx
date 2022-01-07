@@ -18,8 +18,8 @@ import { ActionButton } from '../StyledComponents';
 import './RecipeTable.css'
 
 function sortfunc(a: string, b: string) {
-  var A = a.toUpperCase(); // ignore upper and lowercase
-  var B = b.toUpperCase(); // ignore upper and lowercase
+  const A = a.toUpperCase(); // ignore upper and lowercase
+  const B = b.toUpperCase(); // ignore upper and lowercase
   if (A < B) {
     return -1;
   }
@@ -70,7 +70,7 @@ export function RecipeTable(props: RecipeTableProps) {
   const [selectedRowKeys, setSelectedRowKeys] = useState<Key[]>([]);
   const [selectedRows, setSelectedRows] = useState<RowType[]>([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
-  let navigate = useNavigate();
+  const navigate = useNavigate();
 
   const { writeable, recipes, boxId } = props;
   const { state, dispatch } = useContext(Context)

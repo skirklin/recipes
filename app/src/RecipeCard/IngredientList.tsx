@@ -30,13 +30,13 @@ function IngredientList() {
   const recipe = state.recipe
   if (recipe === undefined) { return null }
   const setEditable = (value: boolean) => {
-    let user = getAuth().currentUser
+    const user = getAuth().currentUser
     if (rbState.writeable && user && recipe.owners.includes(user.uid)) {
       setEditablePrimitive(value)
     }
   }
 
-  let ingredients = recipe.data.recipeIngredient;
+  const ingredients = recipe.data.recipeIngredient;
   const handleChange = (e: any) => {
     if (formatIngredientList(ingredients) !== e.target.value) {
       dispatch({ type: "SET_INGREDIENTS", payload: strToIngredients(e.target.value) });
@@ -45,7 +45,7 @@ function IngredientList() {
   }
 
   function formatIngredientList(ingredients: Recipe["recipeIngredient"]) {
-    let listElts = Array.prototype.map.call(ingredients || [], (ri, id) => <Ingredient key={id}>{ri}</Ingredient>)
+    const listElts = Array.prototype.map.call(ingredients || [], (ri, id) => <Ingredient key={id}>{ri}</Ingredient>)
     if (listElts.length === 0) {
       return (
         <ul style={{ ...ingredientsStyle, listStylePosition: "outside", listStyleType: "unset" }}>

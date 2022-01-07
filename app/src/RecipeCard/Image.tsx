@@ -7,7 +7,7 @@ export default function Image() {
   if (state.recipe === undefined) {
     return null
   }
-  let image = state.recipe.data.image;
+  const image = state.recipe.data.image;
 
   if (image === undefined) {
     return null

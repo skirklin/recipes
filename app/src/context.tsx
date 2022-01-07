@@ -49,7 +49,7 @@ export function recipeBoxReducer(prevState: RecipeBoxStateType, action: RecipeBo
         console.warn("ADD_BOX requires a boxId")
         return prevState
       }
-      let oldBox = prevState.boxes.get(action.boxId)
+      const oldBox = prevState.boxes.get(action.boxId)
       if (action.payload === undefined) {
         console.warn("ADD_BOX requires a payload.")
         return prevState
@@ -72,7 +72,7 @@ export function recipeBoxReducer(prevState: RecipeBoxStateType, action: RecipeBo
         return prevState
       }
       state = { ...prevState, boxes: new Map(prevState.boxes) }
-      let box = state.boxes.get(action.boxId)
+      const box = state.boxes.get(action.boxId)
       if (box === undefined) {
         return state
       }
