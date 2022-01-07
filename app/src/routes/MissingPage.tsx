@@ -1,5 +1,7 @@
+import { Title } from "../StyledComponents"
+
 function MissingPage() {
-  return <div>No contents here.</div>
+  return <Title>Missing page.</Title>
 }
 
 export default MissingPage

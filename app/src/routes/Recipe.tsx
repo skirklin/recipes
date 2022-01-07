@@ -10,6 +10,7 @@ import { RecipeType } from '../types';
 import { getRecipe } from '../utils';
 import { RecipeActionType, RecipeContext, recipeReducer, RecipeStateType } from '../RecipeCard/context';
 import _ from 'lodash';
+import { RecipeActionGroup } from '../StyledComponents';
 
 interface RecipeProps {
   boxId: string
@@ -48,12 +49,12 @@ export function Recipe(props: RecipeProps) {
   }
   return (
     <RecipeContext.Provider value={{ dispatch, state: rState }}>
-      <div style={{margin: "3px"}}>
+      <RecipeActionGroup>
         <DeleteButton recipeId={recipeId} boxId={boxId} />
         <DownloadButton recipe={recipe} />
         <ForkButton recipe={recipe} />
         <VisibilityControl boxId={boxId} recipeId={recipeId} recipe={recipe} />
-      </div>
+      </RecipeActionGroup>
       <RecipeCard />
     </RecipeContext.Provider>
   )

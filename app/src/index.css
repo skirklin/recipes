@@ -23,29 +23,3 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
-
-
-.recipes-btn {
-  border: none;
-  box-shadow: none;
-  background-color: transparent;
-  border: none;
-  color: var(--jet);
-  font-size: 18px;
-  display: inline-block;
-}
-
-.recipes-btn:hover {
-  background-color: transparent;
-  color: var(--selective-yellow);
-}
-
-.recipes-icon {
-  display: "inline-block";
-  font-size: "18px";
-  color: var(--jet)
-}
-
-.recipes-icon:hover {
-  color: var(--selective-yellow)
-}

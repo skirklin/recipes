@@ -240,6 +240,10 @@ export async function deleteRecipe(state: RecipeBoxStateType, boxId: string, rec
   }
 }
 
+export async function deleteBox(state: RecipeBoxStateType, boxId: string) {
+  deleteDoc(doc(db, "boxes", boxId))
+}
+
 const objIdMap = new WeakMap();
 var objectCount = 0;
 export function getUniqueId(rcp: Recipe) {

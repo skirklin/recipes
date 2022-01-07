@@ -1,5 +1,4 @@
 import { ForkOutlined } from '@ant-design/icons';
-import { Button } from 'antd';
 import { useContext, useState } from 'react';
 
 import { PickBoxModal } from '../Modals/PickBoxModal';
@@ -8,13 +7,8 @@ import { useNavigate } from 'react-router-dom';
 import { addRecipe } from '../utils';
 import { RecipeType } from '../types';
 import _ from 'lodash';
-import styled from 'styled-components';
+import { ActionButton } from '../StyledComponents';
 
-
-const StyledButton = styled(Button)`
-  display: inline;
-  float: right;
-`
 
 interface ForkProps {
   boxId?: string
@@ -29,9 +23,7 @@ export default function ForkButton(props: ForkProps) {
 
 
   const addNewRecipe = async (boxId: string) => {
-    let recipeRef = await addRecipe(boxId, recipe, dispatch)
-    // todo: evaluate the impact of this kind of optimization
-    dispatch({ type: "ADD_RECIPE", payload: _.cloneDeep(recipe), boxId, recipeId: recipeRef.id }) 
+    let recipeRef = await addRecipe(boxId, _.cloneDeep(recipe), dispatch)
     navigate(`/boxes/${boxId}/recipes/${recipeRef.id}`)
   }
 
@@ -52,7 +44,7 @@ export default function ForkButton(props: ForkProps) {
   }
 
   return (<>
-      <StyledButton title="Create new recipe" disabled={!recipe} onClick={newRecipeFlow}><ForkOutlined /></StyledButton>
+      <ActionButton title="Create new recipe" disabled={!recipe} onClick={newRecipeFlow} icon={<ForkOutlined />} />
       <PickBoxModal handleOk={newRecipe} isVisible={isModalVisible} setIsVisible={setIsModalVisible}/>
   </>)
 

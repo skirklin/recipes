@@ -4,15 +4,7 @@ import styled from 'styled-components';
 import { LinkOutlined } from '@ant-design/icons';
 import { Context } from '../context';
 import { getAuth } from 'firebase/auth';
-
-
-const Title = styled.h1`
-  font-size: 2em;
-  outline: none;
-  display: inline;
-  padding: 20px 0px 0px 20px;
-  margin-bottom: 0px;
-  `
+import { Title } from '../StyledComponents';
 
 const EditableTitle = styled.input`
   font-size: 2em;

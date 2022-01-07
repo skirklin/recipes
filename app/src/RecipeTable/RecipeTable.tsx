@@ -1,19 +1,21 @@
+import _ from 'lodash';
 import { useContext, useEffect, useState } from 'react';
-import { Button, Popconfirm, Table } from 'antd';
+import { Popconfirm, Table } from 'antd';
 import { ColumnsType } from 'antd/es/table';
 
-import { Recipe } from 'schema-dts';
-import { Key } from 'antd/lib/table/interface';
-import { TableRowSelection } from 'antd/es/table/interface';
+import { Key, TableRowSelection } from 'antd/es/table/interface';
 import { DeleteOutlined, ForkOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import Filterbox from './Filterbox';
-import './RecipeTable.css'
 import NewButton from '../Buttons/NewRecipe';
 import UploadButton from '../Buttons/UploadRecipes';
 import ImportButton from '../Buttons/ImportRecipes';
-import { deleteRecipe } from '../utils';
+import { addRecipe, deleteRecipe } from '../utils';
 import { Context } from '../context';
+import { PickBoxModal } from '../Modals/PickBoxModal';
+import { RecipeType } from '../types';
+import { ActionButton } from '../StyledComponents';
+import './RecipeTable.css'
 
 function sortfunc(a: string, b: string) {
   var A = a.toUpperCase(); // ignore upper and lowercase
@@ -30,7 +32,7 @@ function sortfunc(a: string, b: string) {
 
 export interface RowType {
   boxName: string
-  recipe: Recipe
+  recipe: RecipeType
   boxId: string
   recipeId: string
   key: string
@@ -42,14 +44,36 @@ interface RecipeTableProps {
   boxId?: string
 }
 
+const columns: ColumnsType<RowType> = [
+  {
+    key: 'name',
+    title: 'Name',
+    dataIndex: ['recipe', 'data', 'name'],
+    sorter: (a: RowType, b: RowType) => sortfunc(a.recipe.data.name!.toString(), b.recipe.data.name!.toString()),
+  },
+  {
+    key: 'description',
+    title: 'Description',
+    dataIndex: ['recipe', 'data', 'description'],
+  },
+  {
+    key: 'box',
+    title: 'Box',
+    dataIndex: ['boxName'],
+  },
+];
+
+
+
 export function RecipeTable(props: RecipeTableProps) {
   /// https://ant.design/components/table/#components-table-demo-row-selection-and-operation
-  const [selectedRowKeys, setSelectedRowKeys] = useState<Key[]>([])
-  const [selectedRows, setSelectedRows] = useState<RowType[]>([])
+  const [selectedRowKeys, setSelectedRowKeys] = useState<Key[]>([]);
+  const [selectedRows, setSelectedRows] = useState<RowType[]>([]);
+  const [isModalVisible, setIsModalVisible] = useState(false);
   let navigate = useNavigate();
 
   const { writeable, recipes, boxId } = props;
-  const { state } = useContext(Context)
+  const { state, dispatch } = useContext(Context)
   const [filteredRows, setFilteredRows] = useState<RowType[]>([])
 
   useEffect(() => setFilteredRows(recipes), [recipes])
@@ -70,31 +94,20 @@ export function RecipeTable(props: RecipeTableProps) {
     }
   }
 
-  const columns: ColumnsType<RowType> = [
-    {
-      key: 'name',
-      title: 'Name',
-      dataIndex: ['recipe', 'name'],
-      sorter: (a: RowType, b: RowType) => sortfunc(a.recipe.name!.toString(), b.recipe.name!.toString()),
-    },
-    {
-      key: 'description',
-      title: 'Description',
-      dataIndex: ['recipe', 'description'],
-    },
-    {
-      key: 'box',
-      title: 'Box',
-      dataIndex: ['boxName'],
-    },
-  ];
-
   const hasSelected = selectedRowKeys.length > 0;
 
   async function del() {
     selectedRows.forEach(
       (value: RowType) => {
         deleteRecipe(state, value.boxId, value.recipeId)
+      }
+    )
+  }
+
+  async function fork(boxId: string) {
+    selectedRows.forEach(
+      (value: RowType) => {
+        addRecipe(boxId, _.cloneDeep(value.recipe), dispatch)
       }
     )
   }
@@ -113,11 +126,18 @@ export function RecipeTable(props: RecipeTableProps) {
           onConfirm={del}
           okText="Yes"
           disabled={!writeable || !hasSelected}
-          cancelText="No"
-        >
-          <Button disabled={!writeable || !hasSelected} title="Delete recipes"><DeleteOutlined /></Button>
+          cancelText="No">
+          <ActionButton
+            disabled={!writeable || !hasSelected}
+            title="Delete recipes"
+            icon={<DeleteOutlined />} />
         </Popconfirm>
-        <Button title="Copy recipes into different box" onClick={() => { console.log("fork", selectedRowKeys) }} disabled={!hasSelected}><ForkOutlined /></Button>
+        <ActionButton
+          title="Copy recipes into different box"
+          onClick={() => setIsModalVisible(true)}
+          disabled={!hasSelected}
+          icon={<ForkOutlined />} />
+        <PickBoxModal handleOk={fork} isVisible={isModalVisible} setIsVisible={setIsModalVisible} />
       </div>
       <Table<RowType>
         pagination={false}
@@ -125,8 +145,7 @@ export function RecipeTable(props: RecipeTableProps) {
         columns={columns}
         dataSource={filteredRows}
         onRow={onRow}
-        rowClassName={() => "recipe-row"}
-      />
+        rowClassName={() => "recipe-row"}/>
     </div>
   )
 }

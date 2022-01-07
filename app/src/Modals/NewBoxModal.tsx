@@ -4,9 +4,14 @@ import { addBox } from '../utils';
 import { getAuth } from "firebase/auth";
 import { Context } from "../context";
 
-function NewBoxModal() {
+interface NewBoxModalProps {
+  isVisible: boolean
+  setIsVisible: (visible: boolean) => void
+}
+
+function NewBoxModal(props: NewBoxModalProps) {
+  const {isVisible, setIsVisible} = props;
   const { dispatch } = useContext(Context)
-  const [isVisible, setIsVisible] = useState(false);
   const [newBoxName, setNewBoxName] = useState<string>();
 
   const handleOk = () => {

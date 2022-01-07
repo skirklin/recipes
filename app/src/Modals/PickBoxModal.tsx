@@ -28,6 +28,9 @@ function SelectBox(props: SelectBoxProps) {
     setBoxId(defaultBoxId)
   }, [state, defaultBoxId, setBoxId]
   )
+  if (boxIds.length === 0) {
+    return <div>No boxes found, please create a new box.</div>
+  }
   return <Select style={{ width: "300px" }} autoFocus defaultValue={defaultBoxId} onChange={setBoxId} options={boxOptions} />
 }
 
@@ -40,11 +43,12 @@ interface PickBoxModalProps {
 export function PickBoxModal(props: PickBoxModalProps) {
   const { handleOk, isVisible, setIsVisible } = props;
   const [boxId, setBoxId] = useState("")
+  const [isNewBoxModalVisible, setIsNewBoxModalVisible] = useState(false)
 
   return (
     <Modal destroyOnClose={true} visible={isVisible} onOk={() => { handleOk(boxId) }} onCancel={() => setIsVisible(false)}>
       <SelectBox setBoxId={setBoxId} />
-      <NewBoxModal />
+      <NewBoxModal isVisible={isNewBoxModalVisible} setIsVisible={setIsNewBoxModalVisible} />
     </Modal >
   );
 }

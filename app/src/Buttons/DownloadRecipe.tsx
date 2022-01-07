@@ -1,12 +1,6 @@
 import { DownloadOutlined } from '@ant-design/icons';
-import { Button } from 'antd';
-import styled from 'styled-components';
+import { ActionButton } from '../StyledComponents';
 import { RecipeType } from '../types';
-
-const StyledButton = styled(Button)`
-  display: inline;
-  float: right;
-`
 
 interface DownloadProps {
   recipe: RecipeType
@@ -49,7 +43,7 @@ function DownloadButton(props: DownloadProps) {
     });
 
   }
-  return <StyledButton title="Download recipe" icon={<DownloadOutlined />} disabled={!recipe} onClick={download} />
+  return <ActionButton title="Download recipe" icon={<DownloadOutlined />} disabled={!recipe} onClick={download} />
 }
 
 export default DownloadButton;
