@@ -9,7 +9,6 @@ import { db } from './backend'
 import { addBox, subscribeToBox } from './utils';
 
 async function initializeUser(user: User) {
-  console.log(user)
   let userRef = doc(db, "users", user.uid);
   let userDoc = await getDoc(userRef)
   if (!userDoc.exists() && !user.isAnonymous) {

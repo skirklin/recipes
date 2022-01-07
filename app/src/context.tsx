@@ -28,7 +28,7 @@ export const Context = createContext<ContextType>(
 )
 
 export function recipeBoxReducer(prevState: RecipeBoxStateType, action: RecipeBoxActionType): RecipeBoxStateType {
-  console.log({ action, prevState })
+  console.log("action", { action, prevState })
   let newBox: BoxType, state: RecipeBoxStateType
   switch (action.type) {
     case "ADD_RECIPE":

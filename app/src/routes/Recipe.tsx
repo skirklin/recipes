@@ -23,7 +23,6 @@ export function Recipe(props: RecipeProps) {
   let { recipeId, boxId } = props;
   let { state } = useContext(Context)
   let original = _.cloneDeep(props.recipe)
-  console.log({ state })
 
   const [rState, dispatch] = useReducer<React.Reducer<RecipeStateType, RecipeActionType>>(recipeReducer, {
     recipe: props.recipe, original, recipeId, boxId,
