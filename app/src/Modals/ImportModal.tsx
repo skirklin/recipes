@@ -48,7 +48,6 @@ function ImportModal(props: ImportProps) {
       return
     }
     let response = (await getRecipes({ url: value }))
-    console.log(response.data)
     const data = response.data as any
 
     if (data.error) {
@@ -70,7 +69,6 @@ function ImportModal(props: ImportProps) {
 
   function makeRemover(i: number) {
     let remover = () => {
-      console.log("trying to remove", i)
       setDiscovered(_.filter(discovered, (x, id) => id !== i))
     }
     return remover

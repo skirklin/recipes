@@ -38,11 +38,6 @@ function SaveButton() {
 
   let writeable = false;
   let user = getAuth().currentUser
-  console.log({
-    writeable: rbState.writeable,
-    user,
-    recipe
-  })
   if (rbState.writeable && user && recipe.owners.includes(user.uid) && recipe !== undefined) {
     writeable = true;
   }

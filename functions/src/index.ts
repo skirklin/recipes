@@ -23,14 +23,14 @@ export function getRecipesFromPage(doc: Document, url: string): Recipe[] {
 
   function isRecipe(elt: any) {
     if (!(elt.hasOwnProperty("@context") && elt.hasOwnProperty("@type"))) {
-      console.log("no type or context");
+      console.debug("no type or context");
       return false;
     }
     if (elt["@context"].toString().match(/recipe.org/) || (elt["@type"] !== "Recipe" && elt["@type"][0] !== "Recipe")) {
-      console.log("wrong type or context");
+      console.debug("wrong type or context");
       return false;
     }
-    console.log("found recipe")
+    console.debug("found recipe")
     return true
   }
 
