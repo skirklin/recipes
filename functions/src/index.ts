@@ -1,18 +1,21 @@
 import * as functions from "firebase-functions";
 import { HttpsError } from "firebase-functions/v1/https";
-import { Recipe } from "schema-dts";
+import { Recipe, WithContext } from "schema-dts";
+import axios from 'axios';
+import * as jsdom from 'jsdom';
 
+type RecipeWithContext = WithContext<Recipe>
 
 export function getRecipesFromPage(doc: Document, url: string): Recipe[] {
-  let recipes: Recipe[] = [];
+  const recipes: Recipe[] = [];
   // Pull ld+json metadata from the page and look for a recipe
-  let schemas = doc.querySelectorAll('script[type="application/ld+json"]');
+  const schemas = doc.querySelectorAll('script[type="application/ld+json"]');
   if (schemas === null) {
     return recipes
   }
 
-  function isGraph(elt: Object) {
-    if (elt.hasOwnProperty("@graph")) {
+  function isGraph(elt: Record<string, unknown>) {
+    if (Object.prototype.hasOwnProperty.call(elt, "@graph")) {
       /* the "graph" style ld+json puts objects at the root level, but 
       cross-object references may be represented by simply referencing their ids.
       */
@@ -21,8 +24,8 @@ export function getRecipesFromPage(doc: Document, url: string): Recipe[] {
     return false
   }
 
-  function isRecipe(elt: any) {
-    if (!(elt.hasOwnProperty("@context") && elt.hasOwnProperty("@type"))) {
+  function isRecipe(elt: RecipeWithContext) {
+    if (!(Object.prototype.hasOwnProperty.call(elt,"@context") && Object.prototype.hasOwnProperty.call(elt,"@type"))) {
       console.debug("no type or context");
       return false;
     }
@@ -37,13 +40,17 @@ export function getRecipesFromPage(doc: Document, url: string): Recipe[] {
   for (let index = 0; index < schemas.length; index++) {
     const schema = schemas[index];
 
-    let ldjson = JSON.parse(schema.textContent!);
+    if (schema.textContent === null) {
+      continue
+    }
+
+    let ldjson = JSON.parse(schema.textContent);
     if (isGraph(ldjson)) {
       ldjson = ldjson["@graph"];
     }
     if (Array.isArray(ldjson)) {
       ldjson.forEach(
-        (element: any) => {
+        (element: RecipeWithContext) => {
           if (isRecipe(element)) {
             element.url = url
             recipes.push(element)
@@ -60,15 +67,13 @@ export function getRecipesFromPage(doc: Document, url: string): Recipe[] {
 
 }
 
-export const getRecipes = functions.https.onCall(async (data, context) => {
-  const axios = require("axios")
-  let url = data.url;
+export const getRecipes = functions.https.onCall(async (data) => {
+  const url = data.url;
   if (url === undefined) {
     return new HttpsError("internal", "must specify url")
   }
-  let tpc = await axios.get(data.url)
-  const jsdom = require("jsdom")
-  var htmlDom = new jsdom.JSDOM(tpc.data);
-  let recipes = getRecipesFromPage(htmlDom.window.document, url)
+  const tpc = await axios.get(data.url)
+  const htmlDom = new jsdom.JSDOM(tpc.data);
+  const recipes = getRecipesFromPage(htmlDom.window.document, url)
   return { recipes: JSON.stringify(recipes) }
 })
