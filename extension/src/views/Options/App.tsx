@@ -26,12 +26,15 @@ export const app = initializeApp(firebaseConfig);
 
 // setup auth emulator
 const auth = getAuth();
-connectAuthEmulator(auth, "http://localhost:9099");
+if (process.env.NODE_ENV === "development") {
+  connectAuthEmulator(auth, "http://localhost:9099");
+}
 
 // setup firestore emulator
 export const db = getFirestore();
-connectFirestoreEmulator(db, 'localhost', 8080);
-
+if (process.env.NODE_ENV === "development") {
+  connectFirestoreEmulator(db, 'localhost', 8080);
+}
 
 const SignInCard = styled.div`
   margin: 40px auto;

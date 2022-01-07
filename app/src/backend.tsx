@@ -19,13 +19,19 @@ export const app = initializeApp(firebaseConfig);
 
 // setup auth emulator
 const auth = getAuth(app);
-connectAuthEmulator(auth, "http://localhost:9099");
+if (process.env.NODE_ENV === "development") {
+  connectAuthEmulator(auth, "http://localhost:9099");
+}
 
 // setup firestore emulator
 export const db = getFirestore(app);
-connectFirestoreEmulator(db, 'localhost', 8080);
+if (process.env.NODE_ENV === "development") {
+  connectFirestoreEmulator(db, 'localhost', 8080);
+}
 
 const functions = getFunctions(app);
-connectFunctionsEmulator(functions, "localhost", 5001);
+if (process.env.NODE_ENV === "development") {
+  connectFunctionsEmulator(functions, "localhost", 5001);
+}
 
 export const getRecipes = httpsCallable(functions, 'getRecipes');

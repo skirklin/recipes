@@ -19,11 +19,15 @@ export const app = initializeApp(firebaseConfig);
 
 // setup auth emulator
 const auth = getAuth();
-connectAuthEmulator(auth, "http://localhost:9099");
+if (process.env.NODE_ENV === "development") {
+  connectAuthEmulator(auth, "http://localhost:9099");
+}
 
 // setup firestore emulator
 export const db = getFirestore();
-connectFirestoreEmulator(db, 'localhost', 8080);
+if (process.env.NODE_ENV === "development") {
+  connectFirestoreEmulator(db, 'localhost', 8080);
+}
 
 const provider = new GoogleAuthProvider();
 
@@ -36,7 +40,7 @@ signInWithPopup(auth, provider)
     // The signed-in user info.
     const user = result.user;
     // ...
-    console.log({user, token})
+    console.log({ user, token })
   }).catch((error) => {
     // Handle Errors here.
     const errorCode = error.code;
@@ -46,7 +50,7 @@ signInWithPopup(auth, provider)
     // The AuthCredential type that was used.
     const credential = GoogleAuthProvider.credentialFromError(error);
     // ...
-    console.log({errorCode, errorMessage, email, credential})
+    console.log({ errorCode, errorMessage, email, credential })
   }
   );
 
