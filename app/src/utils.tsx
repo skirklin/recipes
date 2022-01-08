@@ -46,7 +46,7 @@ export function instructionsToStr(instructions: Recipe["recipeInstructions"]): s
   if (typeof instructions === "string") {
     return instructions.toString()
   }
-  const steps = Array.prototype.map.call(instructions, (x: any) => x.text);
+  const steps = Array.prototype.map.call(instructions, (x: Recipe) => x.text);
   return steps.join("\n\n")
 }
 
@@ -147,12 +147,10 @@ export async function unsubscribeFromBox(user: User | null, boxId: string) {
 }
 
 export async function uploadRecipes(boxId: string) {
-  /* @ts-expect-error */
-  const fileHandles: File[] = await window.showOpenFilePicker({
+  const fileHandles = await window.showOpenFilePicker({
     multiple: true,
   })
   for (const fh of fileHandles) {
-    /* @ts-expect-error */
     fh.getFile().then(f => {
       f.text().then(
         (text: string) => {

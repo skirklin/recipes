@@ -15,10 +15,9 @@ export default function Image() {
   if (image instanceof String) {
     return <img src={image.toString()} alt="original" />
   } else {
-    // not sure why ImageObject doesn't think url is a valid propery, according to schema.org it inherits it from Thing and should be an option.
-    /* @ts-expect-error */
+    /* @ts-expect-error ImageObject doesn't think url is a valid propery, according to schema.org it inherits it from Thing and should be an option. */
     if (image.url !== undefined) {
-      /* @ts-expect-error */
+      /* @ts-expect-error ImageObject doesn't think url is a valid propery, according to schema.org it inherits it from Thing and should be an option. */
       return <img src={image.url.toString()} alt="original" style={{ maxWidth: "30%", padding: "15px", float: "right" }} />
     }
   }

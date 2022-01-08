@@ -1,5 +1,6 @@
 import { Input } from "antd";
 import _ from "lodash";
+import { Recipe } from "schema-dts";
 import { RowType } from "./RecipeTable";
 
 interface FilterboxProps {
@@ -7,10 +8,13 @@ interface FilterboxProps {
   data: RowType[]
 }
 
+const getName = (name: Recipe["name"]) => name === undefined ? "" : name.toString()
+
+
 function filterFunc(value: RowType, str: string): boolean {
   const recipe = value.recipe;
   const re = new RegExp(str.toLowerCase())
-  if (recipe.data.name && recipe.data.name!.toString().toLowerCase().match(re) !== null) {
+  if (getName(recipe.data.name).toLowerCase().match(re) !== null) {
     return true
   }
 
@@ -19,7 +23,7 @@ function filterFunc(value: RowType, str: string): boolean {
     return true
   }
 
-  matches = Array.prototype.filter.call(recipe.data.recipeInstructions, ri => (ri.text && ri.text!.toString().toLowerCase().match(re)))
+  matches = Array.prototype.filter.call(recipe.data.recipeInstructions, ri => (ri.text !== undefined && ri.text.toString().toLowerCase().match(re)))
   if (matches.length > 0) {
     return true
   }
@@ -30,7 +34,7 @@ function filterFunc(value: RowType, str: string): boolean {
 
 function Filterbox(props: FilterboxProps) {
   const { data, setFilteredRows } = props;
-  function filterRecipes(e: any) {
+  function filterRecipes(e: { target: { value: string; }; }) {
     setFilteredRows(_.filter(data, (row) => filterFunc(row, e.target.value)))
   }
   return <Input placeholder='Filter recipes' onChange={filterRecipes} style={{ width: "300px" }} />

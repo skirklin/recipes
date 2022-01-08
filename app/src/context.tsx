@@ -31,7 +31,7 @@ export function recipeBoxReducer(prevState: RecipeBoxStateType, action: RecipeBo
   console.log("action", { action, prevState })
   let newBox: BoxType, state: RecipeBoxStateType
   switch (action.type) {
-    case "ADD_RECIPE":
+    case "ADD_RECIPE": {
       if (action.boxId === undefined || (action.recipeId === undefined)) {
         console.warn("ADD_RECIPE requires a boxId and recipeId.")
         return prevState
@@ -41,10 +41,11 @@ export function recipeBoxReducer(prevState: RecipeBoxStateType, action: RecipeBo
         console.warn("ADD_RECIPE requires a payload.")
         return prevState
       }
-      newBox.data.recipes = new Map([...newBox.data.recipes, [action.recipeId, action.payload]])
+      newBox.data.recipes = new Map([...newBox.data.recipes, [action.recipeId, action.payload as RecipeType]])
       state = { ...prevState, boxes: new Map([...prevState.boxes, [action.boxId, newBox as BoxType]]) }
       return state
-    case "ADD_BOX":
+    }
+    case "ADD_BOX": {
       if (action.boxId === undefined) {
         console.warn("ADD_BOX requires a boxId")
         return prevState
@@ -54,11 +55,12 @@ export function recipeBoxReducer(prevState: RecipeBoxStateType, action: RecipeBo
         console.warn("ADD_BOX requires a payload.")
         return prevState
       }
-      newBox = { ...action.payload } as BoxType
+      newBox = { ...action.payload as BoxType}
       newBox.data.recipes = (oldBox && oldBox.data.recipes) || new Map<string, RecipeType>()
       state = { ...prevState, boxes: new Map([...prevState.boxes, [action.boxId, newBox as BoxType]]) }
       return state
-    case "REMOVE_BOX":
+    }
+    case "REMOVE_BOX": {
       if (action.boxId === undefined) {
         console.warn("REMOVE_BOX requires a boxId")
         return prevState
@@ -66,7 +68,8 @@ export function recipeBoxReducer(prevState: RecipeBoxStateType, action: RecipeBo
       state = { ...prevState, boxes: new Map(prevState.boxes) }
       state.boxes.delete(action.boxId)
       return state
-    case "REMOVE_RECIPE":
+    }
+    case "REMOVE_RECIPE": {
       if (action.boxId === undefined || action.recipeId === undefined) {
         console.warn("REMOVE_RECIPE requires a boxId and a recipeId")
         return prevState
@@ -79,8 +82,10 @@ export function recipeBoxReducer(prevState: RecipeBoxStateType, action: RecipeBo
       box.data.recipes = new Map(box.data.recipes)
       box.data.recipes.delete(action.recipeId)
       return state
-    case "SET_BOXES":
-      return { ...prevState, boxes: new Map([...prevState.boxes, ...action.payload]) }
+    }
+    case "SET_BOXES": {
+      return { ...prevState, boxes: new Map([...prevState.boxes, ...action.payload as Map<string, BoxType>]) }
+    }
     case "CLEAR_BOXES":
       return { ...prevState, boxes: new Map() }
     case 'SET_READONLY':
@@ -90,7 +95,7 @@ export function recipeBoxReducer(prevState: RecipeBoxStateType, action: RecipeBo
         console.warn("SET_ACTIVE_RECIPE requires a boxId and recipeId.")
         return prevState
       }
-      return { ...prevState, activeRecipe: action.payload, activeRecipeId: action.recipeId, activeBoxId: action.boxId }
+      return { ...prevState, activeRecipe: action.payload as RecipeType, activeRecipeId: action.recipeId, activeBoxId: action.boxId }
     case 'SET_ACTIVE_BOX':
       if (action.boxId === undefined || action.box === undefined) {
         console.warn("SET_ACTIVE_BOX requires a boxId.")

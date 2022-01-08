@@ -30,6 +30,7 @@
     "@types/react-modal": "^3.13.1",
     "@types/react-tabs": "^2.3.3",
     "@types/styled-components": "^5.1.18",
+    "@types/wicg-file-system-access": "^2020.9.4",
     "eslint": "^8.6.0",
     "jest": "^27.4.7",
     "typescript": "^4.5.4"

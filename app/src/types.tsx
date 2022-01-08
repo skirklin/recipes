@@ -10,9 +10,6 @@ export type BoxPointer = {
   boxId: string,
 }
 
-export type AllType = {
-}
-
 export type BoxStoreType = {
   owners: string[], // user ids
   visibility: Visibility,
@@ -58,7 +55,7 @@ export type RecipeBoxActionType = {
   boxId?: string
   recipe?: RecipeType
   box?: BoxType
-  payload?: any
+  payload?: RecipeType | BoxType | Map<string, BoxType> | Map<string, RecipeType> | boolean
 }
 
 export type UnsubMap = {

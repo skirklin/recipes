@@ -6,6 +6,7 @@ import { useContext } from 'react';
 import styled from 'styled-components';
 import { db } from '../backend';
 import { Context } from '../context';
+import { RecipeType } from '../types';
 import { addRecipe } from '../utils';
 
 import { RecipeContext } from './context';
@@ -27,7 +28,7 @@ function SaveButton() {
   async function save() {
     let docRef;
     if (state.recipeId === undefined || state.recipeId.startsWith("uniqueId=")) {
-      const docRef = await addRecipe(state.boxId, state.recipe!, rbDispatch)
+      const docRef = await addRecipe(state.boxId, state.recipe as RecipeType, rbDispatch)
       dispatch({ type: "SET_RECIPE", payload: state.recipe, recipeId: docRef.id })
     } else {
       docRef = doc(db, "boxes", state.boxId, "recipes", state.recipeId);

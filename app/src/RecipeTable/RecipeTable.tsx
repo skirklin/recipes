@@ -16,6 +16,7 @@ import { PickBoxModal } from '../Modals/PickBoxModal';
 import { RecipeType } from '../types';
 import { ActionButton } from '../StyledComponents';
 import './RecipeTable.css'
+import { Recipe } from 'schema-dts';
 
 function sortfunc(a: string, b: string) {
   const A = a.toUpperCase(); // ignore upper and lowercase
@@ -44,12 +45,14 @@ interface RecipeTableProps {
   boxId?: string
 }
 
+const getName = (name: Recipe["name"]) => name === undefined ? "" : name.toString()
+
 const columns: ColumnsType<RowType> = [
   {
     key: 'name',
     title: 'Name',
     dataIndex: ['recipe', 'data', 'name'],
-    sorter: (a: RowType, b: RowType) => sortfunc(a.recipe.data.name!.toString(), b.recipe.data.name!.toString()),
+    sorter: (a: RowType, b: RowType) => sortfunc(getName(a.recipe.data.name), getName(b.recipe.data.name)),
   },
   {
     key: 'description',
