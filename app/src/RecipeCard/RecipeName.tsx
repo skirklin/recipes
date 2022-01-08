@@ -30,8 +30,8 @@ function RecipeName() {
   }
 
   const rd = recipe.data
-  const name = rd.name!.toString()
-  const box = rbState.boxes.get(state.boxId!);
+  const name = rd.name as string
+  const box = rbState.boxes.get(state.boxId as string);
   const boxName = box === undefined ? "" : box.data.name
   const handleChange = (e: any) => {
     if (name !== e.target.value) {

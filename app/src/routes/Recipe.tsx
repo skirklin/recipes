@@ -61,5 +61,5 @@ export function Recipe(props: RecipeProps) {
 
 export default function RoutedRecipe() {
   const params = useParams();
-  return <Recipe recipeId={params.recipeId!} boxId={params.boxId!} />
+  return <Recipe recipeId={params.recipeId as string} boxId={params.boxId as string} />
 }

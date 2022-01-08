@@ -14,7 +14,6 @@ Modal.setAppElement('#root'); // for accessibility. See: https://reactcommunity.
 
 function App() {
   const [state, dispatch] = useReducer<React.Reducer<RecipeBoxStateType, RecipeBoxActionType>>(recipeBoxReducer, initState())
-  const { boxes } = state;
 
   const recipesValue = useMemo(() => {
     return { state, dispatch };
@@ -47,14 +46,6 @@ function App() {
       return () => { console.debug("Unsubscring from all."); unsubscribe(unsubMap) }
     }, [user]
   )
-
-  useEffect(
-    () => {
-
-    }, [user, boxes],
-  )
-
-
 
   return (
     <Context.Provider value={recipesValue}>

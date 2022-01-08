@@ -3,7 +3,7 @@ import { User } from "firebase/auth";
 import { getDoc, onSnapshot, doc, setDoc, DocumentData, DocumentSnapshot, DocumentReference, collection, QuerySnapshot } from "firebase/firestore";
 import 'antd/dist/antd.css'; // or 'antd/dist/antd.less'
 
-import { BoxStoreType, RecipeBoxActionType, UnsubMap, Visibility } from './types';
+import { BoxStoreType, BoxType, RecipeBoxActionType, RecipeType, UnsubMap, Visibility } from './types';
 
 import { db } from './backend'
 import { addBox, subscribeToBox } from './utils';
@@ -45,7 +45,8 @@ async function handleUserSnapshot(
     return
   }
 
-  dispatch({ type: "SET_USER", payload: data })
+  // oooooh, TODO, implement this :/
+  // dispatch({ type: "SET_USER", payload: data as Map<string, BoxType> })
   const subs = new Map(unsubMap.boxMap)
 
   data.boxes.forEach(
@@ -75,7 +76,7 @@ async function handleRecipesSnapshot(snapshot: QuerySnapshot<DocumentData>, disp
     const doc = change.doc;
     const data = doc.data()
     if (change.type === "added" || change.type === "modified") {
-      dispatch({ type: "ADD_RECIPE", recipeId: doc.id, boxId, payload: data })
+      dispatch({ type: "ADD_RECIPE", recipeId: doc.id, boxId, payload: data as RecipeType })
     } else {
       dispatch({ type: "REMOVE_RECIPE", recipeId: doc.id, boxId })
     }
@@ -109,7 +110,7 @@ async function handleBoxSnapshot(
       name: box.data.name,
     },
   }
-  dispatch({ type: "ADD_BOX", boxId: snapshot.id, payload: boxData })
+  dispatch({ type: "ADD_BOX", boxId: snapshot.id, payload: boxData as BoxType })
 }
 
 
