@@ -80,16 +80,18 @@ export class UserEntry {
     name: string
     visibility: Visibility
     boxes: BoxId[]
+    id: string
 
-    constructor(name: string, visibility: Visibility, boxes: BoxId[]) {
+    constructor(name: string, visibility: Visibility, boxes: BoxId[], id: string) {
         this.name = name
         this.visibility = visibility
         this.boxes = boxes
+        this.id = id
     }
 }
 
 
-export const userConstructor = {
+export const userConverter = {
     toFirestore: (user: UserEntry) => {
         return {
             name: user.name,
@@ -100,6 +102,6 @@ export const userConstructor = {
     fromFirestore: (snapshot: DocumentSnapshot, options: SnapshotOptions) => {
         const data = snapshot.data(options) as UserStoreType
         const boxIds = data.boxes.map(b => b.id)
-        return new UserEntry(data.name, data.visibility, boxIds)
+        return new UserEntry(data.name, data.visibility, boxIds, snapshot.id)
     }
 };

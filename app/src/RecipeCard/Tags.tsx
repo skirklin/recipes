@@ -2,10 +2,9 @@ import { PlusOutlined } from '@ant-design/icons';
 import { Input, Tag } from 'antd';
 import { getAuth } from 'firebase/auth';
 import { useContext, useState } from 'react';
-import { Recipe } from 'schema-dts';
 import styled from 'styled-components';
 import { Context } from '../context';
-import { getRecipeFromState } from '../utils';
+import { categoriesToTags, tagsToCategories, getRecipeFromState } from '../utils';
 import { RecipeCardProps } from './RecipeCard';
 
 const TagsArea = styled.div`
@@ -21,12 +20,12 @@ function Tags(props: RecipeCardProps) {
 
   const recipe = getRecipeFromState(state, boxId, recipeId)
   const rd = recipe ? (recipe.changed ? recipe.changed : recipe.data) : { recipeCategory: [] }
-  const tags = Array.prototype.filter.call(rd.recipeCategory, x => true)
+  const tags = categoriesToTags(rd.recipeCategory)
 
   if (recipe === undefined) { return null }
 
   function setTags(tags: string[]) {
-    dispatch({ type: "SET_CATEGORIES", recipeId, boxId, payload: tags as Recipe["recipeCategory"] })
+    dispatch({ type: "SET_CATEGORIES", recipeId, boxId, payload: tagsToCategories(tags) })
   }
 
   const user = getAuth().currentUser;

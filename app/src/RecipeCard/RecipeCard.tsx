@@ -30,7 +30,7 @@ function RecipeCard(props: RecipeCardProps) {
         <Tags {...props} />
       </div>
       <IndexCardLine />
-      <RecipeActionGroup>
+      <RecipeActionGroup style={{float: "left"}}>
         <SaveButton {...props} />
         <ClearButton {...props} />
       </RecipeActionGroup>

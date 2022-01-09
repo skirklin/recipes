@@ -6,14 +6,16 @@ import { getAuth } from 'firebase/auth';
 import { Title } from '../StyledComponents';
 import { getRecipeFromState } from '../utils';
 import { RecipeCardProps } from './RecipeCard';
+import { Input } from 'antd';
 
-const EditableTitle = styled.input`
+const EditableTitle = styled(Input)`
   font-size: 2em;
   font-weight: bold;
   font-family: sans-serif;
   display: inline;
   padding: 5px   padding: 20px 0px 0px 20px;
   outline: none;
+  max-width: 90%;
 `
 
 function RecipeName(props: RecipeCardProps) {
@@ -21,21 +23,28 @@ function RecipeName(props: RecipeCardProps) {
   const [editable, setEditablePrimitive] = useState(false);
   const { state, dispatch } = useContext(Context);
   const recipe = getRecipeFromState(state, boxId, recipeId)
-  if (recipe === undefined) { return null }
-
+  
   const setEditable = (value: boolean) => {
     const user = getAuth().currentUser
-    if (state.writeable && user && recipe.owners.includes(user.uid)) {
+    if (state.writeable && user && recipe && recipe.owners.includes(user.uid)) {
       setEditablePrimitive(value)
     }
   }
-
-  const rd = recipe.changed? recipe.changed : recipe.data
+  
+  const rd = recipe ? (recipe.changed ? recipe.changed : recipe.data) : {name: "", url: ""}
   const name = rd.name as string
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const handleChange = (e: any) => {
-    if (name !== e.target.value) {
-      dispatch({ type: "SET_NAME", recipeId, boxId, payload: e.target.value });
+  const [value, setValue] = useState<string>(name);
+  if (recipe === undefined) { return null }
+
+  function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
+    if (e !== undefined) {
+      setValue(e.target.value);
+    }
+  }
+
+  function confirmChange() {
+    if (name !== value) {
+      dispatch({ type: "SET_NAME", recipeId, boxId, payload: value });
     }
     setEditable(false);
   }
@@ -46,11 +55,11 @@ function RecipeName(props: RecipeCardProps) {
   if (editable) {
     return (
       <EditableTitle type="text"
-        size={name.length}
         defaultValue={name}
         autoFocus
-        onKeyUp={(e) => { if (e.code === "Escape" || e.code === "Enter") { handleChange(e) } }}
-        onBlur={handleChange} />
+        onChange={(e) => handleChange(e)}
+        onKeyUp={(e) => { if (e.code === "Escape" || e.code === "Enter") { confirmChange() } }}
+        onBlur={() => confirmChange()} />
     )
   } else {
     return (

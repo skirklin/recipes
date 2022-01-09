@@ -3,7 +3,7 @@ import { addDoc, arrayRemove, arrayUnion, collection, deleteDoc, doc, getDoc, ge
 import _ from 'lodash';
 import { Recipe } from "schema-dts"
 import { db } from './backend';
-import { boxConverter, BoxEntry, recipeConverter, RecipeEntry } from './storage';
+import { boxConverter, BoxEntry, recipeConverter, RecipeEntry, UserEntry } from './storage';
 import { ActionType, AppState, BoxId, RecipeId, Visibility } from './types';
 
 
@@ -82,9 +82,22 @@ export function authorToStr(author: Recipe["author"]): string | undefined {
 
 
 export function strToAuthor(author: string): Recipe["author"] {
-  return {"@type": "Person", name: author}
+  return { "@type": "Person", name: author }
 }
 
+export function categoriesToTags(categories: Recipe["recipeCategory"]) {
+  if (categories === undefined) {
+    return []
+  } else if (typeof categories === "string") {
+    return [categories]
+  } else {
+    return Array.prototype.filter.call(categories, x => true)
+  }
+}
+
+export function tagsToCategories(tags: string[]): Recipe["recipeCategory"] {
+  return tags
+}
 
 export function getRecipeFromState(state: AppState, boxId: BoxId, recipeId: RecipeId) {
   const box = state.boxes.get(boxId);
@@ -150,7 +163,7 @@ export function setBoxInState(state: AppState, boxId: BoxId, box: BoxEntry) {
   state.boxes.set(boxId, box);
 }
 
-export async function subscribeToBox(user: User | null, boxId: BoxId) {
+export async function subscribeToBox(user: UserEntry | null, boxId: BoxId) {
   if (user === null) {
     return undefined
   }
@@ -159,16 +172,16 @@ export async function subscribeToBox(user: User | null, boxId: BoxId) {
   if (!boxDoc.exists()) {
     return undefined
   }
-  await updateDoc(doc(db, "users", user.uid), { boxes: arrayUnion(boxRef) })
+  await updateDoc(doc(db, "users", user.id), { boxes: arrayUnion(boxRef) })
 }
 
 
-export async function unsubscribeFromBox(user: User | null, boxId: BoxId) {
+export async function unsubscribeFromBox(user: UserEntry | null, boxId: BoxId) {
   if (user === null) {
     return undefined
   }
   const boxRef = doc(db, "boxes", boxId)
-  await updateDoc(doc(db, "users", user.uid), { boxes: arrayRemove(boxRef) })
+  await updateDoc(doc(db, "users", user.id), { boxes: arrayRemove(boxRef) })
 }
 
 export async function uploadRecipes(boxId: BoxId) {

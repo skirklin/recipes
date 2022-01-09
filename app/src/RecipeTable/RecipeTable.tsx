@@ -1,16 +1,16 @@
 import _ from 'lodash';
 import { useContext, useEffect, useState } from 'react';
-import { Popconfirm, Table } from 'antd';
+import { Popconfirm, Table, TablePaginationConfig, Tag } from 'antd';
 import { ColumnsType } from 'antd/es/table';
 
-import { Key, TableRowSelection } from 'antd/es/table/interface';
+import { FilterValue, Key, TableRowSelection } from 'antd/es/table/interface';
 import { DeleteOutlined, ForkOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import Filterbox from './Filterbox';
 import NewButton from '../Buttons/NewRecipe';
 import UploadButton from '../Buttons/UploadRecipes';
 import ImportButton from '../Buttons/ImportRecipes';
-import { addRecipe, deleteRecipe } from '../utils';
+import { addRecipe, categoriesToTags, deleteRecipe } from '../utils';
 import { Context } from '../context';
 import { PickBoxModal } from '../Modals/PickBoxModal';
 import { ActionButton } from '../StyledComponents';
@@ -18,6 +18,13 @@ import './RecipeTable.css'
 import { Recipe } from 'schema-dts';
 import { RecipeEntry } from '../storage';
 import { BoxId, RecipeId } from '../types';
+import styled from 'styled-components';
+
+const PointerTag = styled(Tag)`
+  &:hover {
+    cursor: pointer;
+  }
+`
 
 function sortfunc(a: string, b: string) {
   const A = a.toUpperCase(); // ignore upper and lowercase
@@ -48,24 +55,6 @@ interface RecipeTableProps {
 
 const getName = (name: Recipe["name"]) => name === undefined ? "" : name.toString()
 
-const columns: ColumnsType<RowType> = [
-  {
-    key: 'name',
-    title: 'Name',
-    dataIndex: ['recipe', 'data', 'name'],
-    sorter: (a: RowType, b: RowType) => sortfunc(getName(a.recipe.data.name), getName(b.recipe.data.name)),
-  },
-  {
-    key: 'description',
-    title: 'Description',
-    dataIndex: ['recipe', 'data', 'description'],
-  },
-  {
-    key: 'box',
-    title: 'Box',
-    dataIndex: ['boxName'],
-  },
-];
 
 
 
@@ -79,6 +68,7 @@ export function RecipeTable(props: RecipeTableProps) {
   const { writeable, recipes, boxId } = props;
   const { state, dispatch } = useContext(Context)
   const [filteredRows, setFilteredRows] = useState<RowType[]>([])
+  const [tagFilter, setTagFilter] = useState<string[]>()
 
   useEffect(() => setFilteredRows(recipes), [recipes])
 
@@ -92,9 +82,14 @@ export function RecipeTable(props: RecipeTableProps) {
     onChange: onSelectChange,
   };
 
-  const onRow = (record: RowType, rowIndex: number | undefined) => {
+  const onNameCell = (record: RowType, rowIndex: number | undefined) => {
     return {
       onClick: () => navigate(`/boxes/${record.boxId}/recipes/${record.recipeId}`),
+    }
+  }
+  const onBoxCell = (record: RowType, rowIndex: number | undefined) => {
+    return {
+      onClick: () => navigate(`/boxes/${record.boxId}`),
     }
   }
 
@@ -116,6 +111,62 @@ export function RecipeTable(props: RecipeTableProps) {
     )
   }
 
+  const allTags = new Set<string>()
+  filteredRows.forEach(
+    (row) => {
+      categoriesToTags(row.recipe.data.recipeCategory).forEach(
+        t => allTags.add(t)
+      )
+    }
+  )
+
+  function handleChange(pagination: TablePaginationConfig, filters: Record<string, FilterValue | null>, sorter: unknown) {
+    console.log(filters)
+    setTagFilter(filters.tags as string[] || [])
+  }
+
+  function addTagToFilter(t: string) {
+    setTagFilter([...(tagFilter || []), t])
+  }
+
+  const columns: ColumnsType<RowType> = [
+    {
+      key: 'name',
+      title: 'Name',
+      dataIndex: ['recipe', 'data', 'name'],
+      width: "300px",
+      sorter: (a: RowType, b: RowType) => sortfunc(getName(a.recipe.data.name), getName(b.recipe.data.name)),
+      onCell: onNameCell,
+      className: "recipe-table-clickable-column",
+    },
+    {
+      key: 'tags',
+      title: 'Tags',
+      dataIndex: ['recipe', 'data', 'recipeCategory'],
+      render: (tags) => {
+        return Array.prototype.map.call(categoriesToTags(tags), t => <PointerTag onClick={() => addTagToFilter(t)}>{t}</PointerTag>)
+      },
+      filters: [...allTags].map(t => ({ text: t, value: t })),
+      filterSearch: allTags.size > 10,
+      onFilter: (value, row) => categoriesToTags(row.recipe.data.recipeCategory).includes(value),
+      filteredValue: tagFilter,
+    },
+    {
+      key: 'box',
+      title: 'Box',
+      dataIndex: ['boxName'],
+      onCell: onBoxCell,
+      width: "200px",
+      className: "recipe-table-clickable-column",
+    },
+    {
+      key: 'description',
+      title: 'Description',
+      dataIndex: ['recipe', 'data', 'description'],
+    },
+  ];
+
+
   return (
     <div style={{ padding: "10px" }}>
       <div style={{ display: "inline-flex" }}>
@@ -133,8 +184,8 @@ export function RecipeTable(props: RecipeTableProps) {
           <ActionButton
             disabled={!writeable || !hasSelected}
             title="Delete recipes"
-            icon={<DeleteOutlined />} 
-            />
+            icon={<DeleteOutlined />}
+          />
         </Popconfirm>
         <ActionButton
           title="Copy recipes into different box"
@@ -148,8 +199,8 @@ export function RecipeTable(props: RecipeTableProps) {
         rowSelection={rowSelection}
         columns={columns}
         dataSource={filteredRows}
-        onRow={onRow}
-        rowClassName={() => "recipe-row"}/>
+        onChange={handleChange}
+      />
     </div>
   )
 }
