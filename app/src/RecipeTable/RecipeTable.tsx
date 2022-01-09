@@ -13,10 +13,10 @@ import ImportButton from '../Buttons/ImportRecipes';
 import { addRecipe, deleteRecipe } from '../utils';
 import { Context } from '../context';
 import { PickBoxModal } from '../Modals/PickBoxModal';
-import { RecipeType } from '../types';
 import { ActionButton } from '../StyledComponents';
 import './RecipeTable.css'
 import { Recipe } from 'schema-dts';
+import { RecipeEntry } from '../storage';
 
 function sortfunc(a: string, b: string) {
   const A = a.toUpperCase(); // ignore upper and lowercase
@@ -33,7 +33,7 @@ function sortfunc(a: string, b: string) {
 
 export interface RowType {
   boxName: string
-  recipe: RecipeType
+  recipe: RecipeEntry
   boxId: string
   recipeId: string
   key: string

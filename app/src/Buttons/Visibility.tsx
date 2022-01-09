@@ -2,21 +2,22 @@ import { BookOutlined, GlobalOutlined, LinkOutlined } from "@ant-design/icons";
 import { Dropdown, Menu } from "antd";
 import { doc, updateDoc } from "firebase/firestore";
 import { db } from "../backend";
+import { BoxEntry, RecipeEntry } from "../storage";
 import { ActionButton } from "../StyledComponents";
-import { BoxType, RecipeType, Visibility } from "../types";
+import { Visibility } from "../types";
 
 
 interface VisibilityProps {
     recipeId?: string
     boxId?: string
-    recipe?: RecipeType
-    box?: BoxType
+    recipe?: RecipeEntry
+    box?: BoxEntry
 }
 
 export default function VisibilityControl(props: VisibilityProps) {
     const { recipeId, boxId, recipe, box } = props;
 
-    function handleMenuClick(e: any) {
+    function handleMenuClick(e: { key: string; }) {
         if (boxId === undefined) {
             return
         }

@@ -28,11 +28,15 @@ export default function ImportButton(props: ImportProps) {
             setIsImportVisible(true)
         }
     }
-
-    return (<>
-        <PickBoxModal setIsVisible={setIsPickBoxVisible} isVisible={isPickBoxVisible} handleOk={handlePickBox} />
-        <ImportModal boxId={boxId} setIsVisible={setIsImportVisible} isVisible={isImportVisible} />
-        <ActionButton onClick={importFlow} disabled={disabled} icon={<ImportOutlined />}/>
-    </>
-    )
+    if (boxId === undefined) {
+        return (<>
+            <ActionButton onClick={importFlow} disabled={disabled} icon={<ImportOutlined />} />
+            <PickBoxModal setIsVisible={setIsPickBoxVisible} isVisible={isPickBoxVisible} handleOk={handlePickBox} />
+        </>)
+    } else {
+        return (<>
+            <ImportModal boxId={boxId} setIsVisible={setIsImportVisible} isVisible={isImportVisible} />
+            <ActionButton onClick={importFlow} disabled={disabled} icon={<ImportOutlined />} />
+        </>)
+    }
 }

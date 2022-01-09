@@ -4,6 +4,8 @@ import { useContext, useEffect, useState } from 'react';
 import { Context } from '../context';
 import NewBoxModal from './NewBoxModal';
 
+type OptionsType = {value: string, label: string}
+
 interface SelectBoxProps {
   setBoxId: (value: string) => void
 }
@@ -12,23 +14,19 @@ function SelectBox(props: SelectBoxProps) {
   const { setBoxId } = props;
   const { state } = useContext(Context)
 
-  const boxIds: string[] = [];
-  for (const k of state.boxes.keys()) {
-    boxIds.push(k)
+  const boxOptions: OptionsType[] = [];
+  for (const [key, value] of state.boxes.entries()) {
+    boxOptions.push(
+      { label: value.data.name, value: key }
+    ) 
   }
 
-  let boxOptions;
-  if (boxIds.length > 0) {
-    boxOptions = boxIds.map(bi => ({ label: state.boxes.get(bi)!.data.name, value: bi }))
-  } else {
-    boxOptions = [{ label: "", value: "" }]
-  }
   const defaultBoxId = boxOptions[0].value
   useEffect(() => {
     setBoxId(defaultBoxId)
   }, [state, defaultBoxId, setBoxId]
   )
-  if (boxIds.length === 0) {
+  if (boxOptions.length === 0) {
     return <div>No boxes found, please create a new box.</div>
   }
   return <Select style={{ width: "300px" }} autoFocus defaultValue={defaultBoxId} onChange={setBoxId} options={boxOptions} />

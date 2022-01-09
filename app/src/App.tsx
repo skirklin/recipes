@@ -3,7 +3,7 @@ import { getAuth, Unsubscribe } from "firebase/auth";
 import Modal from 'react-modal';
 import 'antd/dist/antd.css'; // or 'antd/dist/antd.less'
 
-import { RecipeBoxStateType, RecipeBoxActionType, UnsubMap } from './types';
+import { AppState, ActionType, UnsubMap } from './types';
 import { Context, initState, recipeBoxReducer } from './context';
 import Header from './Header/Header';
 import { Outlet } from 'react-router-dom';
@@ -13,7 +13,7 @@ import { subscribeToUser, unsubscribe } from './subscription';
 Modal.setAppElement('#root'); // for accessibility. See: https://reactcommunity.org/react-modal/accessibility/
 
 function App() {
-  const [state, dispatch] = useReducer<React.Reducer<RecipeBoxStateType, RecipeBoxActionType>>(recipeBoxReducer, initState())
+  const [state, dispatch] = useReducer<React.Reducer<AppState, ActionType>>(recipeBoxReducer, initState())
 
   const recipesValue = useMemo(() => {
     return { state, dispatch };

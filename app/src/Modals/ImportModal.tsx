@@ -8,17 +8,18 @@ import { useContext, useState } from 'react';
 import { Recipe } from 'schema-dts';
 import { getRecipes } from '../backend';
 import { Context } from '../context';
-import { RecipeType, Visibility } from '../types';
+import { RecipeEntry } from '../storage';
+import { Visibility } from '../types';
 import { addRecipe } from '../utils';
 
 interface ImportProps {
-  boxId: string | undefined
+  boxId: string
   isVisible: boolean
   setIsVisible: (isVisible: boolean) => void
 }
 
 interface PossibleRecipeProps {
-  recipe: RecipeType
+  recipe: RecipeEntry
   remove: () => void
 }
 
@@ -35,7 +36,7 @@ function ImportModal(props: ImportProps) {
   const { isVisible, setIsVisible, boxId } = props;
   const [spinning, setSpinning] = useState(false)
   const [value, setValue] = useState<string>();
-  const [discovered, setDiscovered] = useState<RecipeType[]>([])
+  const [discovered, setDiscovered] = useState<RecipeEntry[]>([])
   const { dispatch } = useContext(Context)
 
   async function import_() {
@@ -47,8 +48,8 @@ function ImportModal(props: ImportProps) {
     if (user === null) {
       return
     }
-    const response = (await getRecipes({ url: value }))
-    const data = response.data as any
+    const response = (await getRecipes({ url: value })) as {data: {error?: string, recipes: string}}
+    const data = response.data
 
     if (data.error) {
       alert(data.error)
@@ -59,7 +60,7 @@ function ImportModal(props: ImportProps) {
         return {
           data: recipe as unknown as Recipe,
           visibility: Visibility.private,
-          owners: [user!.uid]
+          owners: [user.uid]
         }
       }
     )
@@ -75,7 +76,7 @@ function ImportModal(props: ImportProps) {
   }
 
   function addRecipes() {
-    discovered.forEach(recipe => addRecipe(boxId!, recipe, dispatch))
+    discovered.forEach(recipe => addRecipe(boxId, recipe, dispatch))
     setDiscovered([]);
     setValue("");
     setIsVisible(false);

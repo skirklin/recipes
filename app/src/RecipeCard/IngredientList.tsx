@@ -1,4 +1,4 @@
-import { useState, useContext } from 'react';
+import { useState, useContext, ChangeEvent } from 'react';
 import styled from 'styled-components';
 import TextareaAutosize from 'react-autosize-textarea';
 import { Recipe } from 'schema-dts';
@@ -36,9 +36,10 @@ function IngredientList() {
     }
   }
 
-  const ingredients = recipe.data.recipeIngredient;
+  const ingredients = recipe.data.recipeIngredient || [];
   const handleChange = (e: any) => {
-    if (formatIngredientList(ingredients) !== e.target.value) {
+    console.log(e)
+    if (ingredientsToStr(ingredients) !== e.target.value) {
       dispatch({ type: "SET_INGREDIENTS", payload: strToIngredients(e.target.value) });
     }
     setEditable(false)
@@ -62,7 +63,7 @@ function IngredientList() {
   if (editable) {
     return (
       <TextareaAutosize
-        defaultValue={ingredientsToStr(ingredients!)}
+        defaultValue={ingredientsToStr(ingredients)}
         autoFocus
         onKeyUp={(e) => { if (e.code === "Escape") { handleChange(e) } }}
         style={{ ...ingredientsStyle }}
@@ -71,7 +72,7 @@ function IngredientList() {
   } else {
     return (
       <div onDoubleClick={() => setEditable(true)}>
-        {formatIngredientList(ingredients!)}
+        {formatIngredientList(ingredients)}
       </div>
     )
   }

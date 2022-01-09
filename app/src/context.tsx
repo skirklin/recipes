@@ -1,24 +1,27 @@
+import { getAuth } from 'firebase/auth';
+import _ from 'lodash';
 import { createContext } from 'react';
-import { RecipeBoxActionType, BoxType, RecipeBoxStateType, RecipeType } from './types';
+import { BoxEntry, RecipeEntry } from './storage';
+import { ActionType, AppState } from './types';
 import { createNewBox } from './utils';
 
 
 export type ContextType = {
-  state: RecipeBoxStateType
-  dispatch: React.Dispatch<RecipeBoxActionType>
+  state: AppState
+  dispatch: React.Dispatch<ActionType>
 }
 
-export function initState(): RecipeBoxStateType {
+export function initState(): AppState {
   return (
     {
-      boxes: new Map<string, BoxType>(),
+      boxes: new Map<string, BoxEntry>(),
       writeable: true,
     }
   )
 }
 
 const initialState = initState()
-const defaultDispatch: React.Dispatch<RecipeBoxActionType> = () => initialState
+const defaultDispatch: React.Dispatch<ActionType> = () => initialState
 
 export const Context = createContext<ContextType>(
   {
@@ -27,22 +30,26 @@ export const Context = createContext<ContextType>(
   }
 )
 
-export function recipeBoxReducer(prevState: RecipeBoxStateType, action: RecipeBoxActionType): RecipeBoxStateType {
+export function recipeBoxReducer(prevState: AppState, action: ActionType): AppState {
   console.log("action", { action, prevState })
-  let newBox: BoxType, state: RecipeBoxStateType
+  const user = getAuth().currentUser
+  if (user === null) {
+    return prevState
+  }
+  let newBox: BoxEntry, state: AppState
   switch (action.type) {
     case "ADD_RECIPE": {
       if (action.boxId === undefined || (action.recipeId === undefined)) {
         console.warn("ADD_RECIPE requires a boxId and recipeId.")
         return prevState
       }
-      newBox = { ...(prevState.boxes.get(action.boxId) || createNewBox()) }
+      newBox = { ...(prevState.boxes.get(action.boxId) || createNewBox(user)) }
       if (action.payload === undefined) {
         console.warn("ADD_RECIPE requires a payload.")
         return prevState
       }
-      newBox.data.recipes = new Map([...newBox.data.recipes, [action.recipeId, action.payload as RecipeType]])
-      state = { ...prevState, boxes: new Map([...prevState.boxes, [action.boxId, newBox as BoxType]]) }
+      newBox.recipes = new Map([...newBox.recipes, [action.recipeId, action.payload as RecipeEntry]])
+      state = { ...prevState, boxes: new Map([...prevState.boxes, [action.boxId, newBox as BoxEntry]]) }
       return state
     }
     case "ADD_BOX": {
@@ -55,9 +62,9 @@ export function recipeBoxReducer(prevState: RecipeBoxStateType, action: RecipeBo
         console.warn("ADD_BOX requires a payload.")
         return prevState
       }
-      newBox = { ...action.payload as BoxType}
-      newBox.data.recipes = (oldBox && oldBox.data.recipes) || new Map<string, RecipeType>()
-      state = { ...prevState, boxes: new Map([...prevState.boxes, [action.boxId, newBox as BoxType]]) }
+      newBox = _.cloneDeep(action.payload as BoxEntry)
+      newBox.recipes = (oldBox && oldBox.recipes) || new Map<string, RecipeEntry>()
+      state = { ...prevState, boxes: new Map([...prevState.boxes, [action.boxId, newBox]]) }
       return state
     }
     case "REMOVE_BOX": {
@@ -79,12 +86,12 @@ export function recipeBoxReducer(prevState: RecipeBoxStateType, action: RecipeBo
       if (box === undefined) {
         return state
       }
-      box.data.recipes = new Map(box.data.recipes)
-      box.data.recipes.delete(action.recipeId)
+      box.recipes = new Map(box.recipes)
+      box.recipes.delete(action.recipeId)
       return state
     }
     case "SET_BOXES": {
-      return { ...prevState, boxes: new Map([...prevState.boxes, ...action.payload as Map<string, BoxType>]) }
+      return { ...prevState, boxes: new Map([...prevState.boxes, ...action.payload as Map<string, BoxEntry>]) }
     }
     case "CLEAR_BOXES":
       return { ...prevState, boxes: new Map() }
@@ -95,7 +102,7 @@ export function recipeBoxReducer(prevState: RecipeBoxStateType, action: RecipeBo
         console.warn("SET_ACTIVE_RECIPE requires a boxId and recipeId.")
         return prevState
       }
-      return { ...prevState, activeRecipe: action.payload as RecipeType, activeRecipeId: action.recipeId, activeBoxId: action.boxId }
+      return { ...prevState, activeRecipe: action.payload as RecipeEntry, activeRecipeId: action.recipeId, activeBoxId: action.boxId }
     case 'SET_ACTIVE_BOX':
       if (action.boxId === undefined || action.box === undefined) {
         console.warn("SET_ACTIVE_BOX requires a boxId.")
