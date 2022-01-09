@@ -9,11 +9,11 @@ import { Recipe } from 'schema-dts';
 import { getRecipes } from '../backend';
 import { Context } from '../context';
 import { RecipeEntry } from '../storage';
-import { Visibility } from '../types';
+import { BoxId, Visibility } from '../types';
 import { addRecipe } from '../utils';
 
 interface ImportProps {
-  boxId: string
+  boxId: BoxId
   isVisible: boolean
   setIsVisible: (isVisible: boolean) => void
 }

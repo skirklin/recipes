@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import { addRecipe, getRecipeFromState } from '../utils';
 import { ActionButton } from '../StyledComponents';
 import { RecipeCardProps } from '../RecipeCard/RecipeCard';
+import { BoxId } from '../types';
 
 interface ForkProps extends RecipeCardProps {
   targetBoxId?: string
@@ -21,12 +22,12 @@ export default function ForkButton(props: ForkProps) {
   const recipe = getRecipeFromState(state, boxId, recipeId)
   if (recipe === undefined) return null
 
-  const addNewRecipe = async (boxId: string) => {
+  const addNewRecipe = async (boxId: BoxId) => {
     const recipeRef = await addRecipe(boxId, _.cloneDeep(recipe), dispatch)
     navigate(`/boxes/${boxId}/recipes/${recipeRef.id}`)
   }
 
-  async function newRecipe(boxId: string) {
+  async function newRecipe(boxId: BoxId) {
     if (boxId === undefined) {
       return // leave the modal visible until something is selected
     }
@@ -34,7 +35,7 @@ export default function ForkButton(props: ForkProps) {
     addNewRecipe(boxId)
   }
 
-  function newRecipeFlow() {
+  function forkRecipeFlow() {
     if (targetBoxId === undefined) {
       setIsModalVisible(true)
     } else {
@@ -43,8 +44,8 @@ export default function ForkButton(props: ForkProps) {
   }
 
   return (<>
-      <ActionButton title="Create new recipe" disabled={!recipe} onClick={newRecipeFlow} icon={<ForkOutlined />} />
-      <PickBoxModal handleOk={newRecipe} isVisible={isModalVisible} setIsVisible={setIsModalVisible}/>
+      <ActionButton title="Copy recipe into new box." disabled={!recipe} onClick={forkRecipeFlow} icon={<ForkOutlined />} />
+      <PickBoxModal handleOk={newRecipe} isVisible={isModalVisible} setIsVisible={setIsModalVisible} disableBoxes={[boxId]}/>
   </>)
 
 }

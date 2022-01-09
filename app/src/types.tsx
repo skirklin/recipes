@@ -1,8 +1,12 @@
-import { Unsubscribe } from 'firebase/firestore';
+import { DocumentReference, Unsubscribe } from 'firebase/firestore';
 import { Recipe } from 'schema-dts';
-import { BoxEntry, RecipeEntry } from './storage';
+import { BoxEntry, RecipeEntry, UserEntry } from './storage';
 
-export type BoxDataType = {
+export type BoxId = string
+export type RecipeId = string
+export type UserId = string
+
+export type BoxType = {
   name: string,
   description?: string,
 }
@@ -11,7 +15,7 @@ export type BoxStoreType = {
   creator: string,
   owners: string[], // user ids
   visibility: Visibility,
-  data: BoxDataType
+  data: BoxType
 }
 
 export type RecipeStoreType = {
@@ -21,27 +25,26 @@ export type RecipeStoreType = {
   owners: string[], // user ids
 }
 
-export type UserType = {
-  boxes: Map<string, BoxEntry>,
-  new: boolean,
-  id: string,
+export type UserStoreType = {
+  name: string,
+  visibility: Visibility,
+  boxes: DocumentReference<BoxEntry>[],
 }
 
 export type AppState = {
   boxes: Map<string, BoxEntry>
-  activeRecipe?: RecipeEntry
-  activeBox?: BoxEntry
-  activeRecipeId?: string
-  activeBoxId?: string
+  user?: UserEntry
   writeable: boolean
 }
 
 export type ActionType = {
   type: string
-  recipeId?: string
-  boxId?: string
+  recipeId?: RecipeId
   recipe?: RecipeEntry
+  boxId?: BoxId
   box?: BoxEntry
+  userId?: UserId
+  user?: UserEntry
   payload?: RecipeEntry 
   | BoxEntry 
   | Map<string, BoxEntry> 
@@ -50,6 +53,7 @@ export type ActionType = {
   | string 
   | Recipe["recipeIngredient"] 
   | Recipe["recipeInstructions"]
+  | Recipe["recipeCategory"]
 }
 
 export type UnsubMap = {
@@ -63,6 +67,6 @@ export type UnsubMap = {
 
 export enum Visibility {
   private = "private", // only owner can read
-  linkable = "linkable", // anyone with link can read
+  // linkable = "linkable", // anyone with link can read
   public = "public", // discoverable
 }

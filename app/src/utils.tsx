@@ -4,7 +4,7 @@ import _ from 'lodash';
 import { Recipe } from "schema-dts"
 import { db } from './backend';
 import { boxConverter, BoxEntry, recipeConverter, RecipeEntry } from './storage';
-import { ActionType, AppState, Visibility } from './types';
+import { ActionType, AppState, BoxId, RecipeId, Visibility } from './types';
 
 
 /* helper functions for converting between structured data and text. */
@@ -56,7 +56,37 @@ export function ingredientsToStr(ingredients: Recipe["recipeIngredient"]): strin
   return steps.join("\n")
 }
 
-export function getRecipeFromState(state: AppState, boxId: string, recipeId: string) {
+export function authorToStr(author: Recipe["author"]): string | undefined {
+  if (author === undefined) {
+    return undefined
+  } else if (typeof author === "object") {
+    if (Object.prototype.hasOwnProperty.call(author, "name")) {
+      // this is hacky, but typescript was making this brutally unpleasant and I didn't want to spend more time on it.
+      return (author as { name: string }).name
+    } else {
+
+      const names = Array.prototype.map.call(author,
+        (x) => {
+          if (x['@type'] === "Person") {
+            return x['name']
+          } else {
+            return ""
+          }
+        })
+      const nonEmptyNames = _.filter(names, (x: string) => x.length > 0)
+      return nonEmptyNames.join(", ")
+    }
+  }
+  return undefined
+}
+
+
+export function strToAuthor(author: string): Recipe["author"] {
+  return {"@type": "Person", name: author}
+}
+
+
+export function getRecipeFromState(state: AppState, boxId: BoxId, recipeId: RecipeId) {
   const box = state.boxes.get(boxId);
   if (box === undefined) {
     return
@@ -64,7 +94,7 @@ export function getRecipeFromState(state: AppState, boxId: string, recipeId: str
   return box.recipes.get(recipeId)
 }
 
-export function setRecipeInState(state: AppState, boxId: string, recipeId: string, recipe: RecipeEntry) {
+export function setRecipeInState(state: AppState, boxId: BoxId, recipeId: RecipeId, recipe: RecipeEntry) {
   const box = state.boxes.get(boxId);
   if (box === undefined) {
     return
@@ -73,7 +103,7 @@ export function setRecipeInState(state: AppState, boxId: string, recipeId: strin
 
 }
 
-export async function getRecipe(state: AppState, boxId: string | undefined, recipeId: string | undefined) {
+export async function getRecipe(state: AppState, boxId: BoxId | undefined, recipeId: RecipeId | undefined) {
   let recipe: RecipeEntry | undefined
   if (boxId === undefined || recipeId === undefined) {
     return undefined
@@ -88,7 +118,7 @@ export async function getRecipe(state: AppState, boxId: string | undefined, reci
   return recipe
 }
 
-export async function getRecipes(state: AppState, boxId: string) {
+export async function getRecipes(state: AppState, boxId: BoxId) {
   const box = state.boxes.get(boxId)
   let recipes: Map<string, RecipeEntry>
   if (box === undefined) {
@@ -101,7 +131,7 @@ export async function getRecipes(state: AppState, boxId: string) {
   return recipes
 }
 
-export async function getBox(state: AppState, boxId: string) {
+export async function getBox(state: AppState, boxId: BoxId) {
   const boxRef = doc(db, "boxes", boxId).withConverter(boxConverter)
   const boxDoc = await getDoc(boxRef)
   if (!boxDoc.exists() || boxDoc.data() === undefined) {
@@ -112,15 +142,15 @@ export async function getBox(state: AppState, boxId: string) {
   return box
 }
 
-export function getBoxFromState(state: AppState, boxId: string) {
+export function getBoxFromState(state: AppState, boxId: BoxId) {
   return state.boxes.get(boxId);
 }
 
-export function setBoxInState(state: AppState, boxId: string, box: BoxEntry) {
+export function setBoxInState(state: AppState, boxId: BoxId, box: BoxEntry) {
   state.boxes.set(boxId, box);
 }
 
-export async function subscribeToBox(user: User | null, boxId: string) {
+export async function subscribeToBox(user: User | null, boxId: BoxId) {
   if (user === null) {
     return undefined
   }
@@ -133,7 +163,7 @@ export async function subscribeToBox(user: User | null, boxId: string) {
 }
 
 
-export async function unsubscribeFromBox(user: User | null, boxId: string) {
+export async function unsubscribeFromBox(user: User | null, boxId: BoxId) {
   if (user === null) {
     return undefined
   }
@@ -141,7 +171,7 @@ export async function unsubscribeFromBox(user: User | null, boxId: string) {
   await updateDoc(doc(db, "users", user.uid), { boxes: arrayRemove(boxRef) })
 }
 
-export async function uploadRecipes(boxId: string) {
+export async function uploadRecipes(boxId: BoxId) {
   const fileHandles = await window.showOpenFilePicker({
     multiple: true,
   })
@@ -154,14 +184,14 @@ export async function uploadRecipes(boxId: string) {
           if (user === null) {
             return
           }
-          const recipe = new RecipeEntry(jsonobj, [user.uid], Visibility.private, undefined)
+          const recipe = new RecipeEntry(jsonobj, [user.uid], Visibility.private, user.uid, undefined)
           addRecipe(boxId, recipe, null)
         })
     })
   }
 }
 
-export async function addRecipe(boxId: string, recipe: RecipeEntry, dispatch: React.Dispatch<ActionType> | null) {
+export async function addRecipe(boxId: BoxId, recipe: RecipeEntry, dispatch: React.Dispatch<ActionType> | null) {
   const colRef = collection(db, "boxes", boxId, "recipes").withConverter(recipeConverter)
   const recipeRef = await addDoc(colRef, recipe)
   return recipeRef
@@ -173,20 +203,15 @@ export async function addBox(user: User | null, name: string, dispatch: React.Di
   }
   const boxesCol = collection(db, "boxes").withConverter(boxConverter)
   const boxData = { name }
-  const box = new BoxEntry(boxData, [user.uid], Visibility.private, undefined)
+  const box = new BoxEntry(boxData, [user.uid], Visibility.private, user.uid, undefined)
   const userRef = doc(db, "users", user.uid)
   const boxRef = await addDoc(boxesCol, box)
   await updateDoc(userRef, { boxes: arrayUnion(boxRef) })
   return boxRef
 }
 
-export function createNewRecipe(user: User | null): RecipeEntry {
-  let owners: string[]
-  if (user === null) {
-    owners = [];
-  } else {
-    owners = [user.uid];
-  }
+export function createNewRecipe(user: User) {
+  const owners = [user.uid];
   const data: Recipe = {
     "@type": "Recipe",
     "name": "New recipe",
@@ -194,16 +219,16 @@ export function createNewRecipe(user: User | null): RecipeEntry {
     "recipeIngredient": [],
     "description": "",
   }
-  return new RecipeEntry(data, owners, Visibility.private, undefined)
+  return new RecipeEntry(data, owners, Visibility.private, user.uid, undefined)
 }
 
 
 export function createNewBox(user: User) {
   const name = "New box"
-  return new BoxEntry({ name }, [user.uid], Visibility.private, undefined)
+  return new BoxEntry({ name }, [user.uid], Visibility.private, user.uid, undefined)
 }
 
-export async function deleteRecipe(state: AppState, boxId: string, recipeId: string) {
+export async function deleteRecipe(state: AppState, boxId: BoxId, recipeId: RecipeId) {
   if (recipeId.startsWith("uniqueId=")) {
     const box = state.boxes.get(boxId)
     if (box !== undefined) {
@@ -214,13 +239,13 @@ export async function deleteRecipe(state: AppState, boxId: string, recipeId: str
   }
 }
 
-export async function deleteBox(state: AppState, boxId: string) {
+export async function deleteBox(state: AppState, boxId: BoxId) {
   deleteDoc(doc(db, "boxes", boxId))
 }
 
 const objIdMap = new WeakMap();
 let objectCount = 0;
-export function getUniqueId(rcp: Recipe) {
+export function getUniqueId(rcp: RecipeEntry) {
   if (!objIdMap.has(rcp)) objIdMap.set(rcp, ++objectCount);
   return objIdMap.get(rcp);
 }

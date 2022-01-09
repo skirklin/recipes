@@ -17,6 +17,7 @@ import { ActionButton } from '../StyledComponents';
 import './RecipeTable.css'
 import { Recipe } from 'schema-dts';
 import { RecipeEntry } from '../storage';
+import { BoxId, RecipeId } from '../types';
 
 function sortfunc(a: string, b: string) {
   const A = a.toUpperCase(); // ignore upper and lowercase
@@ -34,8 +35,8 @@ function sortfunc(a: string, b: string) {
 export interface RowType {
   boxName: string
   recipe: RecipeEntry
-  boxId: string
-  recipeId: string
+  boxId: BoxId
+  recipeId: RecipeId
   key: string
 }
 
@@ -107,7 +108,7 @@ export function RecipeTable(props: RecipeTableProps) {
     )
   }
 
-  async function fork(boxId: string) {
+  async function fork(boxId: BoxId) {
     selectedRows.forEach(
       (value: RowType) => {
         addRecipe(boxId, _.cloneDeep(value.recipe), dispatch)
@@ -128,12 +129,12 @@ export function RecipeTable(props: RecipeTableProps) {
           title={`Are you sure to delete ${selectedRowKeys.length > 1 ? "these recipes" : "this recipe"}s`}
           onConfirm={del}
           okText="Yes"
-          disabled={!writeable || !hasSelected}
           cancelText="No">
           <ActionButton
             disabled={!writeable || !hasSelected}
             title="Delete recipes"
-            icon={<DeleteOutlined />} />
+            icon={<DeleteOutlined />} 
+            />
         </Popconfirm>
         <ActionButton
           title="Copy recipes into different box"

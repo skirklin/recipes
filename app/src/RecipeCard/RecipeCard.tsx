@@ -7,31 +7,33 @@ import IngredientList from './IngredientList';
 import RecipeName from './RecipeName';
 import RecipeDescription from './RecipeDescription';
 import Image from './Image';
+import { BoxId, RecipeId } from '../types';
+import { IndexCardLine, RecipeActionGroup } from '../StyledComponents';
+import ByLine from './Byline';
+import Tags from './Tags';
 
 const RecipeBody = styled.div`
   margin: 5px
 `
 
-const IndexCardLine = styled.hr`
-  background-color: var(--cinnabar);
-  border-width: 0px;
-  height: 1px;
-`
-
 export interface RecipeCardProps {
-  recipeId: string
-  boxId: string
+  recipeId: RecipeId
+  boxId: BoxId
 }
 
 function RecipeCard(props: RecipeCardProps) {
   return (
     <div>
       <RecipeName {...props} />
+      <div style={{ width: "100%" }}>
+        <ByLine {...props} />
+        <Tags {...props} />
+      </div>
       <IndexCardLine />
-      <div >
+      <RecipeActionGroup>
         <SaveButton {...props} />
         <ClearButton {...props} />
-      </div>
+      </RecipeActionGroup>
       <Image {...props} />
       <RecipeDescription {...props} />
       <RecipeBody>

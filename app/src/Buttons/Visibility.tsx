@@ -1,4 +1,4 @@
-import { BookOutlined, GlobalOutlined, LinkOutlined } from "@ant-design/icons";
+import { BookOutlined, GlobalOutlined } from "@ant-design/icons";
 import { Dropdown, Menu } from "antd";
 import { doc, updateDoc } from "firebase/firestore";
 import { useContext } from "react";
@@ -6,13 +6,13 @@ import { db } from "../backend";
 import { Context } from "../context";
 import { BoxEntry, RecipeEntry } from "../storage";
 import { ActionButton } from "../StyledComponents";
-import { Visibility } from "../types";
+import { BoxId, RecipeId, Visibility } from "../types";
 import { getBoxFromState, getRecipeFromState } from "../utils";
 
 
 interface VisibilityProps {
-    recipeId?: string
-    boxId: string
+    recipeId?: RecipeId
+    boxId: BoxId
 }
 
 export default function VisibilityControl(props: VisibilityProps) {
@@ -51,9 +51,6 @@ export default function VisibilityControl(props: VisibilityProps) {
         case Visibility.public:
             icon = <GlobalOutlined />;
             break;
-        case Visibility.linkable:
-            icon = <LinkOutlined />;
-            break;
         default:
             icon = <BookOutlined />;
             break;
@@ -63,9 +60,6 @@ export default function VisibilityControl(props: VisibilityProps) {
         <Menu style={{display: "inline", float: "right"}} onClick={handleMenuClick}>
             <Menu.Item key={Visibility.private} icon={<BookOutlined />}>
                 Private
-            </Menu.Item>
-            <Menu.Item key={Visibility.linkable} icon={<LinkOutlined />}>
-                Anyone with a link can read
             </Menu.Item>
             <Menu.Item key={Visibility.public} icon={<GlobalOutlined />}>
                 Public

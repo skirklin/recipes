@@ -31,7 +31,9 @@ export const Context = createContext<ContextType>(
 )
 
 function handleRecipeChange(key: string, prevState: AppState, action: ActionType) {
+  console.log({key, action})
   if (action.recipeId === undefined || action.boxId === undefined) {
+    console.warn("Can't change a recipe property without passing recipeId and boxId.")
     return prevState
   }
   const recipe = getRecipeFromState(prevState, action.boxId, action.recipeId)
@@ -55,6 +57,14 @@ export function recipeBoxReducer(prevState: AppState, action: ActionType): AppSt
   }
   let newBox: BoxEntry, state: AppState
   switch (action.type) {
+    case "SET_USER": {
+      if (action.userId === undefined || action.user === undefined) {
+        console.warn("SET_USER requires userId and user.")
+        return prevState
+      }
+      state = { ...prevState, user: action.user }
+      return state
+    }
     case "ADD_RECIPE": {
       if (action.boxId === undefined || (action.recipeId === undefined)) {
         console.warn("ADD_RECIPE requires a boxId and recipeId.")
@@ -114,23 +124,14 @@ export function recipeBoxReducer(prevState: AppState, action: ActionType): AppSt
       return { ...prevState, boxes: new Map() }
     case 'SET_READONLY':
       return { ...prevState, writeable: action.payload as boolean }
-    case 'SET_ACTIVE_RECIPE':
-      if (action.boxId === undefined || action.recipeId === undefined || action.recipe === undefined) {
-        console.warn("SET_ACTIVE_RECIPE requires a boxId and recipeId.")
-        return prevState
-      }
-      return { ...prevState, activeRecipe: action.payload as RecipeEntry, activeRecipeId: action.recipeId, activeBoxId: action.boxId }
-    case 'SET_ACTIVE_BOX':
-      if (action.boxId === undefined || action.box === undefined) {
-        console.warn("SET_ACTIVE_BOX requires a boxId.")
-        return prevState
-      }
-      return { ...prevState, activeBox: action.box, activeBoxId: action.boxId }
     case 'SET_NAME': {
       return handleRecipeChange("name", prevState, action)
     }
     case 'SET_INGREDIENTS': {
       return handleRecipeChange("recipeIngredient", prevState, action)
+    }
+    case 'SET_CATEGORIES': {
+      return handleRecipeChange("recipeCategory", prevState, action)
     }
     case 'SET_DESCRIPTION': {
       return handleRecipeChange("description", prevState, action)
