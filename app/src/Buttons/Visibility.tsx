@@ -1,21 +1,30 @@
 import { BookOutlined, GlobalOutlined, LinkOutlined } from "@ant-design/icons";
 import { Dropdown, Menu } from "antd";
 import { doc, updateDoc } from "firebase/firestore";
+import { useContext } from "react";
 import { db } from "../backend";
+import { Context } from "../context";
 import { BoxEntry, RecipeEntry } from "../storage";
 import { ActionButton } from "../StyledComponents";
 import { Visibility } from "../types";
+import { getBoxFromState, getRecipeFromState } from "../utils";
 
 
 interface VisibilityProps {
     recipeId?: string
-    boxId?: string
-    recipe?: RecipeEntry
-    box?: BoxEntry
+    boxId: string
 }
 
 export default function VisibilityControl(props: VisibilityProps) {
-    const { recipeId, boxId, recipe, box } = props;
+    const { state } = useContext(Context)
+    const { recipeId, boxId } = props;
+    let target: RecipeEntry | BoxEntry | undefined
+    if (recipeId === undefined) {
+        target = getBoxFromState(state, boxId)
+    } else {
+        target = getRecipeFromState(state, boxId, recipeId)
+    }
+    if (target === undefined) return null
 
     function handleMenuClick(e: { key: string; }) {
         if (boxId === undefined) {
@@ -31,10 +40,8 @@ export default function VisibilityControl(props: VisibilityProps) {
     }
 
     let visibility: Visibility
-    if (recipe !== undefined) {
-        visibility = recipe.visibility;
-    } else if (box !== undefined) {
-        visibility = box.visibility;
+    if (target !== undefined) {
+        visibility = target.visibility;
     } else {
         visibility = Visibility.private
     }

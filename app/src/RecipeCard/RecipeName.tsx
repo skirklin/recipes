@@ -1,10 +1,11 @@
 import React, { useContext, useState } from 'react';
-import { RecipeContext } from './context';
 import styled from 'styled-components';
 import { LinkOutlined } from '@ant-design/icons';
 import { Context } from '../context';
 import { getAuth } from 'firebase/auth';
 import { Title } from '../StyledComponents';
+import { getBoxFromState, getRecipeFromState } from '../utils';
+import { RecipeCardProps } from './RecipeCard';
 
 const EditableTitle = styled.input`
   font-size: 2em;
@@ -15,24 +16,25 @@ const EditableTitle = styled.input`
   outline: none;
 `
 
-function RecipeName() {
+function RecipeName(props: RecipeCardProps) {
+  const { recipeId, boxId } = props;
   const [editable, setEditablePrimitive] = useState(false);
-  const { state, dispatch } = useContext(RecipeContext);
-  const rbState = useContext(Context).state;
-  const recipe = state.recipe
-  if (recipe === undefined)  { return null }
+  const { state, dispatch } = useContext(Context);
+  const recipe = getRecipeFromState(state, boxId, recipeId)
+  if (recipe === undefined) { return null }
 
   const setEditable = (value: boolean) => {
     const user = getAuth().currentUser
-    if (rbState.writeable && user && recipe.owners.includes(user.uid)  ) {
+    if (state.writeable && user && recipe.owners.includes(user.uid)) {
       setEditablePrimitive(value)
     }
   }
 
-  const rd = recipe.data
+  const rd = recipe.changed? recipe.changed : recipe.data
   const name = rd.name as string
-  const box = rbState.boxes.get(state.boxId as string);
+  const box = getBoxFromState(state, boxId)
   const boxName = box === undefined ? "" : box.data.name
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleChange = (e: any) => {
     if (name !== e.target.value) {
       dispatch({ type: "SET_NAME", payload: e.target.value });
@@ -54,8 +56,8 @@ function RecipeName() {
     )
   } else {
     return (
-      <Title onDoubleClick={() => setEditable(true)} style={{width: '90%'}}>
-        {name} <span style={{fontStyle: 'italic', marginLeft: "3px"}}>({boxName})</span>
+      <Title onDoubleClick={() => setEditable(true)} style={{ width: '90%' }}>
+        {name} <span style={{ fontStyle: 'italic', marginLeft: "3px" }}>({boxName})</span>
         {link}
       </Title>
     )

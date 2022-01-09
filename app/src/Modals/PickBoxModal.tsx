@@ -1,24 +1,27 @@
 import { Modal, Select } from 'antd';
+import { DocumentReference } from 'firebase/firestore';
 
 import { useContext, useEffect, useState } from 'react';
+import NewButton from '../Buttons/NewBox';
 import { Context } from '../context';
-import NewBoxModal from './NewBoxModal';
+import { BoxEntry } from '../storage';
 
-type OptionsType = {value: string, label: string}
+type OptionsType = { value: string, label: string }
 
 interface SelectBoxProps {
   setBoxId: (value: string) => void
+  boxId: string
 }
 
 function SelectBox(props: SelectBoxProps) {
-  const { setBoxId } = props;
+  const { setBoxId, boxId } = props;
   const { state } = useContext(Context)
 
   const boxOptions: OptionsType[] = [];
   for (const [key, value] of state.boxes.entries()) {
     boxOptions.push(
       { label: value.data.name, value: key }
-    ) 
+    )
   }
 
   const defaultBoxId = boxOptions[0].value
@@ -29,7 +32,7 @@ function SelectBox(props: SelectBoxProps) {
   if (boxOptions.length === 0) {
     return <div>No boxes found, please create a new box.</div>
   }
-  return <Select style={{ width: "300px" }} autoFocus defaultValue={defaultBoxId} onChange={setBoxId} options={boxOptions} />
+  return <Select style={{ width: "300px" }} autoFocus value={boxId} onChange={setBoxId} options={boxOptions} />
 }
 
 interface PickBoxModalProps {
@@ -41,12 +44,15 @@ interface PickBoxModalProps {
 export function PickBoxModal(props: PickBoxModalProps) {
   const { handleOk, isVisible, setIsVisible } = props;
   const [boxId, setBoxId] = useState("")
-  const [isNewBoxModalVisible, setIsNewBoxModalVisible] = useState(false)
+
+  const afterNewBox = (boxRef: DocumentReference<BoxEntry>) => {
+    setBoxId(boxRef.id)
+  }
 
   return (
     <Modal destroyOnClose={true} visible={isVisible} onOk={() => { handleOk(boxId) }} onCancel={() => setIsVisible(false)}>
-      <SelectBox setBoxId={setBoxId} />
-      <NewBoxModal isVisible={isNewBoxModalVisible} setIsVisible={setIsNewBoxModalVisible} />
+      <SelectBox setBoxId={setBoxId} boxId={boxId} />
+      <NewButton disabled={false} afterNewBox={afterNewBox} />
     </Modal >
   );
 }

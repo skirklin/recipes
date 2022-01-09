@@ -1,13 +1,16 @@
 import { useContext } from "react";
-import { RecipeContext } from "./context";
+import { Context } from "../context";
+import { getRecipeFromState } from "../utils";
+import { RecipeCardProps } from "./RecipeCard";
 
-export default function Image() {
-
-  const { state } = useContext(RecipeContext);
-  if (state.recipe === undefined) {
+export default function Image(props: RecipeCardProps) {
+  const { recipeId, boxId } = props;
+  const { state } = useContext(Context);
+  const recipe = getRecipeFromState(state, boxId, recipeId)
+  if (recipe === undefined) {
     return null
   }
-  const image = state.recipe.data.image;
+  const image = recipe.data.image;
 
   if (image === undefined) {
     return null

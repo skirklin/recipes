@@ -1,4 +1,3 @@
-/* helper functions for converting between structured data and text. */
 import { getAuth, User } from 'firebase/auth';
 import { addDoc, arrayRemove, arrayUnion, collection, deleteDoc, doc, getDoc, getDocs, updateDoc } from 'firebase/firestore';
 import _ from 'lodash';
@@ -8,6 +7,7 @@ import { boxConverter, BoxEntry, recipeConverter, RecipeEntry } from './storage'
 import { ActionType, AppState, Visibility } from './types';
 
 
+/* helper functions for converting between structured data and text. */
 export function strToIngredients(str: string): Recipe["recipeIngredient"] {
   /* convert text with one ingredient per line to a list of ingredients.
 
@@ -47,7 +47,7 @@ export function instructionsToStr(instructions: Recipe["recipeInstructions"]): s
   if (typeof instructions === "string") {
     return instructions.toString()
   }
-  const steps = Array.prototype.map.call(instructions, (x: Recipe) => x.text);
+  const steps = Array.prototype.map.call(instructions, (x) => x.text.trim());
   return steps.join("\n\n")
 }
 

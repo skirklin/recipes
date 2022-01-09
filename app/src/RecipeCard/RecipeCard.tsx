@@ -18,20 +18,25 @@ const IndexCardLine = styled.hr`
   height: 1px;
 `
 
-function RecipeCard() {
+export interface RecipeCardProps {
+  recipeId: string
+  boxId: string
+}
+
+function RecipeCard(props: RecipeCardProps) {
   return (
     <div>
-      <RecipeName />
+      <RecipeName {...props} />
       <IndexCardLine />
       <div >
-        <SaveButton />
-        <ClearButton />
+        <SaveButton {...props} />
+        <ClearButton {...props} />
       </div>
-      <Image />
-      <RecipeDescription />
+      <Image {...props} />
+      <RecipeDescription {...props} />
       <RecipeBody>
-        <IngredientList />
-        <InstructionList />
+        <IngredientList {...props} />
+        <InstructionList {...props} />
       </RecipeBody>
     </div>
   );
