@@ -2,10 +2,10 @@ import { useContext, useState } from 'react';
 import styled from 'styled-components';
 import TextareaAutosize from 'react-autosize-textarea';
 import { Recipe } from 'schema-dts';
-import { instructionsToStr, strToInstructions } from '../utils';
-import { RecipeContext } from './context';
+import { getRecipeFromState, instructionsToStr, strToInstructions } from '../utils';
 import { Context } from '../context';
 import { getAuth } from 'firebase/auth';
+import { RecipeCardProps } from './RecipeCard';
 
 
 
@@ -19,10 +19,14 @@ const RecipeStep = styled.li`
 `
 
 
-function InstructionList() {
+function InstructionList(props: RecipeCardProps) {
   const [editable, setEditablePrimitive] = useState(false);
-  const { state, dispatch } = useContext(RecipeContext);
-  const rbState = useContext(Context).state;
+  const { recipeId, boxId } = props;
+  const { state, dispatch } = useContext(Context);
+  const recipe = getRecipeFromState(state, boxId, recipeId)
+  if (recipe === undefined) {
+    return null
+  }
 
   const instructionsStyle = {
     outline: "none",
@@ -51,20 +55,20 @@ function InstructionList() {
     )
   }
 
-  const recipe = state.recipe
-  if (recipe === undefined)  { return null }
+  if (recipe === undefined) { return null }
   const setEditable = (value: boolean) => {
     const user = getAuth().currentUser
-    if (rbState.writeable && user && recipe.owners.includes(user.uid)  ) {
+    if (state.writeable && user && recipe.owners.includes(user.uid)) {
       setEditablePrimitive(value)
     }
   }
 
-  const instructions = recipe.data.recipeInstructions;
+  const instructions = recipe.changed ? recipe.changed.recipeInstructions : recipe.data.recipeInstructions;
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleChange = (e: any) => {
-    if (formatInstructionList(instructions) !== e.target.value) {
-      dispatch({ type: "SET_INSTRUCTIONS", payload: strToInstructions(e.target.value) });
+    if (instructionsToStr(instructions) !== e.target.value) {
+      dispatch({ type: "SET_INSTRUCTIONS", boxId, recipeId, payload: strToInstructions(e.target.value) });
     }
     setEditable(false)
   }
@@ -72,7 +76,7 @@ function InstructionList() {
   if (editable) {
     return (
       <TextareaAutosize
-        defaultValue={instructionsToStr(instructions!)}
+        defaultValue={instructionsToStr(instructions)}
         autoFocus
         onKeyUp={(e) => { if (e.code === "Escape") { handleChange(e) } }}
         style={{ ...instructionsStyle }}

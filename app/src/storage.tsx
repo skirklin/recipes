@@ -18,6 +18,7 @@ export class RecipeEntry {
     toString() {
         return this.id;
     }
+
 }
 
 export const recipeConverter = {

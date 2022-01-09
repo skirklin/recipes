@@ -1,26 +1,25 @@
+import _ from 'lodash';
 import { ForkOutlined } from '@ant-design/icons';
 import { useContext, useState } from 'react';
 
 import { PickBoxModal } from '../Modals/PickBoxModal';
 import { Context } from '../context';
 import { useNavigate } from 'react-router-dom';
-import { addRecipe } from '../utils';
-import _ from 'lodash';
+import { addRecipe, getRecipeFromState } from '../utils';
 import { ActionButton } from '../StyledComponents';
-import { RecipeEntry } from '../storage';
+import { RecipeCardProps } from '../RecipeCard/RecipeCard';
 
-
-interface ForkProps {
-  boxId?: string
-  recipe: RecipeEntry
+interface ForkProps extends RecipeCardProps {
+  targetBoxId?: string
 }
 
 export default function ForkButton(props: ForkProps) {
-  const { boxId, recipe } = props;
-  const { dispatch } = useContext(Context)
+  const { boxId, recipeId, targetBoxId } = props;
+  const { state, dispatch } = useContext(Context)
   const navigate = useNavigate()
   const [isModalVisible, setIsModalVisible] = useState(false)
-
+  const recipe = getRecipeFromState(state, boxId, recipeId)
+  if (recipe === undefined) return null
 
   const addNewRecipe = async (boxId: string) => {
     const recipeRef = await addRecipe(boxId, _.cloneDeep(recipe), dispatch)
@@ -36,7 +35,7 @@ export default function ForkButton(props: ForkProps) {
   }
 
   function newRecipeFlow() {
-    if (boxId === undefined) {
+    if (targetBoxId === undefined) {
       setIsModalVisible(true)
     } else {
       addNewRecipe(boxId)

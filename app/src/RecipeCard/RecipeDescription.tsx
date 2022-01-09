@@ -3,8 +3,8 @@ import { useContext, useState } from 'react';
 import TextareaAutosize from 'react-autosize-textarea';
 import styled from 'styled-components';
 import { Context } from '../context';
-
-import { RecipeContext } from './context';
+import { getRecipeFromState } from '../utils';
+import { RecipeCardProps } from './RecipeCard';
 
 
 const Description = styled.div`
@@ -17,33 +17,34 @@ const Description = styled.div`
   width: 60%;
 `
 
-function RecipeDescription() {
+function RecipeDescription(props: RecipeCardProps) {
+  const { recipeId, boxId } = props;
   const [editable, setEditablePrimitive] = useState(false);
-  const { state, dispatch } = useContext(RecipeContext);
-  const rbState = useContext(Context).state;
+  const { state, dispatch } = useContext(Context);
 
-  const recipe = state.recipe
-  if (recipe === undefined)  { return null }
+  const recipe = getRecipeFromState(state, boxId, recipeId)
+  if (recipe === undefined) { return null }
   const setEditable = (value: boolean) => {
     const user = getAuth().currentUser
-    if (rbState.writeable && user && recipe.owners.includes(user.uid)  ) {
+    if (state.writeable && user && recipe.owners.includes(user.uid)) {
       setEditablePrimitive(value)
     }
   }
 
-  const description = recipe.data.description
-  const handleChange = (e: any) => {
+  const description = recipe.changed ? recipe.changed.description : recipe.data.description
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any 
+  function handleChange(e: any) {
     if (e.target.value !== description) {
-      dispatch({ type: "SET_DESCRIPTION", payload: e.target.value });
+      dispatch({ type: "SET_DESCRIPTION", recipeId, boxId, payload: e.target.value });
     }
-    setEditable(false)
+    setEditable(false);
   }
 
-  let props;
+  let textAreaProps;
   if (description !== undefined) {
-    props = {defaultValue: description.toString()}
+    textAreaProps = { defaultValue: description.toString() }
   } else {
-    props = {}
+    textAreaProps = {}
   }
 
   if (editable) {
@@ -54,7 +55,7 @@ function RecipeDescription() {
         onKeyUp={(e) => { if (e.code === "Escape") { handleChange(e) } }}
         style={{ display: "inline-flex", fontStyle: "italic", width: "60%", fontFamily: "sans-serif", fontSize: "16px" }}
         onBlur={handleChange}
-        {...props}
+        {...textAreaProps}
       />
     )
   } else {

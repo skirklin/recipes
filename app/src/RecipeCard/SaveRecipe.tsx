@@ -1,49 +1,49 @@
+import styled from 'styled-components';
 import { SaveOutlined } from '@ant-design/icons';
 import { Button } from 'antd';
 import { getAuth } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
 import { useContext } from 'react';
-import styled from 'styled-components';
+import { useNavigate } from 'react-router-dom';
+
 import { db } from '../backend';
 import { Context } from '../context';
-import { RecipeEntry } from '../storage';
-import { addRecipe } from '../utils';
-
-import { RecipeContext } from './context';
+import { addRecipe, getRecipeFromState } from '../utils';
+import { RecipeCardProps } from './RecipeCard';
 
 const StyledButton = styled(Button)`
   background-color: green;
   display: inline;
 `
 
-function SaveButton() {
-  const { state, dispatch } = useContext(RecipeContext);
-  const { recipe } = state;
-  const { state: rbState, dispatch: rbDispatch} = useContext(Context)
+function SaveButton(props: RecipeCardProps) {
+  const { state, dispatch } = useContext(Context)
+  const { recipeId, boxId } = props;
+  const recipe = getRecipeFromState(state, boxId, recipeId)
+  const navigate = useNavigate()
 
   if (recipe === undefined) {
     return null
   }
 
-  async function save() {
+  const save = async () => {
     let docRef;
-    if (state.recipeId === undefined || state.recipeId.startsWith("uniqueId=")) {
-      const docRef = await addRecipe(state.boxId, state.recipe as RecipeEntry, rbDispatch)
-      dispatch({ type: "SET_RECIPE", payload: state.recipe, recipeId: docRef.id })
+    if (recipeId.startsWith("uniqueId=")) {
+      const docRef = await addRecipe(boxId, recipe, dispatch)
+      navigate(`/boxes/${boxId}/recipes/${docRef.id}`)
     } else {
-      docRef = doc(db, "boxes", state.boxId, "recipes", state.recipeId);
-      await setDoc(docRef, state.recipe)
-      dispatch({ type: "SET_RECIPE", payload: state.recipe, recipeId: docRef.id })
+      docRef = doc(db, "boxes", boxId, "recipes", recipeId);
+      await setDoc(docRef, recipe)
     }
   }
 
   let writeable = false;
   const user = getAuth().currentUser
-  if (rbState.writeable && user && recipe.owners.includes(user.uid) && recipe !== undefined) {
+  if (state.writeable && user && recipe.owners.includes(user.uid) && recipe !== undefined) {
     writeable = true;
   }
 
-  if (state.changed) {
+  if (recipe.changed) {
     return <StyledButton icon={<SaveOutlined />} disabled={!writeable} onClick={save}>Save</StyledButton>
   } else {
     return null

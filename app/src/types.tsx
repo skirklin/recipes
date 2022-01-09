@@ -42,7 +42,14 @@ export type ActionType = {
   boxId?: string
   recipe?: RecipeEntry
   box?: BoxEntry
-  payload?: RecipeEntry | BoxEntry | Map<string, BoxEntry> | Map<string, RecipeEntry> | boolean
+  payload?: RecipeEntry 
+  | BoxEntry 
+  | Map<string, BoxEntry> 
+  | Map<string, RecipeEntry> 
+  | boolean 
+  | string 
+  | Recipe["recipeIngredient"] 
+  | Recipe["recipeInstructions"]
 }
 
 export type UnsubMap = {

@@ -1,11 +1,11 @@
-import { useState, useContext, ChangeEvent } from 'react';
+import { useState, useContext } from 'react';
 import styled from 'styled-components';
 import TextareaAutosize from 'react-autosize-textarea';
 import { Recipe } from 'schema-dts';
-import { ingredientsToStr, strToIngredients } from '../utils';
-import { RecipeContext } from './context';
+import { getRecipeFromState, ingredientsToStr, strToIngredients } from '../utils';
 import { Context } from '../context';
 import { getAuth } from 'firebase/auth';
+import { RecipeCardProps } from './RecipeCard';
 
 
 const Ingredient = styled.li`
@@ -13,10 +13,14 @@ const Ingredient = styled.li`
 `
 
 
-function IngredientList() {
+function IngredientList(props: RecipeCardProps) {
   const [editable, setEditablePrimitive] = useState(false);
-  const { state, dispatch } = useContext(RecipeContext);
-  const rbState = useContext(Context).state;
+  const { recipeId, boxId } = props;
+  const { state, dispatch } = useContext(Context);
+  const recipe = getRecipeFromState(state, boxId, recipeId)
+  if (recipe === undefined) {
+    return null
+  }
 
   const ingredientsStyle = {
     outline: "none",
@@ -27,20 +31,19 @@ function IngredientList() {
     width: "60%",
   }
 
-  const recipe = state.recipe
-  if (recipe === undefined) { return null }
   const setEditable = (value: boolean) => {
     const user = getAuth().currentUser
-    if (rbState.writeable && user && recipe.owners.includes(user.uid)) {
+    if (state.writeable && user && recipe.owners.includes(user.uid)) {
       setEditablePrimitive(value)
     }
   }
 
-  const ingredients = recipe.data.recipeIngredient || [];
+  const ingredients = recipe.changed ? recipe.changed.recipeIngredient : recipe.data.recipeIngredient || [];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleChange = (e: any) => {
     console.log(e)
     if (ingredientsToStr(ingredients) !== e.target.value) {
-      dispatch({ type: "SET_INGREDIENTS", payload: strToIngredients(e.target.value) });
+      dispatch({ type: "SET_INGREDIENTS", recipeId, boxId, payload: strToIngredients(e.target.value) });
     }
     setEditable(false)
   }

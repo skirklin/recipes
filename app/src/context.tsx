@@ -3,7 +3,7 @@ import _ from 'lodash';
 import { createContext } from 'react';
 import { BoxEntry, RecipeEntry } from './storage';
 import { ActionType, AppState } from './types';
-import { createNewBox } from './utils';
+import { createNewBox, getRecipeFromState, setRecipeInState } from './utils';
 
 
 export type ContextType = {
@@ -29,6 +29,23 @@ export const Context = createContext<ContextType>(
     dispatch: defaultDispatch,
   }
 )
+
+function handleRecipeChange(key: string, prevState: AppState, action: ActionType) {
+  if (action.recipeId === undefined || action.boxId === undefined) {
+    return prevState
+  }
+  const recipe = getRecipeFromState(prevState, action.boxId, action.recipeId)
+  if (recipe === undefined) {
+    return prevState
+  }
+
+  const newState = { ...prevState }
+  if (recipe.changed === undefined) {
+    recipe.changed = _.cloneDeep(recipe.data)
+  }
+  recipe.changed = { ...(recipe.changed), [key]: action.payload }
+  return newState
+}
 
 export function recipeBoxReducer(prevState: AppState, action: ActionType): AppState {
   console.log("action", { action, prevState })
@@ -109,6 +126,29 @@ export function recipeBoxReducer(prevState: AppState, action: ActionType): AppSt
         return prevState
       }
       return { ...prevState, activeBox: action.box, activeBoxId: action.boxId }
+    case 'SET_NAME': {
+      return handleRecipeChange("name", prevState, action)
+    }
+    case 'SET_INGREDIENTS': {
+      return handleRecipeChange("recipeIngredient", prevState, action)
+    }
+    case 'SET_DESCRIPTION': {
+      return handleRecipeChange("description", prevState, action)
+    }
+    case 'SET_INSTRUCTIONS': {
+      return handleRecipeChange("recipeInstructions", prevState, action)
+    }
+    case 'RESET_RECIPE': {
+      if (action.recipeId === undefined || action.boxId === undefined) return prevState
+      const recipe = getRecipeFromState(prevState, action.boxId, action.recipeId)
+      if (recipe === undefined) return prevState
+      const newState = { ...prevState }
+      if (recipe.changed !== undefined) {
+        recipe.changed = undefined
+      }
+      setRecipeInState(newState, action.boxId, action.recipeId, recipe)
+      return newState
+    }
     default:
       return prevState
   }
