@@ -3,7 +3,7 @@ import { User } from "firebase/auth";
 import { getDoc, onSnapshot, doc, setDoc, DocumentData, DocumentSnapshot, DocumentReference, collection, QuerySnapshot } from "firebase/firestore";
 import 'antd/dist/antd.css'; // or 'antd/dist/antd.less'
 
-import { ActionType, UnsubMap } from './types';
+import { ActionType, BoxId, UnsubMap } from './types';
 
 import { db } from './backend'
 import { addBox, subscribeToBox } from './utils';
@@ -72,7 +72,7 @@ async function handleUserSnapshot(
   }
 }
 
-async function handleRecipesSnapshot(snapshot: QuerySnapshot<DocumentData>, dispatch: React.Dispatch<ActionType>, boxId: string) {
+async function handleRecipesSnapshot(snapshot: QuerySnapshot<DocumentData>, dispatch: React.Dispatch<ActionType>, boxId: BoxId) {
   const changes = snapshot.docChanges()
   for (const change of changes) {
     const doc = change.doc;

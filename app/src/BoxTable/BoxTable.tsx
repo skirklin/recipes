@@ -10,12 +10,13 @@ import './BoxTable.css';
 import { Context } from "../context";
 import { deleteBox } from "../utils";
 import { DeleteOutlined } from "@ant-design/icons";
+import { BoxId } from "../types";
 
 export type RowType = {
   name: string
   owners: string[]
   numRecipes: number
-  boxId: string
+  boxId: BoxId
   key: string
 }
 

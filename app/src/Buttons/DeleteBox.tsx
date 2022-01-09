@@ -3,13 +3,13 @@ import { Popconfirm } from 'antd';
 import { useContext } from 'react';
 import { Context } from '../context';
 import { useNavigate } from 'react-router-dom';
-import { deleteRecipe } from '../utils';
+import { deleteBox, getBoxFromState } from '../utils';
 import { ActionButton } from '../StyledComponents';
-import { BoxId, RecipeId } from '../types';
+import { BoxId } from '../types';
+import { getAuth } from 'firebase/auth';
 
 
 interface DeleteProps {
-  recipeId: RecipeId
   boxId: BoxId
 }
 
@@ -18,22 +18,28 @@ function DeleteButton(props: DeleteProps) {
   const { writeable } = state;
   const navigate = useNavigate()
 
-  const { recipeId, boxId } = props;
+  const { boxId } = props;
+  const box = getBoxFromState(state, boxId)
+  const user = getAuth().currentUser
+
+  if (box === undefined || user === null || !box.owners.includes(user.uid) ) {
+    return null
+  }
 
   async function del() {
-    deleteRecipe(state, boxId, recipeId)
-    navigate(`/boxes/${boxId}`)
+    deleteBox(state, boxId)
+    navigate(`/`)
   }
 
   if (writeable) {
     return (
       <Popconfirm
-        title="Are you sure you want to delete this recipe?"
+        title="Are you sure you want to delete this box?"
         onConfirm={del}
         okText="Yes"
         cancelText="No"
       >
-        <ActionButton title="Delete this recipe" icon={<DeleteOutlined />} disabled={recipeId === undefined} />
+        <ActionButton title="Delete this box?" icon={<DeleteOutlined />} />
       </Popconfirm>
     )
   } else {

@@ -10,6 +10,8 @@ import { db } from '../backend';
 import { Context } from '../context';
 import { addRecipe, getRecipeFromState } from '../utils';
 import { RecipeCardProps } from './RecipeCard';
+import _ from 'lodash';
+import { recipeConverter } from '../storage';
 
 const StyledButton = styled(Button)`
   background-color: green;
@@ -17,7 +19,7 @@ const StyledButton = styled(Button)`
 `
 
 function SaveButton(props: RecipeCardProps) {
-  const { state, dispatch } = useContext(Context)
+  const { state, dispatch } = useContext(Context);
   const { recipeId, boxId } = props;
   const recipe = getRecipeFromState(state, boxId, recipeId)
   const navigate = useNavigate()
@@ -28,12 +30,20 @@ function SaveButton(props: RecipeCardProps) {
 
   const save = async () => {
     let docRef;
+    if (recipe.changed === undefined) {
+      return
+    }
+    const newRecipe = _.cloneDeep(recipe)
+    newRecipe.data = recipe.changed
+    newRecipe.changed = undefined
     if (recipeId.startsWith("uniqueId=")) {
-      const docRef = await addRecipe(boxId, recipe, dispatch)
+      const docRef = await addRecipe(boxId, newRecipe, dispatch)
+      dispatch({type: "REMOVE_RECIPE", recipeId, boxId}) // removes the local-only version of the recipe
       navigate(`/boxes/${boxId}/recipes/${docRef.id}`)
     } else {
-      docRef = doc(db, "boxes", boxId, "recipes", recipeId);
-      await setDoc(docRef, recipe)
+      docRef = doc(db, "boxes", boxId, "recipes", recipeId).withConverter(recipeConverter)
+      console.log({ docRef, newRecipe })
+      await setDoc(docRef, newRecipe)
     }
   }
 

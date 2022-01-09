@@ -3,6 +3,7 @@ import { PickBoxModal } from "../Modals/PickBoxModal";
 import ImportModal from "../Modals/ImportModal";
 import { ImportOutlined } from "@ant-design/icons";
 import { ActionButton } from "../StyledComponents";
+import { BoxId } from "../types";
 
 interface ImportProps {
     boxId?: string
@@ -15,7 +16,7 @@ export default function ImportButton(props: ImportProps) {
     const [isImportVisible, setIsImportVisible] = useState(false)
     const [isPickBoxVisible, setIsPickBoxVisible] = useState(false)
 
-    function handlePickBox(boxId: string) {
+    function handlePickBox(boxId: BoxId) {
         setBoxId(boxId);
         setIsPickBoxVisible(false);
         importFlow()
@@ -30,13 +31,13 @@ export default function ImportButton(props: ImportProps) {
     }
     if (boxId === undefined) {
         return (<>
-            <ActionButton onClick={importFlow} disabled={disabled} icon={<ImportOutlined />} />
+            <ActionButton title="Import recipes by URL" onClick={importFlow} disabled={disabled} icon={<ImportOutlined />} />
             <PickBoxModal setIsVisible={setIsPickBoxVisible} isVisible={isPickBoxVisible} handleOk={handlePickBox} />
         </>)
     } else {
         return (<>
             <ImportModal boxId={boxId} setIsVisible={setIsImportVisible} isVisible={isImportVisible} />
-            <ActionButton onClick={importFlow} disabled={disabled} icon={<ImportOutlined />} />
+            <ActionButton title="Import recipes by URL" onClick={importFlow} disabled={disabled} icon={<ImportOutlined />} />
         </>)
     }
 }

@@ -3,6 +3,7 @@ import { useState } from "react";
 import { PickBoxModal } from "../Modals/PickBoxModal";
 import { uploadRecipes } from "../utils";
 import { ActionButton } from "../StyledComponents";
+import { BoxId } from "../types";
 
 
 interface UploadProps {
@@ -14,7 +15,7 @@ export default function UploadButton(props: UploadProps) {
     const { boxId, disabled } = props;
     const [isModalVisible, setIsModalVisible] = useState(false)
 
-    async function upload(boxId: string | undefined) {
+    async function upload(boxId: BoxId | undefined) {
         if (boxId === undefined) {
             return // leave the modal visible until something is selected
         }
@@ -31,7 +32,7 @@ export default function UploadButton(props: UploadProps) {
     }
 
     return (<>
-        <ActionButton title="Upload recipes" disabled={disabled} onClick={uploadFlow} icon={<UploadOutlined />} />
+        <ActionButton title="Upload recipes from computer." disabled={disabled} onClick={uploadFlow} icon={<UploadOutlined />} />
         <PickBoxModal handleOk={upload} isVisible={isModalVisible} setIsVisible={setIsModalVisible} />
     </>)
 

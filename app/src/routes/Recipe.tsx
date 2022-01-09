@@ -9,10 +9,11 @@ import RecipeCard from '../RecipeCard/RecipeCard';
 import { getRecipe, getRecipeFromState } from '../utils';
 import { RecipeActionGroup } from '../StyledComponents';
 import { RecipeEntry } from '../storage';
+import { BoxId, RecipeId } from '../types';
 
 interface RecipeProps {
-  boxId: string
-  recipeId: string
+  boxId: BoxId
+  recipeId: RecipeId
   recipe?: RecipeEntry
 }
 
@@ -54,5 +55,9 @@ export function Recipe(props: RecipeProps) {
 
 export default function RoutedRecipe() {
   const params = useParams();
-  return <Recipe recipeId={params.recipeId as string} boxId={params.boxId as string} />
+  if (params.boxId === undefined || params.recipeId === undefined) {
+    throw new Error("Must have a boxId and recipeId.")
+  }
+
+  return <Recipe recipeId={params.recipeId} boxId={params.boxId} />
 }

@@ -25,3 +25,9 @@ export const RecipeActionGroup = styled.div`
   float: right;
   margin: 5px;
 `
+
+export const IndexCardLine = styled.hr`
+  background-color: var(--cinnabar);
+  border-width: 0px;
+  height: 1px;
+`

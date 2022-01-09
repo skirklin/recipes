@@ -4,7 +4,7 @@ import { LinkOutlined } from '@ant-design/icons';
 import { Context } from '../context';
 import { getAuth } from 'firebase/auth';
 import { Title } from '../StyledComponents';
-import { getBoxFromState, getRecipeFromState } from '../utils';
+import { getRecipeFromState } from '../utils';
 import { RecipeCardProps } from './RecipeCard';
 
 const EditableTitle = styled.input`
@@ -32,18 +32,16 @@ function RecipeName(props: RecipeCardProps) {
 
   const rd = recipe.changed? recipe.changed : recipe.data
   const name = rd.name as string
-  const box = getBoxFromState(state, boxId)
-  const boxName = box === undefined ? "" : box.data.name
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleChange = (e: any) => {
     if (name !== e.target.value) {
-      dispatch({ type: "SET_NAME", payload: e.target.value });
+      dispatch({ type: "SET_NAME", recipeId, boxId, payload: e.target.value });
     }
     setEditable(false);
   }
   let link = null;
   if (rd.url) {
-    link = <a href={rd.url.toString()}><LinkOutlined /></a>
+    link = <a href={rd.url.toString()} target="_blank" rel="noreferrer"><LinkOutlined /></a>
   }
   if (editable) {
     return (
@@ -57,8 +55,7 @@ function RecipeName(props: RecipeCardProps) {
   } else {
     return (
       <Title onDoubleClick={() => setEditable(true)} style={{ width: '90%' }}>
-        {name} <span style={{ fontStyle: 'italic', marginLeft: "3px" }}>({boxName})</span>
-        {link}
+        {name} {link}
       </Title>
     )
   }
