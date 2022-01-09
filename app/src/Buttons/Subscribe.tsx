@@ -3,8 +3,6 @@ import { Context } from '../context';
 import { getBoxFromState, subscribeToBox, unsubscribeFromBox } from '../utils';
 import { ActionButton } from '../StyledComponents';
 import { BoxId } from '../types';
-import { getAuth } from 'firebase/auth';
-
 
 interface DeleteProps {
   boxId: BoxId
@@ -16,22 +14,21 @@ function SubscribeButton(props: DeleteProps) {
 
   const { boxId } = props;
   const box = getBoxFromState(state, boxId)
-  const user = getAuth().currentUser
 
-  if (box === undefined || user === null) {
+  console.log({box, state})
+
+  if (box === undefined || state.user === null) {
     return null
   }
 
-  if (!state.boxes.has(boxId)) {
+  if (!state.user.boxes.includes(boxId)) {
     return <ActionButton
-      style={{ marginLeft: "5px" }}
-      onClick={() => subscribeToBox(getAuth().currentUser, boxId)}
+      onClick={() => subscribeToBox(state.user, boxId)}
       disabled={!writeable}
     >Add to collection</ActionButton>
   } else {
     return <ActionButton
-      style={{ marginLeft: "5px" }}
-      onClick={() => unsubscribeFromBox(getAuth().currentUser, boxId)}
+      onClick={() => unsubscribeFromBox(state.user, boxId)}
       disabled={!writeable}
     >Remove from collection</ActionButton>
   }

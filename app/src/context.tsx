@@ -16,6 +16,7 @@ export function initState(): AppState {
     {
       boxes: new Map<string, BoxEntry>(),
       writeable: true,
+      user: null,
     }
   )
 }
@@ -58,7 +59,7 @@ export function recipeBoxReducer(prevState: AppState, action: ActionType): AppSt
   let newBox: BoxEntry, state: AppState
   switch (action.type) {
     case "SET_USER": {
-      if (action.userId === undefined || action.user === undefined) {
+      if (action.user === undefined) {
         console.warn("SET_USER requires userId and user.")
         return prevState
       }
@@ -90,7 +91,7 @@ export function recipeBoxReducer(prevState: AppState, action: ActionType): AppSt
         return prevState
       }
       newBox = _.cloneDeep(action.payload as BoxEntry)
-      newBox.recipes = (oldBox && oldBox.recipes) || new Map<string, RecipeEntry>()
+      newBox.recipes = newBox.recipes.size ? newBox.recipes : (oldBox && oldBox.recipes) || new Map<string, RecipeEntry>()
       state = { ...prevState, boxes: new Map([...prevState.boxes, [action.boxId, newBox]]) }
       return state
     }

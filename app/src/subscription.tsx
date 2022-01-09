@@ -1,22 +1,23 @@
 import React from 'react';
 import { User } from "firebase/auth";
-import { getDoc, onSnapshot, doc, setDoc, DocumentData, DocumentSnapshot, DocumentReference, collection, QuerySnapshot } from "firebase/firestore";
+import { getDoc, onSnapshot, doc, setDoc, DocumentData, DocumentSnapshot, collection, QuerySnapshot } from "firebase/firestore";
 import 'antd/dist/antd.css'; // or 'antd/dist/antd.less'
 
-import { ActionType, BoxId, UnsubMap } from './types';
+import { ActionType, BoxId, UnsubMap, Visibility } from './types';
 
 import { db } from './backend'
 import { addBox, subscribeToBox } from './utils';
-import { boxConverter, BoxEntry, RecipeEntry } from './storage';
+import { boxConverter, BoxEntry, RecipeEntry, userConverter, UserEntry } from './storage';
 
 async function initializeUser(user: User) {
-  const userRef = doc(db, "users", user.uid);
+  const userRef = doc(db, "users", user.uid).withConverter(userConverter);
   const userDoc = await getDoc(userRef)
   if (!userDoc.exists() && !user.isAnonymous) {
-    await setDoc(userRef, { "new": false, "name": user.displayName });
+    await setDoc(userRef, new UserEntry(user.displayName || "Anonymous", Visibility.private, [], userRef.id));
+    const newUser = await getDoc(userRef)
     const userBoxRef = await addBox(user, `${user.displayName}'s box`, null);
     if (userBoxRef !== undefined) {
-      await subscribeToBox(user, userBoxRef.id)
+      await subscribeToBox(newUser.data() || null, userBoxRef.id)
     }
   }
   return userRef
@@ -31,45 +32,37 @@ export async function subscribeToUser(user: User, dispatch: React.Dispatch<Actio
   const userRef = await initializeUser(user)
 
   // subscription for changes to user
-  unsubMap.userUnsub = onSnapshot(userRef,
+  unsubMap.userUnsub = onSnapshot(userRef.withConverter(userConverter),
     snapshot => (handleUserSnapshot(snapshot, dispatch, unsubMap))
   )
 }
 
 async function handleUserSnapshot(
-  snapshot: DocumentSnapshot<DocumentData>,
+  snapshot: DocumentSnapshot<UserEntry>,
   dispatch: React.Dispatch<ActionType>,
   unsubMap: UnsubMap,
 ) {
-  const data = snapshot.data()
-  if (data === undefined) {
+  const user = snapshot.data()
+  if (user === undefined) {
     return
   }
 
   // oooooh, TODO, implement this :/
-  // dispatch({ type: "SET_USER", payload: data as Map<string, BoxEntry> })
-  const subs = new Map(unsubMap.boxMap)
-
-  data.boxes.forEach(
-    (boxRef: DocumentReference) => {
-      if (!unsubMap.boxMap.has(boxRef.id)) {
+  dispatch({ type: "SET_USER", user: user })
+  
+  user.boxes.forEach(
+    (bid: string) => {
+      if (!unsubMap.boxMap.has(bid)) {
+        const boxRef = doc(db, "boxes", bid).withConverter(boxConverter)
         const boxUnsub = onSnapshot(
           boxRef.withConverter(boxConverter), (snapshot) => handleBoxSnapshot(snapshot, dispatch, unsubMap))
 
         const recipesRef = collection(db, "boxes", boxRef.id, "recipes")
         const recipesUnsub = onSnapshot(recipesRef, (snapshot) => handleRecipesSnapshot(snapshot, dispatch, boxRef.id))
         unsubMap.boxMap.set(boxRef.id, { recipesUnsub, boxUnsub })
-      } else {
-        subs.delete(boxRef.id)
       }
     }
   )
-  for (const [boxId, sub] of subs.entries()) {
-    dispatch({type: "REMOVE_BOX", boxId})
-    sub.boxUnsub && sub.boxUnsub()
-    sub.recipesUnsub && sub.recipesUnsub()
-    unsubMap.boxMap.delete(boxId)
-  }
 }
 
 async function handleRecipesSnapshot(snapshot: QuerySnapshot<DocumentData>, dispatch: React.Dispatch<ActionType>, boxId: BoxId) {

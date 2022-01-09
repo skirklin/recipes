@@ -28,7 +28,7 @@ function IngredientList(props: RecipeCardProps) {
     margin: "0px 0px 0px 20px",
     backgroundColor: "lightyellow",
     display: "inline-block",
-    width: "60%",
+    width: "fit-content",
   }
 
   const setEditable = (value: boolean) => {
@@ -52,13 +52,13 @@ function IngredientList(props: RecipeCardProps) {
     const listElts = Array.prototype.map.call(ingredients || [], (ri, id) => <Ingredient key={id}>{ri}</Ingredient>)
     if (listElts.length === 0) {
       return (
-        <ul style={{ ...ingredientsStyle, listStylePosition: "outside", listStyleType: "unset" }}>
+        <ul style={{ ...ingredientsStyle, listStylePosition: "outside", listStyleType: "none" }}>
           {"Add ingredients?"}
         </ul>
       )
     }
     return (
-      <ul style={{ ...ingredientsStyle, listStylePosition: "outside", listStyleType: "unset" }}>
+      <ul style={{ ...ingredientsStyle, listStylePosition: "outside", listStyleType: "none" }}>
         {listElts}
       </ul>
     )

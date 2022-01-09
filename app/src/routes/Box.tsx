@@ -8,6 +8,7 @@ import { IndexCardLine, RecipeActionGroup, Title } from "../StyledComponents";
 import { BoxId } from "../types";
 import DeleteBox from '../Buttons/DeleteBox';
 import SubscribeButton from "../Buttons/Subscribe";
+import VisibilityControl from "../Buttons/Visibility";
 
 interface BoxProps {
   boxId: BoxId
@@ -39,11 +40,11 @@ function Box(props: BoxProps) {
     return <div>Unable to find boxId={boxId}</div>
   }
   const recipes = box.recipes;
+  console.log(box)
   const data: RowType[] = []
   for (const [recipeId, recipe] of recipes.entries()) {
     data.push({ boxName: box.data.name, recipeId, boxId, recipe, key: `recipeId=${recipeId}_boxId=${boxId}` })
   }
-
 
 
   return (
@@ -51,6 +52,7 @@ function Box(props: BoxProps) {
       <Title>{box.data.name}</Title>
       <RecipeActionGroup>
         <SubscribeButton boxId={boxId} />
+        <VisibilityControl boxId={boxId} />
         <DeleteBox boxId={boxId} />
       </RecipeActionGroup>
       <IndexCardLine />

@@ -33,7 +33,7 @@ export type UserStoreType = {
 
 export type AppState = {
   boxes: Map<string, BoxEntry>
-  user?: UserEntry
+  user: UserEntry | null
   writeable: boolean
 }
 

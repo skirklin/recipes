@@ -21,7 +21,7 @@ export const ActionButton = styled(Button)`
 `
 
 export const RecipeActionGroup = styled.div`
-  display: inline;
+  display: inline-block;
   float: right;
   margin: 5px;
 `

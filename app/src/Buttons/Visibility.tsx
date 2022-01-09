@@ -57,7 +57,7 @@ export default function VisibilityControl(props: VisibilityProps) {
     }
 
     const menu = (
-        <Menu style={{display: "inline", float: "right"}} onClick={handleMenuClick}>
+        <Menu onClick={handleMenuClick}>
             <Menu.Item key={Visibility.private} icon={<BookOutlined />}>
                 Private
             </Menu.Item>
@@ -70,7 +70,7 @@ export default function VisibilityControl(props: VisibilityProps) {
 
     return (
         <Dropdown overlay={menu}>
-            <ActionButton title="Change sharing level" style={{ float: "right" }} icon={icon}/>
+            <ActionButton title="Change sharing level" icon={icon}/>
         </Dropdown>
     )
 }
