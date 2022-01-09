@@ -6,16 +6,16 @@ import DownloadButton from '../Buttons/DownloadRecipe';
 import VisibilityControl from '../Buttons/Visibility';
 import ForkButton from '../Buttons/ForkRecipe';
 import RecipeCard from '../RecipeCard/RecipeCard';
-import { RecipeType } from '../types';
 import { getRecipe } from '../utils';
 import { RecipeActionType, RecipeContext, recipeReducer, RecipeStateType } from '../RecipeCard/context';
 import _ from 'lodash';
 import { RecipeActionGroup } from '../StyledComponents';
+import { RecipeEntry } from '../storage';
 
 interface RecipeProps {
   boxId: string
   recipeId: string
-  recipe?: RecipeType
+  recipe?: RecipeEntry
 }
 
 

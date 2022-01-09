@@ -2,21 +2,21 @@ import { User } from 'firebase/auth';
 import _ from 'lodash';
 import { createContext } from 'react';
 import { Recipe } from 'schema-dts';
-import { RecipeType } from '../types';
+import { RecipeEntry } from '../storage';
 import { createNewRecipe } from '../utils';
 
 
 export type RecipeStateType = {
   recipeId?: string,
   boxId: string,
-  recipe?: RecipeType,
-  original?: RecipeType,
+  recipe?: RecipeEntry,
+  original?: RecipeEntry,
   changed: boolean,
 }
 
 export type RecipeActionType = {
   type: string,
-  payload?: string | RecipeType | Recipe["recipeIngredient"] | Recipe["recipeInstructions"]
+  payload?: string | RecipeEntry | Recipe["recipeIngredient"] | Recipe["recipeInstructions"]
   recipeId?: string,
 }
 
@@ -72,8 +72,8 @@ export function recipeReducer(state: RecipeStateType, action: RecipeActionType):
       newState.changed = true;
       return newState
     case 'SET_RECIPE':
-      newState.recipe = _.cloneDeep(action.payload) as RecipeType;
-      newState.original = _.cloneDeep(action.payload) as RecipeType;
+      newState.recipe = _.cloneDeep(action.payload) as RecipeEntry;
+      newState.original = _.cloneDeep(action.payload) as RecipeEntry;
       newState.changed = false;
       if (action.recipeId !== undefined) {
         newState.recipeId = action.recipeId

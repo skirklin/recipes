@@ -1,9 +1,9 @@
 import { DownloadOutlined } from '@ant-design/icons';
+import { RecipeEntry } from '../storage';
 import { ActionButton } from '../StyledComponents';
-import { RecipeType } from '../types';
 
 interface DownloadProps {
-  recipe: RecipeType
+  recipe: RecipeEntry
 }
 
 function DownloadButton(props: DownloadProps) {
@@ -28,7 +28,7 @@ function DownloadButton(props: DownloadProps) {
 
   function download() {
     const downloadLink = document.createElement("a");
-    downloadLink.download = recipe!.data.name + ".json"
+    downloadLink.download = recipe.data.name + ".json"
     downloadLink.innerHTML = "Download File";
 
     // Create a "file" to download

@@ -1,61 +1,48 @@
-import { DocumentReference, Unsubscribe } from 'firebase/firestore';
+import { Unsubscribe } from 'firebase/firestore';
 import { Recipe } from 'schema-dts';
+import { BoxEntry, RecipeEntry } from './storage';
 
-export type RecipePointer = {
-  boxId: string,
-  recipeId: string | undefined,
-}
-
-export type BoxPointer = {
-  boxId: string,
+export type BoxDataType = {
+  name: string,
+  description?: string,
 }
 
 export type BoxStoreType = {
+  creator: string,
   owners: string[], // user ids
   visibility: Visibility,
-  data: {
-    name: string,
-    recipes: DocumentReference[],
-  }
+  data: BoxDataType
 }
 
-export type BoxType = {
-  owners: string[], // user ids
-  visibility: Visibility,
-  data: {
-    name: string,
-    recipes: Map<string, RecipeType>,
-  }
-}
-
-export type RecipeType = {
+export type RecipeStoreType = {
+  creator: string,
   data: Recipe,
   visibility: Visibility,
   owners: string[], // user ids
 }
 
 export type UserType = {
-  boxes: Map<string, BoxType>,
+  boxes: Map<string, BoxEntry>,
   new: boolean,
   id: string,
 }
 
-export type RecipeBoxStateType = {
-  boxes: Map<string, BoxType>
-  activeRecipe?: RecipeType
-  activeBox?: BoxType
+export type AppState = {
+  boxes: Map<string, BoxEntry>
+  activeRecipe?: RecipeEntry
+  activeBox?: BoxEntry
   activeRecipeId?: string
   activeBoxId?: string
   writeable: boolean
 }
 
-export type RecipeBoxActionType = {
+export type ActionType = {
   type: string
   recipeId?: string
   boxId?: string
-  recipe?: RecipeType
-  box?: BoxType
-  payload?: RecipeType | BoxType | Map<string, BoxType> | Map<string, RecipeType> | boolean
+  recipe?: RecipeEntry
+  box?: BoxEntry
+  payload?: RecipeEntry | BoxEntry | Map<string, BoxEntry> | Map<string, RecipeEntry> | boolean
 }
 
 export type UnsubMap = {

@@ -11,7 +11,7 @@ function Boxes() {
   const rows: RowType[] = Array.from(boxes).map(([key, value]) => ({
     name: value.data.name,
     owners: value.owners,
-    numRecipes: value.data.recipes.size,
+    numRecipes: value.recipes.size,
     boxId: key,
     key: key,
   } as RowType))

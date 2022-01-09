@@ -17,7 +17,7 @@ function Breadcrumbs() {
       partMap.set(boxId, box.data.name)
 
       if (recipeId !== undefined) {
-        const recipe = box.data.recipes.get(recipeId)
+        const recipe = box.recipes.get(recipeId)
         if (recipe !== undefined) {
           const rname = recipe.data.name === undefined ? "" : recipe.data.name.toString()
           partMap.set(recipeId, rname)

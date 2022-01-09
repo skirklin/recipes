@@ -3,10 +3,11 @@ import { User } from "firebase/auth";
 import { getDoc, onSnapshot, doc, setDoc, DocumentData, DocumentSnapshot, DocumentReference, collection, QuerySnapshot } from "firebase/firestore";
 import 'antd/dist/antd.css'; // or 'antd/dist/antd.less'
 
-import { BoxStoreType, BoxType, RecipeBoxActionType, RecipeType, UnsubMap, Visibility } from './types';
+import { ActionType, UnsubMap } from './types';
 
 import { db } from './backend'
 import { addBox, subscribeToBox } from './utils';
+import { boxConverter, BoxEntry, RecipeEntry } from './storage';
 
 async function initializeUser(user: User) {
   const userRef = doc(db, "users", user.uid);
@@ -21,7 +22,7 @@ async function initializeUser(user: User) {
   return userRef
 }
 
-export async function subscribeToUser(user: User, dispatch: React.Dispatch<RecipeBoxActionType>, unsubMap: UnsubMap) {
+export async function subscribeToUser(user: User, dispatch: React.Dispatch<ActionType>, unsubMap: UnsubMap) {
   // fetch any boxes associated with this user
   if (user === null) {
     return
@@ -37,7 +38,7 @@ export async function subscribeToUser(user: User, dispatch: React.Dispatch<Recip
 
 async function handleUserSnapshot(
   snapshot: DocumentSnapshot<DocumentData>,
-  dispatch: React.Dispatch<RecipeBoxActionType>,
+  dispatch: React.Dispatch<ActionType>,
   unsubMap: UnsubMap,
 ) {
   const data = snapshot.data()
@@ -46,13 +47,14 @@ async function handleUserSnapshot(
   }
 
   // oooooh, TODO, implement this :/
-  // dispatch({ type: "SET_USER", payload: data as Map<string, BoxType> })
+  // dispatch({ type: "SET_USER", payload: data as Map<string, BoxEntry> })
   const subs = new Map(unsubMap.boxMap)
 
   data.boxes.forEach(
     (boxRef: DocumentReference) => {
       if (!unsubMap.boxMap.has(boxRef.id)) {
-        const boxUnsub = onSnapshot(boxRef, (snapshot) => handleBoxSnapshot(snapshot, dispatch, unsubMap))
+        const boxUnsub = onSnapshot(
+          boxRef.withConverter(boxConverter), (snapshot) => handleBoxSnapshot(snapshot, dispatch, unsubMap))
 
         const recipesRef = collection(db, "boxes", boxRef.id, "recipes")
         const recipesUnsub = onSnapshot(recipesRef, (snapshot) => handleRecipesSnapshot(snapshot, dispatch, boxRef.id))
@@ -70,13 +72,13 @@ async function handleUserSnapshot(
   }
 }
 
-async function handleRecipesSnapshot(snapshot: QuerySnapshot<DocumentData>, dispatch: React.Dispatch<RecipeBoxActionType>, boxId: string) {
+async function handleRecipesSnapshot(snapshot: QuerySnapshot<DocumentData>, dispatch: React.Dispatch<ActionType>, boxId: string) {
   const changes = snapshot.docChanges()
   for (const change of changes) {
     const doc = change.doc;
     const data = doc.data()
     if (change.type === "added" || change.type === "modified") {
-      dispatch({ type: "ADD_RECIPE", recipeId: doc.id, boxId, payload: data as RecipeType })
+      dispatch({ type: "ADD_RECIPE", recipeId: doc.id, boxId, payload: data as RecipeEntry })
     } else {
       dispatch({ type: "REMOVE_RECIPE", recipeId: doc.id, boxId })
     }
@@ -84,33 +86,18 @@ async function handleRecipesSnapshot(snapshot: QuerySnapshot<DocumentData>, disp
 }
 
 async function handleBoxSnapshot(
-  snapshot: DocumentSnapshot<DocumentData>,
-  dispatch: React.Dispatch<RecipeBoxActionType>,
+  snapshot: DocumentSnapshot<BoxEntry>,
+  dispatch: React.Dispatch<ActionType>,
   unsubMap: UnsubMap,
 ) {
-  const box = snapshot.data() as BoxStoreType
+  const box = snapshot.data()
 
   if (box === undefined) {
     dispatch({ type: "REMOVE_BOX", boxId: snapshot.id })
     return
   }
 
-  const owners = []
-  for (const owner of box.owners) {
-    const ownerDoc = await getDoc(doc(db, "users", owner))
-    if (ownerDoc.exists() && ownerDoc.data().name) {
-      owners.push(ownerDoc.data().name)
-    }
-  }
-
-  const boxData = {
-    owners: owners,
-    visibility: Visibility.private,
-    data: {
-      name: box.data.name,
-    },
-  }
-  dispatch({ type: "ADD_BOX", boxId: snapshot.id, payload: boxData as BoxType })
+  dispatch({ type: "ADD_BOX", boxId: snapshot.id, payload: box })
 }
 
 

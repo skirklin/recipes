@@ -4,7 +4,8 @@ import { addDoc, arrayRemove, arrayUnion, collection, deleteDoc, doc, getDoc, ge
 import _ from 'lodash';
 import { Recipe } from "schema-dts"
 import { db } from './backend';
-import { BoxStoreType, BoxType, RecipeBoxActionType, RecipeBoxStateType, RecipeType, Visibility } from './types';
+import { boxConverter, BoxEntry, recipeConverter, RecipeEntry } from './storage';
+import { ActionType, AppState, Visibility } from './types';
 
 
 export function strToIngredients(str: string): Recipe["recipeIngredient"] {
@@ -55,73 +56,67 @@ export function ingredientsToStr(ingredients: Recipe["recipeIngredient"]): strin
   return steps.join("\n")
 }
 
-export function getRecipeFromState(state: RecipeBoxStateType, boxId: string, recipeId: string) {
+export function getRecipeFromState(state: AppState, boxId: string, recipeId: string) {
   const box = state.boxes.get(boxId);
   if (box === undefined) {
     return
   }
-  return box.data.recipes.get(recipeId)
+  return box.recipes.get(recipeId)
 }
 
-export function setRecipeInState(state: RecipeBoxStateType, boxId: string, recipeId: string, recipe: RecipeType) {
+export function setRecipeInState(state: AppState, boxId: string, recipeId: string, recipe: RecipeEntry) {
   const box = state.boxes.get(boxId);
   if (box === undefined) {
     return
   }
-  return box.data.recipes.set(recipeId, recipe)
+  return box.recipes.set(recipeId, recipe)
 
 }
 
-export async function getRecipe(state: RecipeBoxStateType, boxId: string | undefined, recipeId: string | undefined) {
-  let recipe: RecipeType | undefined
+export async function getRecipe(state: AppState, boxId: string | undefined, recipeId: string | undefined) {
+  let recipe: RecipeEntry | undefined
   if (boxId === undefined || recipeId === undefined) {
     return undefined
   }
   const box = state.boxes.get(boxId);
   if (box !== undefined) {
-    recipe = box.data.recipes.get(recipeId)
+    recipe = box.recipes.get(recipeId)
   } else {
-    recipe = (await getDoc(doc(db, "boxes", boxId, "recipes", recipeId))).data() as RecipeType
+    const ref = doc(db, "boxes", boxId, "recipes", recipeId).withConverter(recipeConverter)
+    recipe = (await getDoc(ref)).data()
   }
   return recipe
 }
 
-export async function getRecipes(state: RecipeBoxStateType, boxId: string) {
+export async function getRecipes(state: AppState, boxId: string) {
   const box = state.boxes.get(boxId)
-  let recipes = new Map<string, RecipeType>()
+  let recipes: Map<string, RecipeEntry>
   if (box === undefined) {
-    const querySnapshot = await getDocs(collection(db, "boxes", boxId, "recipes"))
-    const pairs: [string, RecipeType][] = querySnapshot.docs.map(doc => [doc.id, doc.data() as RecipeType])
-    recipes = new Map<string, RecipeType>(pairs)
+    const querySnapshot = await getDocs(collection(db, "boxes", boxId, "recipes").withConverter(recipeConverter))
+    const pairs: [string, RecipeEntry][] = querySnapshot.docs.map(doc => [doc.id, doc.data()])
+    recipes = new Map<string, RecipeEntry>(pairs)
   } else {
-    recipes = box.data.recipes
+    recipes = box.recipes
   }
   return recipes
 }
 
-export async function getBox(state: RecipeBoxStateType, boxId: string) {
-  const boxRef = doc(db, "boxes", boxId)
+export async function getBox(state: AppState, boxId: string) {
+  const boxRef = doc(db, "boxes", boxId).withConverter(boxConverter)
   const boxDoc = await getDoc(boxRef)
   if (!boxDoc.exists() || boxDoc.data() === undefined) {
     return undefined
   }
-  const box = boxDoc.data() as BoxType
-  return ({
-    data: {
-      recipes: await getRecipes(state, boxId),
-      name: box.data.name,
-    },
-    visibility: box.visibility,
-    owners: box.owners,
-  })
+  const box = boxDoc.data()
+  box.recipes = await getRecipes(state, boxId)
+  return box
 }
 
-
-export function getBoxFromState(state: RecipeBoxStateType, boxId: string) {
+export function getBoxFromState(state: AppState, boxId: string) {
   return state.boxes.get(boxId);
 }
 
-export function setBoxInState(state: RecipeBoxStateType, boxId: string, box: BoxType) {
+export function setBoxInState(state: AppState, boxId: string, box: BoxEntry) {
   state.boxes.set(boxId, box);
 }
 
@@ -159,86 +154,67 @@ export async function uploadRecipes(boxId: string) {
           if (user === null) {
             return
           }
-          const fullRecipe: RecipeType = {
-            data: jsonobj,
-            owners: [user.uid],
-            visibility: Visibility.private,
-          }
-          addRecipe(boxId, fullRecipe, null)
+          const recipe = new RecipeEntry(jsonobj, [user.uid], Visibility.private, undefined)
+          addRecipe(boxId, recipe, null)
         })
     })
   }
 }
 
-export async function addRecipe(boxId: string, recipe: RecipeType, dispatch: React.Dispatch<RecipeBoxActionType> | null) {
-  const colRef = collection(db, "boxes", boxId, "recipes")
+export async function addRecipe(boxId: string, recipe: RecipeEntry, dispatch: React.Dispatch<ActionType> | null) {
+  const colRef = collection(db, "boxes", boxId, "recipes").withConverter(recipeConverter)
   const recipeRef = await addDoc(colRef, recipe)
   return recipeRef
 }
 
-export async function addBox(user: User | null, name: string, dispatch: React.Dispatch<RecipeBoxActionType> | null) {
+export async function addBox(user: User | null, name: string, dispatch: React.Dispatch<ActionType> | null) {
   if (user === null) {
     return undefined
   }
-  const boxesCol = collection(db, "boxes")
-  const boxData: BoxStoreType = {
-    owners: [user.uid],
-    visibility: Visibility.private,
-    data: {
-      name,
-      recipes: [],
-    }
-  }
+  const boxesCol = collection(db, "boxes").withConverter(boxConverter)
+  const boxData = { name }
+  const box = new BoxEntry(boxData, [user.uid], Visibility.private, undefined)
   const userRef = doc(db, "users", user.uid)
-  const boxRef = await addDoc(boxesCol, boxData)
+  const boxRef = await addDoc(boxesCol, box)
   await updateDoc(userRef, { boxes: arrayUnion(boxRef) })
   return boxRef
 }
 
-export function createNewRecipe(user: User | null): RecipeType {
+export function createNewRecipe(user: User | null): RecipeEntry {
   let owners: string[]
   if (user === null) {
     owners = [];
   } else {
     owners = [user.uid];
   }
-  return {
-    visibility: Visibility.private,
-    owners,
-    data: {
-      "@type": "Recipe",
-      "name": "New recipe",
-      "recipeInstructions": [],
-      "recipeIngredient": [],
-      "description": "",
-    },
+  const data: Recipe = {
+    "@type": "Recipe",
+    "name": "New recipe",
+    "recipeInstructions": [],
+    "recipeIngredient": [],
+    "description": "",
   }
+  return new RecipeEntry(data, owners, Visibility.private, undefined)
 }
 
 
-export function createNewBox(): BoxType {
-  return {
-    data: {
-      recipes: new Map<string, RecipeType>(),
-      name: "New box",
-    },
-    visibility: Visibility.private,
-    owners: [],
-  }
+export function createNewBox(user: User) {
+  const name = "New box"
+  return new BoxEntry({ name }, [user.uid], Visibility.private, undefined)
 }
 
-export async function deleteRecipe(state: RecipeBoxStateType, boxId: string, recipeId: string) {
+export async function deleteRecipe(state: AppState, boxId: string, recipeId: string) {
   if (recipeId.startsWith("uniqueId=")) {
     const box = state.boxes.get(boxId)
     if (box !== undefined) {
-      box.data.recipes.delete(recipeId)
+      box.recipes.delete(recipeId)
     }
   } else {
     deleteDoc(doc(db, "boxes", boxId, "recipes", recipeId))
   }
 }
 
-export async function deleteBox(state: RecipeBoxStateType, boxId: string) {
+export async function deleteBox(state: AppState, boxId: string) {
   deleteDoc(doc(db, "boxes", boxId))
 }
 

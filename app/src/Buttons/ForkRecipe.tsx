@@ -5,14 +5,14 @@ import { PickBoxModal } from '../Modals/PickBoxModal';
 import { Context } from '../context';
 import { useNavigate } from 'react-router-dom';
 import { addRecipe } from '../utils';
-import { RecipeType } from '../types';
 import _ from 'lodash';
 import { ActionButton } from '../StyledComponents';
+import { RecipeEntry } from '../storage';
 
 
 interface ForkProps {
   boxId?: string
-  recipe: RecipeType
+  recipe: RecipeEntry
 }
 
 export default function ForkButton(props: ForkProps) {

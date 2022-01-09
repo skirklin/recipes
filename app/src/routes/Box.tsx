@@ -5,19 +5,19 @@ import { Context } from "../context";
 import { subscribeToBox, unsubscribeFromBox, getBox } from "../utils";
 import { RecipeTable, RowType } from "../RecipeTable/RecipeTable"
 import { getAuth } from "firebase/auth";
-import { BoxType } from "../types";
 import { ActionButton, Title } from "../StyledComponents";
+import { BoxEntry } from "../storage";
 
 interface BoxRecipesProps {
   boxId: string,
-  box: BoxType,
+  box: BoxEntry,
   writeable: boolean
 }
 
 function BoxRecipes(props: BoxRecipesProps) {
   const { box, boxId, writeable } = props;
 
-  const recipes = box.data.recipes;
+  const recipes = box.recipes;
   const data: RowType[] = []
   for (const [recipeId, recipe] of recipes.entries()) {
     data.push({ boxName: box.data.name, recipeId, boxId, recipe, key: `recipeId=${recipeId}_boxId=${boxId}` })
@@ -26,7 +26,7 @@ function BoxRecipes(props: BoxRecipesProps) {
 }
 
 function Box() {
-  const [box, setBox] = useState<BoxType>()
+  const [box, setBox] = useState<BoxEntry>()
   const { state } = useContext(Context)
   const { writeable } = state
   const params = useParams();
