@@ -1,10 +1,10 @@
-import { getAuth, User } from 'firebase/auth';
+import { getAuth, signOut, User } from 'firebase/auth';
 import { addDoc, arrayRemove, arrayUnion, collection, deleteDoc, doc, getDoc, getDocs, updateDoc } from 'firebase/firestore';
 import _ from 'lodash';
 import { Comment, Recipe } from "schema-dts"
 import { db } from './backend';
-import { boxConverter, BoxEntry, recipeConverter, RecipeEntry, UserEntry } from './storage';
-import { ActionType, AppState, BoxId, RecipeId, Visibility } from './types';
+import { boxConverter, BoxEntry, recipeConverter, RecipeEntry, userConverter, UserEntry } from './storage';
+import { ActionType, AppState, BoxId, RecipeId, UserId, Visibility } from './types';
 
 
 /* helper functions for converting between structured data and text. */
@@ -87,7 +87,6 @@ export function strToAuthor(author: string): Recipe["author"] {
 
 
 export function commentToStr(comment: Recipe["comment"]): string | undefined {
-  console.log(comment)
   if (comment === undefined) {
     return undefined
   } else if (typeof comment === "object") {
@@ -180,6 +179,28 @@ export function getBoxFromState(state: AppState, boxId: BoxId) {
   return state.boxes.get(boxId);
 }
 
+export async function getUser(state: AppState, userId: UserId) {
+  const userRef = doc(db, "users", userId).withConverter(userConverter)
+  const userDoc = await getDoc(userRef)
+  if (!userDoc.exists() || userDoc.data() === undefined) {
+    return undefined
+  }
+  const user = userDoc.data()
+  return user
+
+}
+
+export function getAppUserFromState(state: AppState) {
+  if (state.authUser === null) {
+    return undefined
+  }
+  return state.users.get(state.authUser.uid)
+}
+
+export function getUserFromState(state: AppState, userId: UserId) {
+  return state.users.get(userId)
+}
+
 export function setBoxInState(state: AppState, boxId: BoxId, box: BoxEntry) {
   state.boxes.set(boxId, box);
 }
@@ -205,20 +226,19 @@ export async function unsubscribeFromBox(user: UserEntry | null, boxId: BoxId) {
   await updateDoc(doc(db, "users", user.id), { boxes: arrayRemove(boxRef) })
 }
 
-export async function uploadRecipes(boxId: BoxId) {
+export async function uploadRecipes(boxId: BoxId, user: UserEntry) {
   const fileHandles = await window.showOpenFilePicker({
     multiple: true,
   })
+  if (user === null) {
+    return
+  }
   for (const fh of fileHandles) {
     fh.getFile().then(f => {
       f.text().then(
         (text: string) => {
           const jsonobj = JSON.parse(text) as Recipe
-          const user = getAuth().currentUser
-          if (user === null) {
-            return
-          }
-          const recipe = new RecipeEntry(jsonobj, [user.uid], Visibility.private, user.uid, undefined)
+          const recipe = new RecipeEntry(jsonobj, [user.id], Visibility.private, user.id, undefined)
           addRecipe(boxId, recipe, null)
         })
     })
@@ -231,14 +251,14 @@ export async function addRecipe(boxId: BoxId, recipe: RecipeEntry, dispatch: Rea
   return recipeRef
 }
 
-export async function addBox(user: User | null, name: string, dispatch: React.Dispatch<ActionType> | null) {
+export async function addBox(user: UserEntry, name: string, dispatch: React.Dispatch<ActionType> | null) {
   if (user === null) {
     return undefined
   }
   const boxesCol = collection(db, "boxes").withConverter(boxConverter)
   const boxData = { name }
-  const box = new BoxEntry(boxData, [user.uid], Visibility.private, user.uid, undefined)
-  const userRef = doc(db, "users", user.uid)
+  const box = new BoxEntry(boxData, [user.id], Visibility.private, user.id, undefined)
+  const userRef = doc(db, "users", user.id)
   const boxRef = await addDoc(boxesCol, box)
   await updateDoc(userRef, { boxes: arrayUnion(boxRef) })
   return boxRef
@@ -317,4 +337,9 @@ function makeTextFile(text: string) {
 
   // returns a URL you can use as a href
   return textFile;
+}
+
+export function userSignOut(dispatch: React.Dispatch<ActionType>) {
+  signOut(getAuth());
+  dispatch({type: "SET_AUTH_USER", authUser: null})
 }

@@ -1,7 +1,6 @@
 import { Input, Modal } from "antd"
 import { useContext, useState } from "react"
-import { addBox } from '../utils';
-import { getAuth } from "firebase/auth";
+import { addBox, getAppUserFromState } from '../utils';
 import { Context } from "../context";
 import { DocumentReference } from "firebase/firestore";
 import { BoxEntry } from "../storage";
@@ -14,9 +13,14 @@ interface NewBoxModalProps {
 
 function NewBoxModal(props: NewBoxModalProps) {
   const { isVisible, setIsVisible, afterNewBox } = props;
-  const { dispatch } = useContext(Context)
+  const { dispatch, state } = useContext(Context)
   const [newBoxName, setNewBoxName] = useState<string>();
   const [confirmLoading, setConfirmLoading] = useState(false);
+  const user = getAppUserFromState(state)
+
+  if (user === undefined) { 
+    return null
+  }
 
   const handleOk = async () => {
     setConfirmLoading(true);
@@ -24,7 +28,7 @@ function NewBoxModal(props: NewBoxModalProps) {
     if (newBoxName === undefined) {
       return
     }
-    const newBoxRef = await addBox(getAuth().currentUser, newBoxName, dispatch)
+    const newBoxRef = await addBox(user, newBoxName, dispatch)
     if (afterNewBox !== undefined && newBoxRef !== undefined) {
       afterNewBox(newBoxRef)
     }

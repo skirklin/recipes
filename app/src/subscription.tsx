@@ -15,22 +15,26 @@ async function initializeUser(user: User) {
   if (!userDoc.exists() && !user.isAnonymous) {
     await setDoc(userRef, new UserEntry(user.displayName || "Anonymous", Visibility.private, [], userRef.id));
     const newUser = await getDoc(userRef)
-    const userBoxRef = await addBox(user, `${user.displayName}'s box`, null);
-    if (userBoxRef !== undefined) {
-      await subscribeToBox(newUser.data() || null, userBoxRef.id)
+    if (newUser.exists()) {
+      const userEntry = newUser.data()
+      const userBoxRef = await addBox(userEntry, `${user.displayName}'s box`, null);
+      if (userBoxRef !== undefined) {
+        await subscribeToBox(newUser.data() || null, userBoxRef.id)
+      }
     }
   }
   return userRef
 }
 
 export async function subscribeToUser(user: User, dispatch: React.Dispatch<ActionType>, unsubMap: UnsubMap) {
+  console.log("subscribing to user", user)
   // fetch any boxes associated with this user
   if (user === null) {
     return
   }
 
   const userRef = await initializeUser(user)
-
+  
   // subscription for changes to user
   unsubMap.userUnsub = onSnapshot(userRef.withConverter(userConverter),
     snapshot => (handleUserSnapshot(snapshot, dispatch, unsubMap))
@@ -43,13 +47,14 @@ async function handleUserSnapshot(
   unsubMap: UnsubMap,
 ) {
   const user = snapshot.data()
+  console.log(user)
   if (user === undefined) {
     return
   }
 
-  // oooooh, TODO, implement this :/
-  dispatch({ type: "SET_USER", user: user })
-  
+  dispatch({ type: "ADD_USER", user })
+  console.log({user})
+
   user.boxes.forEach(
     (bid: string) => {
       if (!unsubMap.boxMap.has(bid)) {
@@ -96,6 +101,7 @@ async function handleBoxSnapshot(
 
 
 export function unsubscribe(unsubMap: UnsubMap) {
+  console.log("unsubscribing")
   unsubMap.userUnsub && unsubMap.userUnsub();
   unsubMap.boxesUnsub && unsubMap.boxesUnsub();
   for (const box of unsubMap.boxMap.values()) {

@@ -1,7 +1,6 @@
-import { getAuth } from 'firebase/auth';
 import _ from 'lodash';
 import { createContext } from 'react';
-import { BoxEntry, RecipeEntry } from './storage';
+import { BoxEntry, RecipeEntry, UserEntry } from './storage';
 import { ActionType, AppState } from './types';
 import { createNewBox, getRecipeFromState, setRecipeInState } from './utils';
 
@@ -16,7 +15,8 @@ export function initState(): AppState {
     {
       boxes: new Map<string, BoxEntry>(),
       writeable: true,
-      user: null,
+      users: new Map<string, UserEntry>(),
+      authUser: null,
     }
   )
 }
@@ -32,7 +32,7 @@ export const Context = createContext<ContextType>(
 )
 
 function handleRecipeChange(key: string, prevState: AppState, action: ActionType) {
-  console.log({key, action})
+  console.log({ key, action })
   if (action.recipeId === undefined || action.boxId === undefined) {
     console.warn("Can't change a recipe property without passing recipeId and boxId.")
     return prevState
@@ -51,27 +51,38 @@ function handleRecipeChange(key: string, prevState: AppState, action: ActionType
 }
 
 export function recipeBoxReducer(prevState: AppState, action: ActionType): AppState {
-  console.log("action", { action, prevState })
-  const user = getAuth().currentUser
-  if (user === null) {
-    return prevState
-  }
+  console.debug("action", { action, prevState })
   let newBox: BoxEntry, state: AppState
   switch (action.type) {
-    case "SET_USER": {
-      if (action.user === undefined) {
-        console.warn("SET_USER requires userId and user.")
+    case "SET_AUTH_USER": {
+      const authUser = action.authUser
+      if (authUser === undefined) {
+        console.warn("SET_AUTH_USER requires userId and user.")
         return prevState
       }
-      state = { ...prevState, user: action.user }
+      if (authUser !== prevState.authUser) {
+        console.log("clearing state")
+        return {...initState(), authUser}
+      } else {
+        return prevState
+      }
+    }
+    case "ADD_USER": {
+      const user = action.user
+      if (user === undefined ) {
+        console.warn("ADD_USER requires userId and user.")
+        return prevState
+      }
+
+      state = { ...prevState, users: new Map([...prevState.users, [user.id, user]]) }
       return state
     }
     case "ADD_RECIPE": {
-      if (action.boxId === undefined || (action.recipeId === undefined)) {
+      if (action.boxId === undefined || (action.recipeId === undefined) || prevState.authUser === null) {
         console.warn("ADD_RECIPE requires a boxId and recipeId.")
         return prevState
       }
-      newBox = { ...(prevState.boxes.get(action.boxId) || createNewBox(user)) }
+      newBox = { ...(prevState.boxes.get(action.boxId) || createNewBox(prevState.authUser)) }
       if (action.payload === undefined) {
         console.warn("ADD_RECIPE requires a payload.")
         return prevState

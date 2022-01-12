@@ -1,6 +1,6 @@
 import { useContext } from 'react';
 import { Context } from '../context';
-import { getBoxFromState, subscribeToBox, unsubscribeFromBox } from '../utils';
+import { getAppUserFromState, getBoxFromState, subscribeToBox, unsubscribeFromBox } from '../utils';
 import { ActionButton } from '../StyledComponents';
 import { BoxId } from '../types';
 
@@ -15,20 +15,20 @@ function SubscribeButton(props: DeleteProps) {
   const { boxId } = props;
   const box = getBoxFromState(state, boxId)
 
-  console.log({box, state})
+  const user = getAppUserFromState(state)
 
-  if (box === undefined || state.user === null) {
+  if (box === undefined || user === undefined) {
     return null
   }
 
-  if (!state.user.boxes.includes(boxId)) {
+  if (!user.boxes.includes(boxId)) {
     return <ActionButton
-      onClick={() => subscribeToBox(state.user, boxId)}
+      onClick={() => subscribeToBox(user, boxId)}
       disabled={!writeable}
     >Add to collection</ActionButton>
   } else {
     return <ActionButton
-      onClick={() => unsubscribeFromBox(state.user, boxId)}
+      onClick={() => unsubscribeFromBox(user, boxId)}
       disabled={!writeable}
     >Remove from collection</ActionButton>
   }

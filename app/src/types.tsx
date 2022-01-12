@@ -1,3 +1,4 @@
+import { User } from 'firebase/auth';
 import { DocumentReference, Unsubscribe } from 'firebase/firestore';
 import { Comment, Recipe } from 'schema-dts';
 import { BoxEntry, RecipeEntry, UserEntry } from './storage';
@@ -33,7 +34,8 @@ export type UserStoreType = {
 
 export type AppState = {
   boxes: Map<string, BoxEntry>
-  user: UserEntry | null
+  users: Map<string, UserEntry>
+  authUser: User | null
   writeable: boolean
 }
 
@@ -45,6 +47,7 @@ export type ActionType = {
   box?: BoxEntry
   userId?: UserId
   user?: UserEntry
+  authUser?: User | null
   payload?: RecipeEntry 
   | BoxEntry 
   | Map<string, BoxEntry> 

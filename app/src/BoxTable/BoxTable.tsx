@@ -11,10 +11,11 @@ import { Context } from "../context";
 import { deleteBox } from "../utils";
 import { DeleteOutlined } from "@ant-design/icons";
 import { BoxId } from "../types";
+import { UserEntry } from "../storage";
 
 export type RowType = {
   name: string
-  owners: string[]
+  owners: UserEntry[]
   numRecipes: number
   boxId: BoxId
   key: string
@@ -30,7 +31,7 @@ const columns: ColumnsType<RowType> = [
     key: 'owners',
     title: 'Owners',
     dataIndex: ['owners'],
-    // render: value => {return <span>{value.join(', ')}</span>},
+    render: (value: UserEntry[]) => <span>{value.map(u => u.name).join(', ')}</span>,
   },
   {
     key: 'numRecipes',

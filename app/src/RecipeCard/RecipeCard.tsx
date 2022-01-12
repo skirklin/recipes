@@ -34,8 +34,8 @@ function ActionBar(props: RecipeCardProps) {
     <RecipeActionGroup>
       <DeleteButton {...props} element="button" />
       <DownloadButton {...props} element="button" />
-      <ForkButton {...props} />
-      <VisibilityControl {...props} />
+      <ForkButton {...props} element="button" />
+      <VisibilityControl {...props} element="button" />
     </RecipeActionGroup>
   )
 }
@@ -45,8 +45,8 @@ function ActionMenu(props: RecipeCardProps) {
     <Menu>
       <DeleteButton {...props} element="menu" />
       <DownloadButton {...props} element="menu" />
-      <Menu.Item><ForkButton {...props} /></Menu.Item>
-      <Menu.Item><VisibilityControl {...props} /></Menu.Item>
+      <ForkButton {...props} element="menu" />
+      <VisibilityControl {...props} element="menu" />
     </Menu>
   )
   return <Dropdown overlay={menu} ><BarsOutlined style={{ marginLeft: "auto", fontSize: "2em", padding: "5px" }} /></Dropdown>
@@ -55,9 +55,10 @@ function ActionMenu(props: RecipeCardProps) {
 function RecipeActions(props: RecipeCardProps) {
   const isTabletOrMobile = useMediaQuery({ query: '(max-width: 1224px)' })
   if (isTabletOrMobile) {
-    return null
+    return <ActionMenu {...props} />
+  } else {
+    return <ActionBar {...props} />
   }
-  return <ActionMenu {...props} />
 }
 
 function RecipeCard(props: RecipeCardProps) {
@@ -72,10 +73,10 @@ function RecipeCard(props: RecipeCardProps) {
         <Tags {...props} />
       </div>
       <IndexCardTopLine />
-      <RecipeActionGroup >
+      <div style={{width: "100%", paddingLeft: "5px"}}>
         <SaveButton {...props} />
         <ClearButton {...props} />
-      </RecipeActionGroup>
+      </div>
       <RecipeDescription {...props} />
       <RecipeBody>
         <IngredientList {...props} />

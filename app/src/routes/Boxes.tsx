@@ -2,6 +2,9 @@ import { useContext } from "react"
 import { Context } from "../context"
 import { RowType, BoxTable } from '../BoxTable/BoxTable'
 import { Title } from "../StyledComponents";
+import { getUserFromState } from "../utils";
+import { UserEntry } from "../storage";
+import { Visibility } from "../types";
 
 
 function Boxes() {
@@ -10,7 +13,7 @@ function Boxes() {
 
   const rows: RowType[] = Array.from(boxes).map(([key, value]) => ({
     name: value.data.name,
-    owners: value.owners,
+    owners: value.owners.map(uid => getUserFromState(state, uid) || new UserEntry("Anonymous", Visibility.private, [], uid)),
     numRecipes: value.recipes.size,
     boxId: key,
     key: key,

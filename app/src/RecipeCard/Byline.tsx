@@ -1,8 +1,7 @@
 import React, { useContext, useState } from 'react';
 import styled from 'styled-components';
 import { Context } from '../context';
-import { getAuth } from 'firebase/auth';
-import { getRecipeFromState, authorToStr } from '../utils';
+import { getRecipeFromState, authorToStr, getAppUserFromState } from '../utils';
 import { RecipeCardProps } from './RecipeCard';
 
 const EditableByline = styled.input`
@@ -28,8 +27,8 @@ function Byline(props: RecipeCardProps) {
   if (recipe === undefined) { return null }
 
   const setEditable = (value: boolean) => {
-    const user = getAuth().currentUser
-    if (state.writeable && user && recipe.owners.includes(user.uid)) {
+    const user = getAppUserFromState(state)
+    if (state.writeable && user && recipe.owners.includes(user.id)) {
       setEditablePrimitive(value)
     }
   }
