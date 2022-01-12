@@ -1,5 +1,5 @@
 import { getAuth, signOut, User } from 'firebase/auth';
-import { addDoc, arrayRemove, arrayUnion, collection, deleteDoc, doc, getDoc, getDocs, updateDoc } from 'firebase/firestore';
+import { addDoc, arrayRemove, arrayUnion, collection, deleteDoc, doc, getDoc, getDocs, query, updateDoc, where } from 'firebase/firestore';
 import _ from 'lodash';
 import { Comment, Recipe } from "schema-dts"
 import { db } from './backend';
@@ -154,10 +154,19 @@ export async function getRecipe(state: AppState, boxId: BoxId | undefined, recip
 export async function getRecipes(state: AppState, boxId: BoxId) {
   const box = state.boxes.get(boxId)
   let recipes: Map<string, RecipeEntry>
+  const user = state.authUser;
   if (box === undefined) {
-    const querySnapshot = await getDocs(collection(db, "boxes", boxId, "recipes").withConverter(recipeConverter))
-    const pairs: [string, RecipeEntry][] = querySnapshot.docs.map(doc => [doc.id, doc.data()])
-    recipes = new Map<string, RecipeEntry>(pairs)
+    if (user !== null) {
+      // a query where box === public also works.
+      const colRef = collection(db, "boxes", boxId, "recipes").withConverter(recipeConverter)
+      const ownedQuery = await getDocs(query(colRef, where("owners", "array-contains", user.uid)))
+      const publicQuery = await getDocs(query(colRef, where("visibility", "==", "public")))
+      let pairs: [string, RecipeEntry][] = ownedQuery.docs.map(doc => [doc.id, doc.data()])
+      pairs = pairs.concat(publicQuery.docs.map(doc => [doc.id, doc.data()]))
+      recipes = new Map<string, RecipeEntry>(pairs)
+    } else {
+      recipes = new Map<string, RecipeEntry>()
+    }
   } else {
     recipes = box.recipes
   }
@@ -341,5 +350,13 @@ function makeTextFile(text: string) {
 
 export function userSignOut(dispatch: React.Dispatch<ActionType>) {
   signOut(getAuth());
-  dispatch({type: "SET_AUTH_USER", authUser: null})
+  dispatch({ type: "SET_AUTH_USER", authUser: null })
+}
+
+export async function setBoxVisiblity(boxId: BoxId, visibility: Visibility) {
+  updateDoc(doc(db, "boxes", boxId), { visibility })
+}
+
+export async function setRecipeVisiblity(boxId: BoxId, recipeId: RecipeId, visibility: Visibility) {
+  updateDoc(doc(db, "boxes", boxId, "recipes", recipeId), { visibility })
 }

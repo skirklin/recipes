@@ -10,16 +10,17 @@ import Filterbox from './Filterbox';
 import NewButton from '../Buttons/NewRecipe';
 import UploadButton from '../Buttons/UploadRecipes';
 import ImportButton from '../Buttons/ImportRecipes';
-import { addRecipe, categoriesToTags, deleteRecipe } from '../utils';
+import { addRecipe, categoriesToTags, deleteRecipe, setRecipeVisiblity } from '../utils';
 import { Context } from '../context';
 import { PickBoxModal } from '../Modals/PickBoxModal';
 import { ActionButton } from '../StyledComponents';
 import './RecipeTable.css'
 import { Recipe } from 'schema-dts';
 import { RecipeEntry } from '../storage';
-import { BoxId, RecipeId } from '../types';
+import { BoxId, RecipeId, Visibility } from '../types';
 import styled from 'styled-components';
 import { useMediaQuery } from 'react-responsive'
+import VisibilityControl from '../Buttons/Visibility';
 
 
 const PointerTag = styled(Tag)`
@@ -113,6 +114,14 @@ export function RecipeTable(props: RecipeTableProps) {
     )
   }
 
+  function handleVisiblityChange(e: { key: string }) {
+    selectedRows.forEach(
+      (value: RowType) => {
+        setRecipeVisiblity(value.boxId, value.recipeId, e.key as Visibility)
+      }
+    )
+  }
+
   const allTags = new Set<string>()
   filteredRows.forEach(
     (row) => {
@@ -180,7 +189,6 @@ export function RecipeTable(props: RecipeTableProps) {
     )
   }
 
-
   return (
     <div style={{ padding: "5px" }}>
       <div style={{ display: "flex" }}>
@@ -189,6 +197,12 @@ export function RecipeTable(props: RecipeTableProps) {
           <NewButton boxId={boxId} disabled={!writeable} element="button" />
           <UploadButton boxId={boxId} disabled={!writeable} element="button" />
           <ImportButton boxId={boxId} disabled={!writeable} element="button" />
+          <VisibilityControl
+            disabled={!writeable || !hasSelected}
+            handleChange={handleVisiblityChange}
+            value={Visibility.public}
+            element="button"
+          />
           <Popconfirm
             title={`Are you sure to delete ${selectedRowKeys.length > 1 ? "these recipes" : "this recipe"}s`}
             onConfirm={del}

@@ -23,7 +23,6 @@ function DeleteButton(props: DeleteProps) {
 
   const { recipeId, boxId, element } = props;
   const user = getAppUserFromState(state)
-  console.log({user, recipe})
 
   if (recipe === undefined || user === undefined || !recipe.owners.includes(user.id)) {
     return null
