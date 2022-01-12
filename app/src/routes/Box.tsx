@@ -49,12 +49,14 @@ function Box(props: BoxProps) {
 
   return (
     <div>
-      <Title>{box.data.name}</Title>
-      <RecipeActionGroup>
-        <SubscribeButton boxId={boxId} />
-        <VisibilityControl boxId={boxId} />
-        <DeleteBox boxId={boxId} />
-      </RecipeActionGroup>
+      <div style={{ display: "flex" }}>
+        <Title>{box.data.name}</Title>
+        <RecipeActionGroup>
+          <SubscribeButton boxId={boxId} />
+          <VisibilityControl boxId={boxId} />
+          <DeleteBox boxId={boxId} />
+        </RecipeActionGroup>
+      </div>
       <IndexCardLine />
       <RecipeTable recipes={data} writeable={writeable} boxId={boxId} />
     </div>

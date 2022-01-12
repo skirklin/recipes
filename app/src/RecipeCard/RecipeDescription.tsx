@@ -14,7 +14,7 @@ const Description = styled.div`
   font-size: 16px;
   padding: 0px;
   margin: 0px 20px;
-  width: 60%;
+  minWidth: 60%;
 `
 
 function RecipeDescription(props: RecipeCardProps) {
@@ -32,10 +32,9 @@ function RecipeDescription(props: RecipeCardProps) {
   }
 
   const description = recipe.changed ? recipe.changed.description : recipe.data.description
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any 
-  function handleChange(e: any) {
-    if (e.target.value !== description) {
-      dispatch({ type: "SET_DESCRIPTION", recipeId, boxId, payload: e.target.value });
+  function handleChange(value: string) {
+    if (value !== description) {
+      dispatch({ type: "SET_DESCRIPTION", recipeId, boxId, payload: value });
     }
     setEditable(false);
   }
@@ -52,9 +51,9 @@ function RecipeDescription(props: RecipeCardProps) {
       <TextareaAutosize
         placeholder="Add a description?"
         autoFocus
-        onKeyUp={(e) => { if (e.code === "Escape") { handleChange(e) } }}
-        style={{ display: "inline-flex", fontStyle: "italic", width: "60%", fontFamily: "sans-serif", fontSize: "16px" }}
-        onBlur={handleChange}
+        onKeyUp={(e) => { if (e.code === "Escape") { handleChange(e.currentTarget.value) } }}
+        style={{ display: "inline-flex", fontStyle: "italic", minWidth: "60%", fontFamily: "sans-serif", fontSize: "16px" }}
+        onBlur={e => handleChange(e.target.value)}
         {...textAreaProps}
       />
     )

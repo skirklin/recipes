@@ -12,7 +12,7 @@ const EditableByline = styled.input`
   outline: none;
 `
 
-const StyledByline = styled.p`
+const StyledByline = styled.span`
   display: inline-block;
   font-style: italic;
   padding: 0px 0px 0px 30px;

@@ -8,8 +8,8 @@ import { useNavigate } from 'react-router-dom';
 import './Header.css';
 
 const MenuArea = styled.div`
-  float: right;
   margin: 5px;
+  margin-left: auto;
   font-size: 16px;
 `
 

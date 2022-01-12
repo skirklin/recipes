@@ -44,7 +44,7 @@ export default function ForkButton(props: ForkProps) {
   }
 
   return (<>
-      <ActionButton title="Copy recipe into new box." disabled={!recipe} onClick={forkRecipeFlow} icon={<ForkOutlined />} />
+      <ActionButton title="Copy recipe into new box." disabled={!recipe} onClick={forkRecipeFlow} icon={<ForkOutlined />} >Copy</ActionButton>
       <PickBoxModal handleOk={newRecipe} isVisible={isModalVisible} setIsVisible={setIsModalVisible} disableBoxes={[boxId]}/>
   </>)
 

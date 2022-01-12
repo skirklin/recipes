@@ -45,7 +45,7 @@ function DownloadButton(props: RecipeCardProps) {
     });
 
   }
-  return <ActionButton title="Download recipe." icon={<DownloadOutlined />} disabled={!recipe} onClick={() => download(recipe)} />
+  return <ActionButton title="Download recipe." icon={<DownloadOutlined />} disabled={!recipe} onClick={() => download(recipe)} >Download</ActionButton>
 }
 
 export default DownloadButton;

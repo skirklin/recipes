@@ -7,6 +7,7 @@ import Menu from './Menu'
 const Container = styled.div`
   background-color: var(--mint-cream);
   padding: 5px;
+  display: flex;
 `
 
 function Header() {

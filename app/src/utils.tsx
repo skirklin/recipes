@@ -1,7 +1,7 @@
 import { getAuth, User } from 'firebase/auth';
 import { addDoc, arrayRemove, arrayUnion, collection, deleteDoc, doc, getDoc, getDocs, updateDoc } from 'firebase/firestore';
 import _ from 'lodash';
-import { Recipe } from "schema-dts"
+import { Comment, Recipe } from "schema-dts"
 import { db } from './backend';
 import { boxConverter, BoxEntry, recipeConverter, RecipeEntry, UserEntry } from './storage';
 import { ActionType, AppState, BoxId, RecipeId, Visibility } from './types';
@@ -83,6 +83,27 @@ export function authorToStr(author: Recipe["author"]): string | undefined {
 
 export function strToAuthor(author: string): Recipe["author"] {
   return { "@type": "Person", name: author }
+}
+
+
+export function commentToStr(comment: Recipe["comment"]): string | undefined {
+  console.log(comment)
+  if (comment === undefined) {
+    return undefined
+  } else if (typeof comment === "object") {
+    if (Object.prototype.hasOwnProperty.call(comment, "text")) {
+      // this is hacky, but typescript was making this brutally unpleasant and I didn't want to spend more time on it.
+      return (comment as { text: string }).text
+    } else {
+      alert("Unfamiliar comment format, please report")
+    }
+  }
+  return undefined
+}
+
+
+export function strToComment(text: string): Comment {
+  return { "@type": "Comment", text }
 }
 
 export function categoriesToTags(categories: Recipe["recipeCategory"]) {

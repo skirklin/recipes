@@ -29,6 +29,7 @@ function IngredientList(props: RecipeCardProps) {
     backgroundColor: "lightyellow",
     display: "inline-block",
     width: "fit-content",
+    minWidth: "50%",
   }
 
   const setEditable = (value: boolean) => {
@@ -39,27 +40,18 @@ function IngredientList(props: RecipeCardProps) {
   }
 
   const ingredients = recipe.changed ? recipe.changed.recipeIngredient : recipe.data.recipeIngredient || [];
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const handleChange = (e: any) => {
-    console.log(e)
-    if (ingredientsToStr(ingredients) !== e.target.value) {
-      dispatch({ type: "SET_INGREDIENTS", recipeId, boxId, payload: strToIngredients(e.target.value) });
+  const handleChange = (value: string) => {
+    if (ingredientsToStr(ingredients) !== value) {
+      dispatch({ type: "SET_INGREDIENTS", recipeId, boxId, payload: strToIngredients(value) });
     }
     setEditable(false)
   }
 
   function formatIngredientList(ingredients: Recipe["recipeIngredient"]) {
     const listElts = Array.prototype.map.call(ingredients || [], (ri, id) => <Ingredient key={id}>{ri}</Ingredient>)
-    if (listElts.length === 0) {
-      return (
-        <ul style={{ ...ingredientsStyle, listStylePosition: "outside", listStyleType: "none" }}>
-          {"Add ingredients?"}
-        </ul>
-      )
-    }
     return (
       <ul style={{ ...ingredientsStyle, listStylePosition: "outside", listStyleType: "none" }}>
-        {listElts}
+        {listElts.length > 0 ? listElts : "Add ingredients?"}
       </ul>
     )
   }
@@ -68,13 +60,14 @@ function IngredientList(props: RecipeCardProps) {
       <TextareaAutosize
         defaultValue={ingredientsToStr(ingredients)}
         autoFocus
-        onKeyUp={(e) => { if (e.code === "Escape") { handleChange(e) } }}
+        placeholder='Add ingredients?'
+        onKeyUp={(e) => { if (e.code === "Escape") { handleChange(e.currentTarget.value) } }}
         style={{ ...ingredientsStyle }}
-        onBlur={handleChange} />
+        onBlur={(e) => handleChange(e.target.value)} />
     )
   } else {
     return (
-      <div onDoubleClick={() => setEditable(true)}>
+      <div onDoubleClick={() => setEditable(true)} >
         {formatIngredientList(ingredients)}
       </div>
     )

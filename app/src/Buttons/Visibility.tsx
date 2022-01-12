@@ -1,4 +1,4 @@
-import { BookOutlined, GlobalOutlined } from "@ant-design/icons";
+import { BookOutlined, GlobalOutlined, ProfileOutlined } from "@ant-design/icons";
 import { Dropdown, Menu } from "antd";
 import { doc, updateDoc } from "firebase/firestore";
 import { useContext } from "react";
@@ -64,13 +64,16 @@ export default function VisibilityControl(props: VisibilityProps) {
             <Menu.Item key={Visibility.public} icon={<GlobalOutlined />}>
                 Public
             </Menu.Item>
+            <Menu.Item key="add_owner" icon={<ProfileOutlined />}>
+                Add owner
+            </Menu.Item>
         </Menu>
     );
 
 
     return (
         <Dropdown overlay={menu}>
-            <ActionButton title="Change sharing level" icon={icon}/>
+            <ActionButton title="Change sharing level" icon={icon}>Sharing</ActionButton>
         </Dropdown>
     )
 }

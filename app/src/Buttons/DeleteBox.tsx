@@ -39,7 +39,7 @@ function DeleteButton(props: DeleteProps) {
         okText="Yes"
         cancelText="No"
       >
-        <ActionButton title="Delete this box?" icon={<DeleteOutlined />} />
+        <ActionButton title="Delete this box?" icon={<DeleteOutlined />} >Delete</ActionButton>
       </Popconfirm>
     )
   } else {
