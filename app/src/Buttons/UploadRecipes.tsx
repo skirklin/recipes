@@ -20,6 +20,10 @@ export default function UploadButton(props: UploadProps) {
     const { state } = useContext(Context)
     const user = getAppUserFromState(state)
 
+    if (process.env.NODE_ENV !== "development") {
+        return null
+    }
+
     async function upload(boxId: BoxId | undefined) {
         if (boxId === undefined || user === undefined) {
             return // leave the modal visible until something is selected

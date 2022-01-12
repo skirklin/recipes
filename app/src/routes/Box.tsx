@@ -2,10 +2,10 @@ import { useContext, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { Context } from "../context";
 
-import { getBox, getBoxFromState } from "../utils";
+import { getBox, getBoxFromState, setBoxVisiblity } from "../utils";
 import { RecipeTable, RowType } from "../RecipeTable/RecipeTable"
 import { IndexCardTopLine, RecipeActionGroup, Title } from "../StyledComponents";
-import { BoxId } from "../types";
+import { BoxId, Visibility } from "../types";
 import DeleteBox from '../Buttons/DeleteBox';
 import SubscribeButton from "../Buttons/Subscribe";
 import VisibilityControl from "../Buttons/Visibility";
@@ -17,7 +17,7 @@ interface BoxProps {
 function Box(props: BoxProps) {
   const { boxId } = props;
   const { state, dispatch } = useContext(Context)
-  const { writeable } = state
+  const { writeable, authUser } = state
 
   useEffect(() => {
     (async () => {
@@ -36,6 +36,10 @@ function Box(props: BoxProps) {
   )
   const box = getBoxFromState(state, boxId)
 
+  if (authUser === null) {
+    return null
+  }
+
   if (box === undefined) {
     return <div>Unable to find boxId={boxId}</div>
   }
@@ -46,6 +50,9 @@ function Box(props: BoxProps) {
     data.push({ boxName: box.data.name, recipeId, boxId, recipe, key: `recipeId=${recipeId}_boxId=${boxId}` })
   }
 
+  function handleVisiblityChange(e: { key: string }) {
+    setBoxVisiblity(boxId, e.key as Visibility)
+  }
 
   return (
     <div>
@@ -53,12 +60,17 @@ function Box(props: BoxProps) {
         <Title>{box.data.name}</Title>
         <RecipeActionGroup>
           <SubscribeButton boxId={boxId} />
-          <VisibilityControl boxId={boxId} element="button" />
+          <VisibilityControl
+            value={box.visibility}
+            element="button"
+            handleChange={handleVisiblityChange}
+            disabled={!(writeable && box.owners.includes(authUser.uid))}
+          />
           <DeleteBox boxId={boxId} element="button" />
         </RecipeActionGroup>
       </div>
       <IndexCardTopLine />
-      <RecipeTable recipes={data} writeable={writeable} boxId={boxId} />
+      <RecipeTable recipes={data} writeable={writeable && box.owners.includes(authUser.uid)} boxId={boxId} />
     </div>
   )
 }
