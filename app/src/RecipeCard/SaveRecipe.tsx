@@ -1,27 +1,26 @@
 import styled from 'styled-components';
 import { SaveOutlined } from '@ant-design/icons';
 import { Button } from 'antd';
-import { getAuth } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
 import { useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { db } from '../backend';
 import { Context } from '../context';
-import { addRecipe, getRecipeFromState } from '../utils';
+import { addRecipe, getAppUserFromState, getRecipeFromState } from '../utils';
 import { RecipeCardProps } from './RecipeCard';
 import _ from 'lodash';
 import { recipeConverter } from '../storage';
 
 const StyledButton = styled(Button)`
-  background-color: green;
-  display: inline;
+  background-color: lightgreen;
 `
 
 function SaveButton(props: RecipeCardProps) {
   const { state, dispatch } = useContext(Context);
   const { recipeId, boxId } = props;
   const recipe = getRecipeFromState(state, boxId, recipeId)
+  const user = getAppUserFromState(state)
   const navigate = useNavigate()
 
   if (recipe === undefined) {
@@ -48,8 +47,7 @@ function SaveButton(props: RecipeCardProps) {
   }
 
   let writeable = false;
-  const user = getAuth().currentUser
-  if (state.writeable && user && recipe.owners.includes(user.uid) && recipe !== undefined) {
+  if (state.writeable && user && recipe.owners.includes(user.id) && recipe !== undefined) {
     writeable = true;
   }
 

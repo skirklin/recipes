@@ -1,7 +1,6 @@
 import { DeleteOutlined } from '@ant-design/icons';
 import { Button, Modal, Spin } from 'antd';
 import TextArea from 'antd/lib/input/TextArea';
-import { getAuth } from 'firebase/auth';
 import _ from 'lodash';
 
 import { useContext, useState } from 'react';
@@ -10,7 +9,7 @@ import { getRecipes } from '../backend';
 import { Context } from '../context';
 import { RecipeEntry } from '../storage';
 import { BoxId, Visibility } from '../types';
-import { addRecipe } from '../utils';
+import { addRecipe, getAppUserFromState } from '../utils';
 
 interface ImportProps {
   boxId: BoxId
@@ -37,15 +36,15 @@ function ImportModal(props: ImportProps) {
   const [spinning, setSpinning] = useState(false)
   const [value, setValue] = useState<string>();
   const [discovered, setDiscovered] = useState<RecipeEntry[]>([])
-  const { dispatch } = useContext(Context)
+  const { dispatch, state } = useContext(Context)
 
+  const user = getAppUserFromState(state)
   async function import_() {
     setSpinning(true)
     if (boxId === undefined || value === "") {
       return
     }
-    const user = getAuth().currentUser
-    if (user === null) {
+    if (user === undefined) {
       return
     }
     const response = (await getRecipes({ url: value })) as {data: {error?: string, recipes: string}}
@@ -60,7 +59,7 @@ function ImportModal(props: ImportProps) {
         return {
           data: recipe as unknown as Recipe,
           visibility: Visibility.private,
-          owners: [user.uid]
+          owners: [user.id]
         }
       }
     )

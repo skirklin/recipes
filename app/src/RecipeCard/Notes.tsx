@@ -1,8 +1,7 @@
 import { useContext, useState } from 'react';
 import TextareaAutosize from 'react-autosize-textarea';
-import { commentToStr, strToComment, getRecipeFromState } from '../utils';
+import { commentToStr, strToComment, getRecipeFromState, getAppUserFromState } from '../utils';
 import { Context } from '../context';
-import { getAuth } from 'firebase/auth';
 import { RecipeCardProps } from './RecipeCard';
 import styled from 'styled-components';
 
@@ -24,15 +23,14 @@ function Notes(props: RecipeCardProps) {
 
   if (recipe === undefined) { return null }
   const setEditable = (value: boolean) => {
-    const user = getAuth().currentUser
-    if (state.writeable && user && recipe.owners.includes(user.uid)) {
+    const user = getAppUserFromState(state)
+    if (state.writeable && user && recipe.owners.includes(user.id)) {
       setEditablePrimitive(value)
     }
   }
 
   const rd = recipe.changed ? recipe.changed : recipe.data
   const comment = commentToStr(rd.comment)
-  console.log({recipe, comment})
 
   const handleChange = (value: string) => {
     if (comment !== value) {

@@ -53,7 +53,7 @@ function Box(props: BoxProps) {
         <Title>{box.data.name}</Title>
         <RecipeActionGroup>
           <SubscribeButton boxId={boxId} />
-          <VisibilityControl boxId={boxId} />
+          <VisibilityControl boxId={boxId} element="button" />
           <DeleteBox boxId={boxId} element="button" />
         </RecipeActionGroup>
       </div>

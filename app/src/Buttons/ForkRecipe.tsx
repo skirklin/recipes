@@ -9,13 +9,15 @@ import { addRecipe, getRecipeFromState } from '../utils';
 import { ActionButton } from '../StyledComponents';
 import { RecipeCardProps } from '../RecipeCard/RecipeCard';
 import { BoxId } from '../types';
+import { Menu } from 'antd';
 
 interface ForkProps extends RecipeCardProps {
   targetBoxId?: string
+  element: "menu" | "button"
 }
 
 export default function ForkButton(props: ForkProps) {
-  const { boxId, recipeId, targetBoxId } = props;
+  const { boxId, recipeId, targetBoxId, element } = props;
   const { state, dispatch } = useContext(Context)
   const navigate = useNavigate()
   const [isModalVisible, setIsModalVisible] = useState(false)
@@ -43,9 +45,20 @@ export default function ForkButton(props: ForkProps) {
     }
   }
 
+  let elt;
+  switch (element) {
+    case "button":
+      elt = <ActionButton title="Copy recipe into new box." disabled={!recipe} onClick={forkRecipeFlow} icon={<ForkOutlined />} >Copy</ActionButton>
+      break;
+
+    case "menu":
+      elt = <Menu.Item key="copy" title="Copy recipe into new box." disabled={!recipe} onClick={forkRecipeFlow} icon={<ForkOutlined />} >Copy</Menu.Item>
+      break;
+  }
+
   return (<>
-      <ActionButton title="Copy recipe into new box." disabled={!recipe} onClick={forkRecipeFlow} icon={<ForkOutlined />} >Copy</ActionButton>
-      <PickBoxModal handleOk={newRecipe} isVisible={isModalVisible} setIsVisible={setIsModalVisible} disableBoxes={[boxId]}/>
+    {elt}
+    <PickBoxModal handleOk={newRecipe} isVisible={isModalVisible} setIsVisible={setIsModalVisible} disableBoxes={[boxId]} />
   </>)
 
 }

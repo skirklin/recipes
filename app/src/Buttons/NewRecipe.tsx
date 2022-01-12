@@ -3,11 +3,9 @@ import { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Context } from "../context";
 import { PickBoxModal } from "../Modals/PickBoxModal";
-import { createNewRecipe, getUniqueId } from "../utils";
-import { getAuth } from "firebase/auth";
+import { createNewRecipe, getAppUserFromState, getUniqueId } from "../utils";
 import { ActionButton } from "../StyledComponents";
 import { BoxId } from "../types";
-import { RecipeEntry } from "../storage";
 import { Menu } from "antd";
 
 
@@ -22,15 +20,14 @@ export default function NewButton(props: NewProps) {
     const { state, dispatch } = useContext(Context)
     const navigate = useNavigate()
     const [isModalVisible, setIsModalVisible] = useState(false)
-    const { user } = state
+    const user = getAppUserFromState(state)
 
 
     const addNewRecipe = (boxId: BoxId) => {
-        if (user === null) {
+        if (user === undefined) {
             return
         }
-        // since user can't be null here, the returned value can't either.
-        const recipe = createNewRecipe(user) as RecipeEntry;
+        const recipe = createNewRecipe(user);
         const recipeId = `uniqueId=${getUniqueId(recipe)}`
         dispatch({ type: "ADD_RECIPE", payload: recipe, boxId, recipeId })
         navigate(`/boxes/${boxId}/recipes/${recipeId}`)
@@ -59,7 +56,7 @@ export default function NewButton(props: NewProps) {
             </ActionButton>
             break;
         case "menu":
-            elt = <Menu.Item title="Create new recipe" disabled={disabled} onClick={newRecipeFlow} icon={<PlusOutlined />} >
+            elt = <Menu.Item key="newRecipe" title="Create new recipe" disabled={disabled} onClick={newRecipeFlow} icon={<PlusOutlined />} >
                 New
             </Menu.Item>
             break;

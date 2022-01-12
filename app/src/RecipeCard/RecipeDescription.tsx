@@ -1,9 +1,8 @@
-import { getAuth } from 'firebase/auth';
 import { useContext, useState } from 'react';
 import TextareaAutosize from 'react-autosize-textarea';
 import styled from 'styled-components';
 import { Context } from '../context';
-import { getRecipeFromState } from '../utils';
+import { getAppUserFromState, getRecipeFromState } from '../utils';
 import { RecipeCardProps } from './RecipeCard';
 
 
@@ -25,8 +24,8 @@ function RecipeDescription(props: RecipeCardProps) {
   const recipe = getRecipeFromState(state, boxId, recipeId)
   if (recipe === undefined) { return null }
   const setEditable = (value: boolean) => {
-    const user = getAuth().currentUser
-    if (state.writeable && user && recipe.owners.includes(user.uid)) {
+    const user = getAppUserFromState(state)
+    if (state.writeable && user && recipe.owners.includes(user.id)) {
       setEditablePrimitive(value)
     }
   }

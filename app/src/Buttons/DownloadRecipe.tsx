@@ -24,7 +24,7 @@ export function DownloadButton(props: DownloadProps) {
       elt = <ActionButton title="Delete this box?" onClick={() => download(recipe)} icon={<DownloadOutlined />} >Download</ActionButton>
       break;
     case "menu":
-      elt = <Menu.Item title="Delete this box?" onClick={() => download(recipe)} icon={<DownloadOutlined />} >Download</Menu.Item>
+      elt = <Menu.Item key="download" title="Delete this box?" onClick={() => download(recipe)} icon={<DownloadOutlined />} >Download</Menu.Item>
       break;
   }
 

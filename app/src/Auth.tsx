@@ -1,10 +1,10 @@
-import { useEffect, useState } from 'react';
+import React, { useContext, useEffect } from 'react';
 import styled from 'styled-components';
 
 import { GoogleAuthProvider, EmailAuthProvider, onAuthStateChanged, getAuth, FacebookAuthProvider } from "firebase/auth";
 
 import StyledFirebaseAuth from 'react-firebaseui/StyledFirebaseAuth';
-import App from './App';
+import { Context } from './context';
 
 const SignInCard = styled.div`
   margin: 40px auto;
@@ -31,18 +31,22 @@ const uiConfig = {
   },
 };
 
-function WrappedApp() {
-  const [isSignedIn, setIsSignedIn] = useState(false); // Local signed-in state.
+function Auth(props: {children: JSX.Element}) {
+  const { dispatch, state } = useContext(Context)
+  const { authUser } = state;
 
   // Listen to the Firebase Auth state and set the local state.
   useEffect(() => {
-    const unregisterAuthObserver = onAuthStateChanged(getAuth(), user => {
-      setIsSignedIn(!!user);
+    const unregisterAuthObserver = onAuthStateChanged(getAuth(), authUser => {
+      dispatch({ type: "SET_AUTH_USER", authUser })
     });
-    return () => unregisterAuthObserver(); // Make sure we un-register Firebase observers when the component unmounts.
-  }, []);
+    return () => {
+      dispatch({ type: "SET_AUTH_USER", authUser: null });
+      unregisterAuthObserver(); // Make sure we un-register Firebase observers when the component unmounts.
+    } 
+  }, [dispatch]);
 
-  if (!isSignedIn) {
+  if (authUser === null) {
     return (
       <SignInCard>
         <h1>Recipe book</h1>
@@ -50,10 +54,9 @@ function WrappedApp() {
         <StyledFirebaseAuth uiConfig={uiConfig} firebaseAuth={getAuth()} />
       </SignInCard>
     );
+  } else {
+    return props.children
   }
-  return (
-    <App />
-  );
 }
 
-export default WrappedApp;
+export default Auth;

@@ -2,9 +2,8 @@ import React, { useContext, useState } from 'react';
 import styled from 'styled-components';
 import { LinkOutlined } from '@ant-design/icons';
 import { Context } from '../context';
-import { getAuth } from 'firebase/auth';
 import { Title } from '../StyledComponents';
-import { getRecipeFromState } from '../utils';
+import { getAppUserFromState, getRecipeFromState } from '../utils';
 import { RecipeCardProps } from './RecipeCard';
 import { Input } from 'antd';
 
@@ -23,8 +22,8 @@ function RecipeName(props: RecipeCardProps) {
   const recipe = getRecipeFromState(state, boxId, recipeId)
   
   const setEditable = (value: boolean) => {
-    const user = getAuth().currentUser
-    if (state.writeable && user && recipe && recipe.owners.includes(user.uid)) {
+    const user = getAppUserFromState(state)
+    if (state.writeable && user && recipe && recipe.owners.includes(user.id)) {
       setEditablePrimitive(value)
     }
   }

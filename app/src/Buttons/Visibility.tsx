@@ -13,11 +13,12 @@ import { getBoxFromState, getRecipeFromState } from "../utils";
 interface VisibilityProps {
     recipeId?: RecipeId
     boxId: BoxId
+    element: "menu" | "button"
 }
 
 export default function VisibilityControl(props: VisibilityProps) {
     const { state } = useContext(Context)
-    const { recipeId, boxId } = props;
+    const { recipeId, boxId, element } = props;
     let target: RecipeEntry | BoxEntry | undefined
     if (recipeId === undefined) {
         target = getBoxFromState(state, boxId)
@@ -31,7 +32,6 @@ export default function VisibilityControl(props: VisibilityProps) {
             return
         }
         const newPrivacy = e.key
-        // dispatch({ type: "SET_VISIBILITY", payload: newPrivacy, recipeId, boxId })
         if (recipeId === undefined) {
             updateDoc(doc(db, "boxes", boxId), { visibility: newPrivacy })
         } else {
@@ -70,10 +70,20 @@ export default function VisibilityControl(props: VisibilityProps) {
         </Menu>
     );
 
+    let elt;
+    switch (element) {
+        case "button":
+            elt = <ActionButton title="Change sharing level" icon={icon}>Sharing</ActionButton>
+            break;
+            
+            case "menu":
+            elt = <Menu.Item key="subscription" title="Change sharing level" icon={icon}>Sharing</Menu.Item>
+            break;
+    }
 
     return (
         <Dropdown overlay={menu}>
-            <ActionButton title="Change sharing level" icon={icon}>Sharing</ActionButton>
+            {elt}
         </Dropdown>
     )
 }

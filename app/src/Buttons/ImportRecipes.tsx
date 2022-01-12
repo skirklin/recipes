@@ -32,7 +32,7 @@ export default function ImportButton(props: ImportProps) {
             </ActionButton>
             break;
         case "menu":
-            elt = <Menu.Item onClick={importFlow} title="Import recipe by URL" icon={<ImportOutlined />} disabled={disabled} >
+            elt = <Menu.Item key="import" onClick={importFlow} title="Import recipe by URL" icon={<ImportOutlined />} disabled={disabled} >
                 Import
             </Menu.Item>
             break;

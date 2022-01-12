@@ -7,7 +7,6 @@ import { RecipeCardProps } from './RecipeCard';
 import { getRecipeFromState } from '../utils';
 
 const StyledButton = styled(Button)`
-  display: inline;
 `
 
 function ClearButton(props: RecipeCardProps) {

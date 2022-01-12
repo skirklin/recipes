@@ -1,10 +1,9 @@
 import { PlusOutlined } from '@ant-design/icons';
 import { Input, Tag } from 'antd';
-import { getAuth } from 'firebase/auth';
 import { useContext, useState } from 'react';
 import styled from 'styled-components';
 import { Context } from '../context';
-import { categoriesToTags, tagsToCategories, getRecipeFromState } from '../utils';
+import { categoriesToTags, tagsToCategories, getRecipeFromState, getAppUserFromState } from '../utils';
 import { RecipeCardProps } from './RecipeCard';
 import { useMediaQuery } from 'react-responsive'
 
@@ -30,8 +29,8 @@ function Tags(props: RecipeCardProps) {
     dispatch({ type: "SET_CATEGORIES", recipeId, boxId, payload: tagsToCategories(tags) })
   }
 
-  const user = getAuth().currentUser;
-  const editable = !!(state.writeable && user && recipe && recipe.owners.includes(user.uid))
+  const user = getAppUserFromState(state);
+  const editable = !!(state.writeable && user && recipe && recipe.owners.includes(user.id))
 
   function onClose(idx: number) {
     const newTags = Array.prototype.filter.call(tags, (t, tidx) => idx !== tidx);
@@ -73,6 +72,7 @@ function Tags(props: RecipeCardProps) {
             <Tag
               closable={editable}
               onClose={() => onClose(idx)}
+              key={idx}
               onDoubleClick={() => { setInputValue(rc); setEditableTag(idx); }}
               visible
             >
@@ -83,7 +83,7 @@ function Tags(props: RecipeCardProps) {
       }
     );
     if (editable && editableTag === undefined) {
-      elts.push(<Tag style={{ borderStyle: "dashed", backgroundColor: "transparent" }} onClick={() => newTag()}><PlusOutlined />new tag</Tag>);
+      elts.push(<Tag key="__new_tag__" style={{ borderStyle: "dashed", backgroundColor: "transparent" }} onClick={() => newTag()}><PlusOutlined />new tag</Tag>);
     }
     return elts;
   }
