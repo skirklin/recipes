@@ -6,13 +6,13 @@ import InstructionList from './InstructionList';
 import IngredientList from './IngredientList';
 import RecipeName from './RecipeName';
 import RecipeDescription from './RecipeDescription';
-import Comment from './Comment'
+import Notes from './Notes'
 import DeleteButton from '../Buttons/DeleteRecipe'
 import DownloadButton from '../Buttons/DownloadRecipe';
 import VisibilityControl from '../Buttons/Visibility';
 import ForkButton from '../Buttons/ForkRecipe';
 import { BoxId, RecipeId } from '../types';
-import { IndexCardLine, RecipeActionGroup } from '../StyledComponents';
+import { IndexCardBottomLine, IndexCardTopLine, RecipeActionGroup } from '../StyledComponents';
 import ByLine from './Byline';
 import Tags from './Tags';
 import { useMediaQuery } from 'react-responsive';
@@ -32,8 +32,8 @@ export interface RecipeCardProps {
 function ActionBar(props: RecipeCardProps) {
   return (
     <RecipeActionGroup>
-      <DeleteButton {...props} />
-      <DownloadButton {...props} />
+      <DeleteButton {...props} element="button" />
+      <DownloadButton {...props} element="button" />
       <ForkButton {...props} />
       <VisibilityControl {...props} />
     </RecipeActionGroup>
@@ -43,13 +43,13 @@ function ActionBar(props: RecipeCardProps) {
 function ActionMenu(props: RecipeCardProps) {
   const menu = (
     <Menu>
-      <Menu.Item><DeleteButton {...props} /></Menu.Item>
-      <Menu.Item><DownloadButton {...props} /></Menu.Item>
+      <DeleteButton {...props} element="menu" />
+      <DownloadButton {...props} element="menu" />
       <Menu.Item><ForkButton {...props} /></Menu.Item>
       <Menu.Item><VisibilityControl {...props} /></Menu.Item>
     </Menu>
   )
-  return <Dropdown overlay={menu}><BarsOutlined/></Dropdown>
+  return <Dropdown overlay={menu} ><BarsOutlined style={{ marginLeft: "auto", fontSize: "2em", padding: "5px" }} /></Dropdown>
 }
 
 function RecipeActions(props: RecipeCardProps) {
@@ -57,7 +57,7 @@ function RecipeActions(props: RecipeCardProps) {
   if (isTabletOrMobile) {
     return null
   }
-  return <ActionBar {...props} />
+  return <ActionMenu {...props} />
 }
 
 function RecipeCard(props: RecipeCardProps) {
@@ -71,7 +71,7 @@ function RecipeCard(props: RecipeCardProps) {
         <ByLine {...props} />
         <Tags {...props} />
       </div>
-      <IndexCardLine />
+      <IndexCardTopLine />
       <RecipeActionGroup >
         <SaveButton {...props} />
         <ClearButton {...props} />
@@ -80,8 +80,9 @@ function RecipeCard(props: RecipeCardProps) {
       <RecipeBody>
         <IngredientList {...props} />
         <InstructionList {...props} />
-        <Comment {...props} />
       </RecipeBody>
+      <IndexCardBottomLine />
+      <Notes {...props} />
     </div>
   );
 }

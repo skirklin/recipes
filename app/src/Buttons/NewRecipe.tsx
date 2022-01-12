@@ -8,22 +8,24 @@ import { getAuth } from "firebase/auth";
 import { ActionButton } from "../StyledComponents";
 import { BoxId } from "../types";
 import { RecipeEntry } from "../storage";
+import { Menu } from "antd";
 
 
 interface NewProps {
     boxId?: string
+    element: "menu" | "button"
     disabled: boolean
 }
 
 export default function NewButton(props: NewProps) {
-    const { boxId, disabled } = props;
-    const { dispatch } = useContext(Context)
+    const { boxId, disabled, element } = props;
+    const { state, dispatch } = useContext(Context)
     const navigate = useNavigate()
     const [isModalVisible, setIsModalVisible] = useState(false)
+    const { user } = state
 
 
     const addNewRecipe = (boxId: BoxId) => {
-        const user = getAuth().currentUser
         if (user === null) {
             return
         }
@@ -49,10 +51,24 @@ export default function NewButton(props: NewProps) {
             addNewRecipe(boxId)
         }
     }
+    let elt;
+    switch (element) {
+        case "button":
+            elt = <ActionButton title="Create new recipe" disabled={disabled} onClick={newRecipeFlow} icon={<PlusOutlined />}>
+                New
+            </ActionButton>
+            break;
+        case "menu":
+            elt = <Menu.Item title="Create new recipe" disabled={disabled} onClick={newRecipeFlow} icon={<PlusOutlined />} >
+                New
+            </Menu.Item>
+            break;
+    }
+
 
     return (<>
-            <ActionButton title="Create new recipe" disabled={disabled} onClick={newRecipeFlow} icon={<PlusOutlined />} />
-            <PickBoxModal handleOk={newRecipe} isVisible={isModalVisible} setIsVisible={setIsModalVisible}/>
+        {elt}
+        <PickBoxModal handleOk={newRecipe} isVisible={isModalVisible} setIsVisible={setIsModalVisible} />
     </>)
 
 }
