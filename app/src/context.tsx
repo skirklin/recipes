@@ -51,7 +51,7 @@ function handleRecipeChange(key: string, prevState: AppState, action: ActionType
 }
 
 export function recipeBoxReducer(prevState: AppState, action: ActionType): AppState {
-  console.debug("action", { action, prevState })
+  console.log("action", { action, prevState })
   let newBox: BoxEntry, state: AppState
   switch (action.type) {
     case "SET_AUTH_USER": {

@@ -30,7 +30,7 @@ export const recipeConverter = {
             data: recipe.data,
             owners: recipe.owners,
             visibility: recipe.visibility,
-            creator: recipe.creator,
+            creator: recipe.creator || recipe.owners[0],
         };
     },
     fromFirestore: (snapshot: DocumentSnapshot, options: SnapshotOptions) => {
@@ -67,7 +67,7 @@ export const boxConverter = {
             data: box.data,
             owners: box.owners,
             visibility: box.visibility,
-            creator: box.creator,
+            creator: box.creator || box.owners[0],
         };
     },
     fromFirestore: (snapshot: DocumentSnapshot, options: SnapshotOptions) => {
