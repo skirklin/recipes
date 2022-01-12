@@ -9,13 +9,12 @@ import { RecipeCardProps } from './RecipeCard';
 
 
 
-const RecipeStepsList = styled.ol`
+const RecipeStepsArea = styled.div`
   margin: 20px;
-  padding: 20px;
 `
 
 const RecipeStep = styled.li`
-  padding-bottom: 10px;
+  padding-bottom: 5px;
 `
 
 
@@ -28,12 +27,6 @@ function InstructionList(props: RecipeCardProps) {
     return null
   }
 
-  const instructionsStyle = {
-    outline: "none",
-    margin: "15px",
-    width: "90%",
-  }
-
   function formatInstructionList(instructions: Recipe["recipeInstructions"]) {
     let listElts;
     if (typeof instructions === "string") {
@@ -41,18 +34,17 @@ function InstructionList(props: RecipeCardProps) {
     } else {
       listElts = Array.prototype.map.call(instructions || [], (ri, id) => <RecipeStep key={id}>{ri.text}</RecipeStep>)
     }
-    if (listElts.length === 0) {
+    if (listElts.length > 0) {
       return (
-        <RecipeStepsList>
-          {"Add instructions?"}
-        </RecipeStepsList>
+        <ol>
+          {listElts}
+        </ol>
+      )
+    } else {
+      return (
+        <div>Add instructions?</div>
       )
     }
-    return (
-      <RecipeStepsList>
-        {listElts}
-      </RecipeStepsList>
-    )
   }
 
   if (recipe === undefined) { return null }
@@ -65,28 +57,30 @@ function InstructionList(props: RecipeCardProps) {
 
   const instructions = recipe.changed ? recipe.changed.recipeInstructions : recipe.data.recipeInstructions;
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const handleChange = (e: any) => {
-    if (instructionsToStr(instructions) !== e.target.value) {
-      dispatch({ type: "SET_INSTRUCTIONS", boxId, recipeId, payload: strToInstructions(e.target.value) });
+  const handleChange = (value: string) => {
+    if (instructionsToStr(instructions) !== value) {
+      dispatch({ type: "SET_INSTRUCTIONS", boxId, recipeId, payload: strToInstructions(value) });
     }
     setEditable(false)
   }
 
   if (editable) {
     return (
-      <TextareaAutosize
-        defaultValue={instructionsToStr(instructions)}
-        autoFocus
-        onKeyUp={(e) => { if (e.code === "Escape") { handleChange(e) } }}
-        style={{ ...instructionsStyle }}
-        onBlur={handleChange} />
+      <RecipeStepsArea>
+        <TextareaAutosize
+          defaultValue={instructionsToStr(instructions)}
+          autoFocus
+          placeholder='Add instructions?'
+          onKeyUp={(e) => { if (e.code === "Escape") { handleChange(e.currentTarget.value) } }}
+          style={{paddingLeft: "20px"}}
+          onBlur={e => handleChange(e.target.value)} />
+      </RecipeStepsArea>
     )
   } else {
     return (
-      <div onDoubleClick={() => setEditable(true)}>
-        {formatInstructionList(instructions) || "Add instructions?"}
-      </div>
+      <RecipeStepsArea onDoubleClick={() => setEditable(true)}>
+        {formatInstructionList(instructions)}
+      </RecipeStepsArea>
     )
   }
 }

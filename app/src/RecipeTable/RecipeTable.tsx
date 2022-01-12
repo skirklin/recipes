@@ -19,6 +19,8 @@ import { Recipe } from 'schema-dts';
 import { RecipeEntry } from '../storage';
 import { BoxId, RecipeId } from '../types';
 import styled from 'styled-components';
+import { useMediaQuery } from 'react-responsive'
+
 
 const PointerTag = styled(Tag)`
   &:hover {
@@ -134,11 +136,26 @@ export function RecipeTable(props: RecipeTableProps) {
       key: 'name',
       title: 'Name',
       dataIndex: ['recipe', 'data', 'name'],
-      width: "300px",
       sorter: (a: RowType, b: RowType) => sortfunc(getName(a.recipe.data.name), getName(b.recipe.data.name)),
       onCell: onNameCell,
       className: "recipe-table-clickable-column",
-    },
+    }
+  ]
+
+  if (boxId === undefined) {
+    columns.push(
+      {
+        key: 'box',
+        title: 'Box',
+        dataIndex: ['boxName'],
+        onCell: onBoxCell,
+        className: "recipe-table-clickable-column",
+      }
+    )
+  }
+
+  const isTabletOrMobile = useMediaQuery({ query: '(max-width: 1224px)' })
+  columns.push(
     {
       key: 'tags',
       title: 'Tags',
@@ -150,49 +167,46 @@ export function RecipeTable(props: RecipeTableProps) {
       filterSearch: allTags.size > 10,
       onFilter: (value, row) => categoriesToTags(row.recipe.data.recipeCategory).includes(value),
       filteredValue: tagFilter,
-    },
-    {
-      key: 'box',
-      title: 'Box',
-      dataIndex: ['boxName'],
-      onCell: onBoxCell,
-      width: "200px",
-      className: "recipe-table-clickable-column",
-    },
-    {
-      key: 'description',
-      title: 'Description',
-      dataIndex: ['recipe', 'data', 'description'],
-    },
-  ];
+    }
+  )
+
+  if (!isTabletOrMobile) {
+    columns.push(
+      {
+        key: 'description',
+        title: 'Description',
+        dataIndex: ['recipe', 'data', 'description'],
+      }
+    )
+  }
 
 
   return (
-    <div style={{ padding: "10px" }}>
-      <div style={{ display: "inline-flex" }}>
+    <div style={{ padding: "5px" }}>
+      <div style={{ display: "flex" }}>
         <Filterbox data={recipes} setFilteredRows={setFilteredRows} />
-      </div>
-      <div style={{ float: 'right', display: 'inline-flex', padding: '5px' }}>
-        <NewButton boxId={boxId} disabled={!writeable} />
-        <UploadButton boxId={boxId} disabled={!writeable} />
-        <ImportButton boxId={boxId} disabled={!writeable} />
-        <Popconfirm
-          title={`Are you sure to delete ${selectedRowKeys.length > 1 ? "these recipes" : "this recipe"}s`}
-          onConfirm={del}
-          okText="Yes"
-          cancelText="No">
+        <div style={{ marginLeft: 'auto' }}>
+          <NewButton boxId={boxId} disabled={!writeable} />
+          <UploadButton boxId={boxId} disabled={!writeable} />
+          <ImportButton boxId={boxId} disabled={!writeable} />
+          <Popconfirm
+            title={`Are you sure to delete ${selectedRowKeys.length > 1 ? "these recipes" : "this recipe"}s`}
+            onConfirm={del}
+            okText="Yes"
+            cancelText="No">
+            <ActionButton
+              disabled={!writeable || !hasSelected}
+              title="Delete recipes"
+              icon={<DeleteOutlined />}
+            />
+          </Popconfirm>
           <ActionButton
-            disabled={!writeable || !hasSelected}
-            title="Delete recipes"
-            icon={<DeleteOutlined />}
-          />
-        </Popconfirm>
-        <ActionButton
-          title="Copy recipes into different box"
-          onClick={() => setIsModalVisible(true)}
-          disabled={!hasSelected}
-          icon={<ForkOutlined />} />
-        <PickBoxModal handleOk={fork} isVisible={isModalVisible} setIsVisible={setIsModalVisible} />
+            title="Copy recipes into different box"
+            onClick={() => setIsModalVisible(true)}
+            disabled={!hasSelected}
+            icon={<ForkOutlined />} />
+          <PickBoxModal handleOk={fork} isVisible={isModalVisible} setIsVisible={setIsModalVisible} />
+        </div>
       </div>
       <Table<RowType>
         pagination={false}

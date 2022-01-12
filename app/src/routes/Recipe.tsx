@@ -1,13 +1,8 @@
 import { useContext, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { Context } from '../context';
-import DeleteButton from '../Buttons/DeleteRecipe'
-import DownloadButton from '../Buttons/DownloadRecipe';
-import VisibilityControl from '../Buttons/Visibility';
-import ForkButton from '../Buttons/ForkRecipe';
 import RecipeCard from '../RecipeCard/RecipeCard';
 import { getRecipe, getRecipeFromState } from '../utils';
-import { RecipeActionGroup } from '../StyledComponents';
 import { RecipeEntry } from '../storage';
 import { BoxId, RecipeId } from '../types';
 
@@ -42,12 +37,6 @@ export function Recipe(props: RecipeProps) {
   }
   return (
     <>
-      <RecipeActionGroup>
-        <DeleteButton {...props} />
-        <DownloadButton {...props} />
-        <ForkButton {...props} />
-        <VisibilityControl {...props} />
-      </RecipeActionGroup>
       <RecipeCard {...props} />
     </>
   )

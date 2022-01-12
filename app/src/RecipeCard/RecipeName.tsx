@@ -13,9 +13,7 @@ const EditableTitle = styled(Input)`
   font-weight: bold;
   font-family: sans-serif;
   display: inline;
-  padding: 5px   padding: 20px 0px 0px 20px;
   outline: none;
-  max-width: 90%;
 `
 
 function RecipeName(props: RecipeCardProps) {
@@ -63,7 +61,7 @@ function RecipeName(props: RecipeCardProps) {
     )
   } else {
     return (
-      <Title onDoubleClick={() => setEditable(true)} style={{ width: '90%' }}>
+      <Title onDoubleClick={() => setEditable(true)}>
         {name} {link}
       </Title>
     )

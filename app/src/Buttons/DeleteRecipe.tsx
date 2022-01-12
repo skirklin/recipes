@@ -33,7 +33,7 @@ function DeleteButton(props: DeleteProps) {
         okText="Yes"
         cancelText="No"
       >
-        <ActionButton title="Delete this recipe" icon={<DeleteOutlined />} disabled={recipeId === undefined} />
+        <ActionButton title="Delete this recipe" icon={<DeleteOutlined />} disabled={recipeId === undefined} >Delete</ActionButton>
       </Popconfirm>
     )
   } else {

@@ -6,10 +6,11 @@ import styled from 'styled-components';
 import { Context } from '../context';
 import { categoriesToTags, tagsToCategories, getRecipeFromState } from '../utils';
 import { RecipeCardProps } from './RecipeCard';
+import { useMediaQuery } from 'react-responsive'
+
 
 const TagsArea = styled.div`
-  display: inline-block;
-  float: right;
+  margin-left: auto;
 `
 
 function Tags(props: RecipeCardProps) {
@@ -21,8 +22,9 @@ function Tags(props: RecipeCardProps) {
   const recipe = getRecipeFromState(state, boxId, recipeId)
   const rd = recipe ? (recipe.changed ? recipe.changed : recipe.data) : { recipeCategory: [] }
   const tags = categoriesToTags(rd.recipeCategory)
+  const isTabletOrMobile = useMediaQuery({ query: '(max-width: 1224px)' })
 
-  if (recipe === undefined) { return null }
+  if (recipe === undefined || isTabletOrMobile) { return null }
 
   function setTags(tags: string[]) {
     dispatch({ type: "SET_CATEGORIES", recipeId, boxId, payload: tagsToCategories(tags) })

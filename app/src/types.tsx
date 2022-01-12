@@ -1,5 +1,5 @@
 import { DocumentReference, Unsubscribe } from 'firebase/firestore';
-import { Recipe } from 'schema-dts';
+import { Comment, Recipe } from 'schema-dts';
 import { BoxEntry, RecipeEntry, UserEntry } from './storage';
 
 export type BoxId = string
@@ -54,6 +54,7 @@ export type ActionType = {
   | Recipe["recipeIngredient"] 
   | Recipe["recipeInstructions"]
   | Recipe["recipeCategory"]
+  | Comment
 }
 
 export type UnsubMap = {

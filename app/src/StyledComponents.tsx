@@ -5,7 +5,7 @@ export const Title = styled.h1`
   font-size: 2em;
   outline: none;
   display: inline;
-  padding: 20px 0px 0px 20px;
+  padding-left: 5px;
   margin-bottom: 0px;
 `
 
@@ -22,8 +22,10 @@ export const ActionButton = styled(Button)`
 
 export const RecipeActionGroup = styled.div`
   display: inline-block;
-  float: right;
-  margin: 5px;
+  margin-left: auto;
+  margin-right: 3px;
+  margin-top: 3px;
+  margin-bottom: 3px;
 `
 
 export const IndexCardLine = styled.hr`
