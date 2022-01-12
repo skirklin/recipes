@@ -80,19 +80,21 @@ export function BoxTable(props: BoxTableProps) {
   const hasSelected = (selectedRows.length > 0)
   return (
     <div>
+      <div style={{display: "flex"}}>
 
-      <RecipeActionGroup>
-        <NewBoxButton disabled={!writeable} />
-        <Popconfirm
-          title={`Are you sure to delete ${selectedRowKeys.length > 1 ? "these recipes" : "this recipe"}s`}
-          onConfirm={del}
-          okText="Yes"
-          disabled={!writeable || !hasSelected}
-          cancelText="No"
-        >
-          <ActionButton disabled={!writeable || !hasSelected} title="Delete recipes" icon={<DeleteOutlined />} />
-        </Popconfirm>
-      </RecipeActionGroup>
+        <RecipeActionGroup style={{marginLeft: "auto"}}>
+          <NewBoxButton disabled={!writeable} />
+          <Popconfirm
+            title={`Are you sure to delete ${selectedRowKeys.length > 1 ? "these recipes" : "this recipe"}s`}
+            onConfirm={del}
+            okText="Yes"
+            disabled={!writeable || !hasSelected}
+            cancelText="No"
+          >
+            <ActionButton disabled={!writeable || !hasSelected} title="Delete recipes" icon={<DeleteOutlined />}>Delete</ActionButton>
+          </Popconfirm>
+        </RecipeActionGroup>
+      </div>
 
       <Table<RowType>
         dataSource={rows}

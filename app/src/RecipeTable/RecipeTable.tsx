@@ -186,9 +186,9 @@ export function RecipeTable(props: RecipeTableProps) {
       <div style={{ display: "flex" }}>
         <Filterbox data={recipes} setFilteredRows={setFilteredRows} />
         <div style={{ marginLeft: 'auto' }}>
-          <NewButton boxId={boxId} disabled={!writeable} />
-          <UploadButton boxId={boxId} disabled={!writeable} />
-          <ImportButton boxId={boxId} disabled={!writeable} />
+          <NewButton boxId={boxId} disabled={!writeable} element="button" />
+          <UploadButton boxId={boxId} disabled={!writeable} element="button" />
+          <ImportButton boxId={boxId} disabled={!writeable} element="button" />
           <Popconfirm
             title={`Are you sure to delete ${selectedRowKeys.length > 1 ? "these recipes" : "this recipe"}s`}
             onConfirm={del}
@@ -198,13 +198,13 @@ export function RecipeTable(props: RecipeTableProps) {
               disabled={!writeable || !hasSelected}
               title="Delete recipes"
               icon={<DeleteOutlined />}
-            />
+            >Delete</ActionButton>
           </Popconfirm>
           <ActionButton
             title="Copy recipes into different box"
             onClick={() => setIsModalVisible(true)}
             disabled={!hasSelected}
-            icon={<ForkOutlined />} />
+            icon={<ForkOutlined />} >Copy</ActionButton>
           <PickBoxModal handleOk={fork} isVisible={isModalVisible} setIsVisible={setIsModalVisible} />
         </div>
       </div>

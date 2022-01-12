@@ -1,9 +1,9 @@
 import { DeleteOutlined } from '@ant-design/icons';
-import { Popconfirm } from 'antd';
+import { Menu, Popconfirm } from 'antd';
 import { useContext } from 'react';
 import { Context } from '../context';
 import { useNavigate } from 'react-router-dom';
-import { deleteRecipe } from '../utils';
+import { deleteRecipe, getRecipeFromState } from '../utils';
 import { ActionButton } from '../StyledComponents';
 import { BoxId, RecipeId } from '../types';
 
@@ -11,19 +11,38 @@ import { BoxId, RecipeId } from '../types';
 interface DeleteProps {
   recipeId: RecipeId
   boxId: BoxId
+  element: "button" | "menu"
 }
 
 function DeleteButton(props: DeleteProps) {
   const { state } = useContext(Context)
-  const { writeable } = state;
+  const { writeable, user } = state;
+  const recipe = getRecipeFromState(state, props.boxId, props.recipeId)
+
   const navigate = useNavigate()
 
-  const { recipeId, boxId } = props;
+  const { recipeId, boxId, element } = props;
+
+  if (recipe === undefined || user === null || !recipe.owners.includes(user.id)) {
+    return null
+  }
+
 
   async function del() {
     deleteRecipe(state, boxId, recipeId)
     navigate(`/boxes/${boxId}`)
   }
+
+  let elt;
+  switch (element) {
+    case "button":
+      elt = <ActionButton title="Delete this recipe?" icon={<DeleteOutlined />} >Delete</ActionButton>
+      break;
+    case "menu":
+      elt = <Menu.Item title="Delete this recipe?" icon={<DeleteOutlined />} >Delete</Menu.Item>
+      break;
+  }
+
 
   if (writeable) {
     return (
@@ -32,9 +51,7 @@ function DeleteButton(props: DeleteProps) {
         onConfirm={del}
         okText="Yes"
         cancelText="No"
-      >
-        <ActionButton title="Delete this recipe" icon={<DeleteOutlined />} disabled={recipeId === undefined} >Delete</ActionButton>
-      </Popconfirm>
+      >{elt}</Popconfirm>
     )
   } else {
     return null

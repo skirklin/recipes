@@ -28,8 +28,14 @@ export const RecipeActionGroup = styled.div`
   margin-bottom: 3px;
 `
 
-export const IndexCardLine = styled.hr`
+export const IndexCardTopLine = styled.hr`
   background-color: var(--cinnabar);
+  border-width: 0px;
+  height: 1px;
+`
+
+export const IndexCardBottomLine = styled.hr`
+  background-color: blue;
   border-width: 0px;
   height: 1px;
 `

@@ -25,8 +25,8 @@ function IngredientList(props: RecipeCardProps) {
   const ingredientsStyle = {
     outline: "none",
     padding: "10px",
-    margin: "0px 0px 0px 20px",
-    backgroundColor: "lightyellow",
+    margin: "0px 0px 0px 30px",
+    backgroundColor: "var(--pale-spring-bud)",
     display: "inline-block",
     width: "fit-content",
     minWidth: "50%",

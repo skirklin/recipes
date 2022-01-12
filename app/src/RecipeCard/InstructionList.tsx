@@ -10,7 +10,7 @@ import { RecipeCardProps } from './RecipeCard';
 
 
 const RecipeStepsArea = styled.div`
-  margin: 20px;
+  margin-top: 10px;
 `
 
 const RecipeStep = styled.li`

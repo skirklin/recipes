@@ -6,16 +6,14 @@ import { getAuth } from 'firebase/auth';
 import { RecipeCardProps } from './RecipeCard';
 import styled from 'styled-components';
 
-const CommentBlock = styled.div`
+const NotesArea = styled.div`
   margin: 10px;
   padding: 10px;
-  background-color: var(--mint-cream);
-  outline: solid;
   display: block;
 `
 
 
-function Comment(props: RecipeCardProps) {
+function Notes(props: RecipeCardProps) {
   const [editable, setEditablePrimitive] = useState(false);
   const { recipeId, boxId } = props;
   const { state, dispatch } = useContext(Context);
@@ -45,25 +43,25 @@ function Comment(props: RecipeCardProps) {
 
   if (editable) {
     return (
-      <CommentBlock>
+      <NotesArea>
         <TextareaAutosize
           autoFocus
           defaultValue={comment}
-          placeholder='Add comment?'
+          placeholder='Add a note?'
           onKeyUp={(e) => { if (e.code === "Escape") { handleChange(e.currentTarget.value) } }}
           onBlur={e => handleChange(e.target.value)}
         />
-      </CommentBlock>
+      </NotesArea>
     )
   } else {
     return (
-      <CommentBlock>
+      <NotesArea>
         <div onDoubleClick={() => setEditable(true)}>
-          {comment || "Add comment?"}
+          {comment || "Add a note?"}
         </div>
-      </CommentBlock>
+      </NotesArea>
     )
   }
 }
 
-export default Comment;
+export default Notes;

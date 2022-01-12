@@ -16,7 +16,7 @@ export default function NewButton(props: NewProps) {
     const [isModalVisible, setIsModalVisible] = useState(false)
 
     return (<>
-        <ActionButton title="Create new box." disabled={disabled} onClick={() => setIsModalVisible(true)} icon={<PlusOutlined />} />
+        <ActionButton title="Create new box." disabled={disabled} onClick={() => setIsModalVisible(true)} icon={<PlusOutlined />} >New</ActionButton>
         <NewBoxModal isVisible={isModalVisible} setIsVisible={setIsModalVisible} afterNewBox={afterNewBox} />
     </>)
 

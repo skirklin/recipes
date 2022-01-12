@@ -4,7 +4,7 @@ import { Context } from "../context";
 
 import { getBox, getBoxFromState } from "../utils";
 import { RecipeTable, RowType } from "../RecipeTable/RecipeTable"
-import { IndexCardLine, RecipeActionGroup, Title } from "../StyledComponents";
+import { IndexCardTopLine, RecipeActionGroup, Title } from "../StyledComponents";
 import { BoxId } from "../types";
 import DeleteBox from '../Buttons/DeleteBox';
 import SubscribeButton from "../Buttons/Subscribe";
@@ -54,10 +54,10 @@ function Box(props: BoxProps) {
         <RecipeActionGroup>
           <SubscribeButton boxId={boxId} />
           <VisibilityControl boxId={boxId} />
-          <DeleteBox boxId={boxId} />
+          <DeleteBox boxId={boxId} element="button" />
         </RecipeActionGroup>
       </div>
-      <IndexCardLine />
+      <IndexCardTopLine />
       <RecipeTable recipes={data} writeable={writeable} boxId={boxId} />
     </div>
   )

@@ -4,15 +4,17 @@ import { PickBoxModal } from "../Modals/PickBoxModal";
 import { uploadRecipes } from "../utils";
 import { ActionButton } from "../StyledComponents";
 import { BoxId } from "../types";
+import { Menu } from "antd";
 
 
 interface UploadProps {
     boxId?: string
     disabled: boolean
+    element: "button" | "menu"
 }
 
 export default function UploadButton(props: UploadProps) {
-    const { boxId, disabled } = props;
+    const { boxId, disabled, element } = props;
     const [isModalVisible, setIsModalVisible] = useState(false)
 
     async function upload(boxId: BoxId | undefined) {
@@ -31,8 +33,23 @@ export default function UploadButton(props: UploadProps) {
         }
     }
 
+    let elt;
+    switch (element) {
+        case "button":
+            elt = <ActionButton onClick={uploadFlow} title="Upload recipes from computer." icon={<UploadOutlined />} disabled={disabled} >
+                Upload
+            </ActionButton>
+            break;
+        case "menu":
+            elt = <Menu.Item onClick={uploadFlow} title="Upload recipes from computer." icon={<UploadOutlined />} disabled={disabled} >
+                Upload
+            </Menu.Item>
+            break;
+    }
+
+
     return (<>
-        <ActionButton title="Upload recipes from computer." disabled={disabled} onClick={uploadFlow} icon={<UploadOutlined />} />
+        {elt}
         <PickBoxModal handleOk={upload} isVisible={isModalVisible} setIsVisible={setIsModalVisible} />
     </>)
 

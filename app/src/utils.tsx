@@ -244,8 +244,8 @@ export async function addBox(user: User | null, name: string, dispatch: React.Di
   return boxRef
 }
 
-export function createNewRecipe(user: User) {
-  const owners = [user.uid];
+export function createNewRecipe(user: UserEntry) {
+  const owners = [user.id];
   const data: Recipe = {
     "@type": "Recipe",
     "name": "New recipe",
@@ -253,7 +253,7 @@ export function createNewRecipe(user: User) {
     "recipeIngredient": [],
     "description": "",
   }
-  return new RecipeEntry(data, owners, Visibility.private, user.uid, undefined)
+  return new RecipeEntry(data, owners, Visibility.private, user.id, undefined)
 }
 
 
@@ -282,4 +282,39 @@ let objectCount = 0;
 export function getUniqueId(rcp: RecipeEntry) {
   if (!objIdMap.has(rcp)) objIdMap.set(rcp, ++objectCount);
   return objIdMap.get(rcp);
+}
+
+export function download(recipe: RecipeEntry) {
+  const downloadLink = document.createElement("a");
+  downloadLink.download = recipe.data.name + ".json"
+  downloadLink.innerHTML = "Download File";
+
+  // Create a "file" to download
+  downloadLink.href = makeTextFile(JSON.stringify(recipe, null, 2))
+  document.body.appendChild(downloadLink);
+
+  // wait for the link to be added to the document
+  window.requestAnimationFrame(function () {
+    const event = new MouseEvent('click');
+    downloadLink.dispatchEvent(event); // synthetically click on it
+    document.body.removeChild(downloadLink);
+  });
+}
+
+
+let textFile: string | null;
+
+function makeTextFile(text: string) {
+  const data = new Blob([text], { type: 'application/ld+json' });
+
+  // If we are replacing a previously generated file we need to
+  // manually revoke the object URL to avoid memory leaks.
+  if (textFile !== null) {
+    window.URL.revokeObjectURL(textFile);
+  }
+
+  textFile = window.URL.createObjectURL(data);
+
+  // returns a URL you can use as a href
+  return textFile;
 }
