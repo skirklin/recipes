@@ -1,6 +1,7 @@
-import { BookOutlined, GlobalOutlined, ProfileOutlined } from "@ant-design/icons";
+import { BookOutlined, GlobalOutlined } from "@ant-design/icons";
 import { Dropdown, Menu } from "antd";
 import { ActionButton } from "../StyledComponents";
+import AddOwnerButton from '../Buttons/AddOwner'
 import { Visibility } from "../types";
 
 
@@ -8,11 +9,12 @@ interface VisibilityProps {
     element: "menu" | "button"
     disabled?: boolean
     value: Visibility
-    handleChange: (e: {key: string}) => void
+    handleChange: (e: { key: string }) => void
+    handleAddOwner: (newOwner: string) => void
 }
 
 export default function VisibilityControl(props: VisibilityProps) {
-    const { element, value, handleChange, disabled } = props;
+    const { element, value, handleChange, disabled, handleAddOwner } = props;
     let icon;
     switch (value) {
         case Visibility.public:
@@ -24,16 +26,14 @@ export default function VisibilityControl(props: VisibilityProps) {
     }
 
     const menu = (
-        <Menu onClick={handleChange}>
-            <Menu.Item key={Visibility.private} icon={<BookOutlined />}>
+        <Menu>
+            <Menu.Item onClick={e => handleChange(e)} key={Visibility.private} icon={<BookOutlined />}>
                 Private
             </Menu.Item>
-            <Menu.Item key={Visibility.public} icon={<GlobalOutlined />}>
+            <Menu.Item onClick={e => handleChange(e)} key={Visibility.public} icon={<GlobalOutlined />}>
                 Public
             </Menu.Item>
-            <Menu.Item key="add_owner" icon={<ProfileOutlined />}>
-                Add owner
-            </Menu.Item>
+            <AddOwnerButton element="menu" handleOk={handleAddOwner} />
         </Menu>
     );
 
@@ -42,8 +42,8 @@ export default function VisibilityControl(props: VisibilityProps) {
         case "button":
             elt = <ActionButton disabled={disabled} title="Change sharing level" icon={icon}>Sharing</ActionButton>
             break;
-            
-            case "menu":
+
+        case "menu":
             elt = <Menu.Item disabled={disabled} key="subscription" title="Change sharing level" icon={icon}>Sharing</Menu.Item>
             break;
     }

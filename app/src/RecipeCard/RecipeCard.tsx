@@ -21,6 +21,7 @@ import { BarsOutlined } from '@ant-design/icons';
 import { useContext } from 'react';
 import { Context } from '../context';
 import { getRecipeFromState, setRecipeVisiblity } from '../utils';
+import { addRecipeOwner } from '../backend';
 
 
 const RecipeBody = styled.div`
@@ -40,7 +41,15 @@ function ActionBar(props: RecipeCardProps) {
     return null
   }
 
-  function handleVisiblityChange(e: {key: string}) {
+  function handleAddOwner(newOwnerEmail: string) {
+    addRecipeOwner({ boxId, recipeId, newOwnerEmail }).then(
+      (result) => {
+        console.log(result)
+      }
+    )
+  }
+
+  function handleVisiblityChange(e: { key: string }) {
     setRecipeVisiblity(boxId, recipeId, e.key as Visibility)
   }
   return (
@@ -48,7 +57,9 @@ function ActionBar(props: RecipeCardProps) {
       <DeleteButton {...props} element="button" />
       <DownloadButton {...props} element="button" />
       <ForkButton {...props} element="button" />
-      <VisibilityControl {...props} handleChange={handleVisiblityChange} value={recipe.visibility} element="button" />
+      <VisibilityControl {...props}
+        handleAddOwner={handleAddOwner}
+        handleChange={handleVisiblityChange} value={recipe.visibility} element="button" />
     </RecipeActionGroup>
   )
 }
@@ -61,8 +72,12 @@ function ActionMenu(props: RecipeCardProps) {
     return null
   }
 
-  function handleVisiblityChange(e: {key: string}) {
+  function handleVisiblityChange(e: { key: string | undefined }) {
     setRecipeVisiblity(boxId, recipeId, e.key as Visibility)
+  }
+
+  function handleAddOwner(newOwner: string) {
+    addRecipeOwner({ boxId, recipeId, newOwner })
   }
 
   const menu = (
@@ -70,7 +85,11 @@ function ActionMenu(props: RecipeCardProps) {
       <DeleteButton {...props} element="menu" />
       <DownloadButton {...props} element="menu" />
       <ForkButton {...props} element="menu" />
-      <VisibilityControl {...props} handleChange={handleVisiblityChange} value={recipe.visibility} element="menu" />
+      <VisibilityControl
+        {...props}
+        handleAddOwner={handleAddOwner}
+        handleChange={handleVisiblityChange}
+        value={recipe.visibility} element="menu" />
     </Menu>
   )
   return <Dropdown overlay={menu} ><BarsOutlined style={{ marginLeft: "auto", fontSize: "2em", padding: "5px" }} /></Dropdown>
@@ -97,7 +116,7 @@ function RecipeCard(props: RecipeCardProps) {
         <Tags {...props} />
       </div>
       <IndexCardTopLine />
-      <div style={{width: "100%", paddingLeft: "5px"}}>
+      <div style={{ width: "100%", paddingLeft: "5px" }}>
         <SaveButton {...props} />
         <ClearButton {...props} />
       </div>

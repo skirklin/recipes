@@ -3,6 +3,14 @@ import { HttpsError } from "firebase-functions/v1/https";
 import { Recipe, WithContext } from "schema-dts";
 import axios from 'axios';
 import * as jsdom from 'jsdom';
+import { initializeApp } from 'firebase-admin/app';
+import { getAuth } from 'firebase-admin/auth';
+import { getFirestore } from 'firebase-admin/firestore';
+
+const app = initializeApp();
+const db = getFirestore(app);
+
+// setup auth emulator
 
 type RecipeWithContext = WithContext<Recipe>
 
@@ -25,7 +33,7 @@ export function getRecipesFromPage(doc: Document, url: string): Recipe[] {
   }
 
   function isRecipe(elt: RecipeWithContext) {
-    if (!(Object.prototype.hasOwnProperty.call(elt,"@context") && Object.prototype.hasOwnProperty.call(elt,"@type"))) {
+    if (!(Object.prototype.hasOwnProperty.call(elt, "@context") && Object.prototype.hasOwnProperty.call(elt, "@type"))) {
       console.debug("no type or context");
       return false;
     }
@@ -77,3 +85,63 @@ export const getRecipes = functions.https.onCall(async (data) => {
   const recipes = getRecipesFromPage(htmlDom.window.document, url)
   return { recipes: JSON.stringify(recipes) }
 })
+
+export const addRecipeOwner = functions.https.onCall(async (data) => {
+
+  const { recipeId, boxId, newOwnerEmail } = data;
+  const auth = getAuth()
+  const docRef = db.doc(`boxes/${boxId}/recipes/${recipeId}`)
+  const recipe = (await docRef.get()).data()
+  if (recipe === undefined) {
+    return
+  }
+  auth.getUserByEmail(newOwnerEmail)
+    .then((user) => {
+      docRef.update({ owners: [...recipe.owners, user.uid] })
+    })
+    .catch((error) => {
+      console.log(error)
+      auth.createUser({
+        email: newOwnerEmail,
+      })
+        .then((user) => {
+          docRef.update({ owners: [...recipe.owners, user.uid] })
+        })
+        .catch((error) => {
+          console.log(error)
+          return new HttpsError("internal", "Unable to find or create user for that email")
+        })
+    }
+    )
+})
+
+
+export const addBoxOwner = functions.https.onCall(async (data) => {
+
+  const { boxId, newOwnerEmail } = data;
+  const auth = getAuth()
+  const docRef = db.doc(`boxes/${boxId}`)
+  const box = (await docRef.get()).data()
+  if (box === undefined) {
+    return
+  }
+
+  auth.getUserByEmail(newOwnerEmail)
+    .then((user) => {
+      docRef.update({ owners: [...box.owners, user.uid] })
+    })
+    .catch((error) => {
+      console.log(error)
+      auth.createUser({
+        email: newOwnerEmail,
+      })
+        .then((user) => {
+          docRef.update({ owners: [...box.owners, user.uid] })
+        })
+        .catch((error) => {
+          console.log(error)
+          return new HttpsError("internal", "Unable to find or create user for that email")
+        })
+    }
+    )
+}) 

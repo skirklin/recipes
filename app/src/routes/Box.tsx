@@ -9,6 +9,7 @@ import { BoxId, Visibility } from "../types";
 import DeleteBox from '../Buttons/DeleteBox';
 import SubscribeButton from "../Buttons/Subscribe";
 import VisibilityControl from "../Buttons/Visibility";
+import { addBoxOwner } from "../backend";
 
 interface BoxProps {
   boxId: BoxId
@@ -54,6 +55,11 @@ function Box(props: BoxProps) {
     setBoxVisiblity(boxId, e.key as Visibility)
   }
 
+  function handleAddOwner(newOwner: string) {
+    addBoxOwner({boxId, newOwner})
+  }
+
+
   return (
     <div>
       <div style={{ display: "flex" }}>
@@ -64,6 +70,7 @@ function Box(props: BoxProps) {
             value={box.visibility}
             element="button"
             handleChange={handleVisiblityChange}
+            handleAddOwner={handleAddOwner}
             disabled={!(writeable && box.owners.includes(authUser.uid))}
           />
           <DeleteBox boxId={boxId} element="button" />
