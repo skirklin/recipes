@@ -21,6 +21,7 @@ service cloud.firestore {
         allow read: if resource == null 
           || request.auth.uid in resource.data.owners
           || request.auth.uid in get(/databases/$(database)/documents/boxes/$(box)).data.owners
+          || get(/databases/$(database)/documents/boxes/$(box)).data.visibility != 'private'
           || resource.data.visibility != 'private';
         allow write: if resource == null 
           || request.auth.uid in get(/databases/$(database)/documents/boxes/$(box)).data.owners 
