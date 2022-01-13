@@ -1,10 +1,10 @@
 import { useContext, useState } from 'react';
 import styled from 'styled-components';
-import TextareaAutosize from 'react-autosize-textarea';
 import { Recipe } from 'schema-dts';
 import { getAppUserFromState, getRecipeFromState, instructionsToStr, strToInstructions } from '../utils';
 import { Context } from '../context';
 import { RecipeCardProps } from './RecipeCard';
+import { StyledTextArea } from '../StyledComponents';
 
 
 
@@ -67,13 +67,15 @@ function InstructionList(props: RecipeCardProps) {
   if (editable) {
     return (
       <RecipeStepsArea>
-        <TextareaAutosize
+
+        <StyledTextArea
           defaultValue={instructionsToStr(instructions)}
           autoFocus
+          autoSize
           placeholder='Add instructions?'
           onKeyUp={(e) => { if (e.code === "Escape") { handleChange(e.currentTarget.value) } }}
-          style={{"width": "95%"}}
-          onBlur={e => handleChange(e.target.value)} />
+          onBlur={e => handleChange(e.target.value)}
+        />
       </RecipeStepsArea>
     )
   } else {

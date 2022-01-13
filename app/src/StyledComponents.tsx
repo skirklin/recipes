@@ -1,4 +1,4 @@
-import { Button } from "antd";
+import { Button, Input } from "antd";
 import styled from "styled-components";
 
 export const Title = styled.h1`
@@ -38,4 +38,15 @@ export const IndexCardBottomLine = styled.hr`
   background-color: blue;
   border-width: 0px;
   height: 1px;
+`
+
+export const StyledTextArea = styled(Input.TextArea)`
+  &:focus {
+    border: none;
+    box-shadow: none;
+  }
+  &:hover {
+    border: none;
+    box-shadow: none;
+  }
 `

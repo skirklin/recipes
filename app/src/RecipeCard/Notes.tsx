@@ -1,9 +1,9 @@
 import { useContext, useState } from 'react';
-import TextareaAutosize from 'react-autosize-textarea';
 import { commentToStr, strToComment, getRecipeFromState, getAppUserFromState } from '../utils';
 import { Context } from '../context';
 import { RecipeCardProps } from './RecipeCard';
 import styled from 'styled-components';
+import { StyledTextArea } from '../StyledComponents';
 
 const NotesArea = styled.div`
   margin: 10px;
@@ -42,7 +42,8 @@ function Notes(props: RecipeCardProps) {
   if (editable) {
     return (
       <NotesArea>
-        <TextareaAutosize
+        <StyledTextArea
+          autoSize
           autoFocus
           defaultValue={comment}
           placeholder='Add a note?'

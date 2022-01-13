@@ -1,7 +1,7 @@
 import { useContext, useState } from 'react';
-import TextareaAutosize from 'react-autosize-textarea';
 import styled from 'styled-components';
 import { Context } from '../context';
+import { StyledTextArea } from '../StyledComponents';
 import { getAppUserFromState, getRecipeFromState } from '../utils';
 import { RecipeCardProps } from './RecipeCard';
 
@@ -47,7 +47,8 @@ function RecipeDescription(props: RecipeCardProps) {
 
   if (editable) {
     return (
-      <TextareaAutosize
+      <StyledTextArea
+        autoSize
         placeholder="Add a description?"
         autoFocus
         onKeyUp={(e) => { if (e.code === "Escape") { handleChange(e.currentTarget.value) } }}
