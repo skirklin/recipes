@@ -5,7 +5,7 @@ import { useContext, useState } from 'react';
 import { PickBoxModal } from '../Modals/PickBoxModal';
 import { Context } from '../context';
 import { useNavigate } from 'react-router-dom';
-import { addRecipe, getRecipeFromState } from '../utils';
+import { addRecipe, getAppUserFromState, getRecipeFromState } from '../utils';
 import { ActionButton } from '../StyledComponents';
 import { RecipeCardProps } from '../RecipeCard/RecipeCard';
 import { BoxId } from '../types';
@@ -21,11 +21,14 @@ export default function ForkButton(props: ForkProps) {
   const { state, dispatch } = useContext(Context)
   const navigate = useNavigate()
   const [isModalVisible, setIsModalVisible] = useState(false)
+  const user = getAppUserFromState(state)
   const recipe = getRecipeFromState(state, boxId, recipeId)
-  if (recipe === undefined) return null
+  if (recipe === undefined || user === undefined) return null
 
   const addNewRecipe = async (boxId: BoxId) => {
-    const recipeRef = await addRecipe(boxId, _.cloneDeep(recipe), dispatch)
+    const clone = _.cloneDeep(recipe);
+    clone.owners = [user.id]
+    const recipeRef = await addRecipe(boxId, clone, dispatch)
     navigate(`/boxes/${boxId}/recipes/${recipeRef.id}`)
   }
 
