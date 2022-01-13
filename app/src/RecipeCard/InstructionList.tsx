@@ -10,6 +10,7 @@ import { RecipeCardProps } from './RecipeCard';
 
 const RecipeStepsArea = styled.div`
   margin-top: 10px;
+  width: 100%;
 `
 
 const RecipeStep = styled.li`
@@ -71,7 +72,7 @@ function InstructionList(props: RecipeCardProps) {
           autoFocus
           placeholder='Add instructions?'
           onKeyUp={(e) => { if (e.code === "Escape") { handleChange(e.currentTarget.value) } }}
-          style={{paddingLeft: "20px"}}
+          style={{"width": "95%"}}
           onBlur={e => handleChange(e.target.value)} />
       </RecipeStepsArea>
     )
