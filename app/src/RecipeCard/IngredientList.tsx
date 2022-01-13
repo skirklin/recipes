@@ -1,10 +1,10 @@
 import { useState, useContext } from 'react';
 import styled from 'styled-components';
-import TextareaAutosize from 'react-autosize-textarea';
 import { Recipe } from 'schema-dts';
 import { getAppUserFromState, getRecipeFromState, ingredientsToStr, strToIngredients } from '../utils';
 import { Context } from '../context';
 import { RecipeCardProps } from './RecipeCard';
+import { StyledTextArea } from '../StyledComponents';
 
 
 const Ingredient = styled.li`
@@ -56,9 +56,10 @@ function IngredientList(props: RecipeCardProps) {
   }
   if (editable) {
     return (
-      <TextareaAutosize
+      <StyledTextArea
         defaultValue={ingredientsToStr(ingredients)}
         autoFocus
+        autoSize
         placeholder='Add ingredients?'
         onKeyUp={(e) => { if (e.code === "Escape") { handleChange(e.currentTarget.value) } }}
         style={{ ...ingredientsStyle }}
