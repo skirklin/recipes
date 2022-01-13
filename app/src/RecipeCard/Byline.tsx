@@ -2,7 +2,7 @@ import { Input } from 'antd';
 import React, { useContext, useState } from 'react';
 import styled from 'styled-components';
 import { Context } from '../context';
-import { getRecipeFromState, authorToStr, getAppUserFromState } from '../utils';
+import { getRecipeFromState, authorToStr, getAppUserFromState, strToAuthor } from '../utils';
 import { RecipeCardProps } from './RecipeCard';
 
 const EditableByline = styled(Input)`
@@ -44,7 +44,7 @@ function Byline(props: RecipeCardProps) {
   const byline = authorToStr(rd.author)
   const handleChange = (value: string) => {
     if (byline !== value) {
-      dispatch({ type: "SET_BYLINE", payload: value });
+      dispatch({ type: "SET_AUTHOR", payload: strToAuthor(value), recipeId, boxId });
     }
     setEditable(false);
   }

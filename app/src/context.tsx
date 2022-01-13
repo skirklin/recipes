@@ -148,6 +148,9 @@ export function recipeBoxReducer(prevState: AppState, action: ActionType): AppSt
     case 'SET_COMMENT': {
       return handleRecipeChange("comment", prevState, action)
     }
+    case 'SET_AUTHOR': {
+      return handleRecipeChange("author", prevState, action)
+    }
     case 'SET_DESCRIPTION': {
       return handleRecipeChange("description", prevState, action)
     }

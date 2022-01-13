@@ -57,6 +57,7 @@ export type ActionType = {
   | Recipe["recipeIngredient"] 
   | Recipe["recipeInstructions"]
   | Recipe["recipeCategory"]
+  | Recipe["author"]
   | Comment
 }
 
