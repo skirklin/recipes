@@ -78,7 +78,7 @@ export function getRecipesFromPage(doc: Document, url: string): Recipe[] {
 export const getRecipes = functions.https.onCall(async (data) => {
   const url = data.url;
   if (url === undefined) {
-    return new HttpsError("internal", "must specify url")
+    throw new HttpsError("internal", "must specify url")
   }
   const tpc = await axios.get(data.url)
   const htmlDom = new jsdom.JSDOM(tpc.data);
@@ -86,62 +86,50 @@ export const getRecipes = functions.https.onCall(async (data) => {
   return { recipes: JSON.stringify(recipes) }
 })
 
-export const addRecipeOwner = functions.https.onCall(async (data) => {
-
-  const { recipeId, boxId, newOwnerEmail } = data;
+async function updateOwners(docRef: FirebaseFirestore.DocumentReference<FirebaseFirestore.DocumentData>, newOwnerEmail: string) {
   const auth = getAuth()
-  const docRef = db.doc(`boxes/${boxId}/recipes/${recipeId}`)
-  const recipe = (await docRef.get()).data()
-  if (recipe === undefined) {
-    return
-  }
   auth.getUserByEmail(newOwnerEmail)
     .then((user) => {
       docRef.update({ owners: FieldValue.arrayUnion(user.uid) })
     })
     .catch((error) => {
-      console.log(error)
-      auth.createUser({
-        email: newOwnerEmail,
-      })
-        .then((user) => {
-          docRef.update({ owners: FieldValue.arrayUnion(user.uid) })
+      if (error.code === "auth/user-not-found") {
+
+        auth.createUser({
+          email: newOwnerEmail,
         })
-        .catch((error) => {
-          console.log(error)
-          return new HttpsError("internal", "Unable to find or create user for that email")
-        })
-    }
-    )
+          .then((user) => {
+            docRef.update({ owners: FieldValue.arrayUnion(user.uid) })
+          })
+          .catch((error) => {
+            throw new HttpsError("internal", "Unable to find or create user for provided email address.", error)
+          })
+      } else {
+        throw new HttpsError("internal", "Unable to find account for provided email address.", error)
+      }
+    })
+}
+
+export const addRecipeOwner = functions.https.onCall(async (data) => {
+
+  const { recipeId, boxId, newOwnerEmail } = data;
+  const docRef = db.doc(`boxes/${boxId}/recipes/${recipeId}`)
+  const recipe = (await docRef.get()).data()
+  if (recipe === undefined) {
+    throw new HttpsError("internal", "Specified recipe does not exist")
+  }
+  updateOwners(docRef, newOwnerEmail)
 })
 
 
 export const addBoxOwner = functions.https.onCall(async (data) => {
 
   const { boxId, newOwnerEmail } = data;
-  const auth = getAuth()
   const docRef = db.doc(`boxes/${boxId}`)
   const box = (await docRef.get()).data()
   if (box === undefined) {
-    return
+    throw new HttpsError("internal", "Specified box does not exist")
   }
 
-  auth.getUserByEmail(newOwnerEmail)
-    .then((user) => {
-      docRef.update({ owners: FieldValue.arrayUnion(user.uid) })
-    })
-    .catch((error) => {
-      console.log(error)
-      auth.createUser({
-        email: newOwnerEmail,
-      })
-        .then((user) => {
-          docRef.update({ owners: FieldValue.arrayUnion(user.uid) })
-        })
-        .catch((error) => {
-          console.log(error)
-          return new HttpsError("internal", "Unable to find or create user for that email")
-        })
-    }
-    )
+  updateOwners(docRef, newOwnerEmail)
 }) 
