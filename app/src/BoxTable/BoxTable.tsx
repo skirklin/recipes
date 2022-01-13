@@ -79,6 +79,8 @@ export function BoxTable(props: BoxTableProps) {
         deleteBox(state, value.boxId, dispatch)
       }
     )
+    setSelectedRowKeys([]);
+    setSelectedRows([]);
   }
   const hasSelected = (selectedRows.length > 0)
 

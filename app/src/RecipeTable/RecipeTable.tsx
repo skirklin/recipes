@@ -105,6 +105,8 @@ export function RecipeTable(props: RecipeTableProps) {
         deleteRecipe(state, value.boxId, value.recipeId, dispatch)
       }
     )
+    setSelectedRowKeys([])
+    setSelectedRows([])
   }
 
   async function fork(boxId: BoxId) {
@@ -113,6 +115,7 @@ export function RecipeTable(props: RecipeTableProps) {
         addRecipe(boxId, _.cloneDeep(value.recipe), dispatch)
       }
     )
+    navigate(`/boxes/${boxId}`)
   }
 
   function handleVisiblityChange(e: { key: string }) {
@@ -141,7 +144,6 @@ export function RecipeTable(props: RecipeTableProps) {
   )
 
   function handleChange(pagination: TablePaginationConfig, filters: Record<string, FilterValue | null>, sorter: unknown) {
-    console.log(filters)
     setTagFilter(filters.tags as string[] || [])
   }
 
