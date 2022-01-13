@@ -16,6 +16,9 @@ export function DownloadButton(props: DownloadProps) {
   const { state } = useContext(Context)
   const { boxId, recipeId, element } = props;
   const recipe = getRecipeFromState(state, boxId, recipeId)
+  if (process.env.NODE_ENV !== "development") {
+    return null
+  }
   if (recipe === undefined) return null
 
   let elt;

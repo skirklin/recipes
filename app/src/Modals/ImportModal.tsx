@@ -56,6 +56,9 @@ function ImportModal(props: ImportProps) {
     const recipes = JSON.parse(data.recipes)
     const fullRecipes = recipes.map(
       (recipe: Recipe) => {
+        delete recipe.review
+        delete recipe.comment
+        delete recipe.commentCount
         return {
           data: recipe as unknown as Recipe,
           visibility: Visibility.private,

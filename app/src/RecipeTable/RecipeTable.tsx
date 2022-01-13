@@ -21,6 +21,7 @@ import { BoxId, RecipeId, Visibility } from '../types';
 import styled from 'styled-components';
 import { useMediaQuery } from 'react-responsive'
 import VisibilityControl from '../Buttons/Visibility';
+import { addRecipeOwner } from '../backend';
 
 
 const PointerTag = styled(Tag)`
@@ -122,6 +123,14 @@ export function RecipeTable(props: RecipeTableProps) {
     )
   }
 
+  function handleAddOwner(newOwner: string) {
+    selectedRows.forEach(
+      (value: RowType) => {
+        addRecipeOwner({ boxId: value.boxId, recipeId: value.recipeId, newOwner })
+      }
+    )
+  }
+
   const allTags = new Set<string>()
   filteredRows.forEach(
     (row) => {
@@ -135,6 +144,7 @@ export function RecipeTable(props: RecipeTableProps) {
     console.log(filters)
     setTagFilter(filters.tags as string[] || [])
   }
+
 
   function addTagToFilter(t: string) {
     setTagFilter([...(tagFilter || []), t])
@@ -200,6 +210,7 @@ export function RecipeTable(props: RecipeTableProps) {
           <VisibilityControl
             disabled={!writeable || !hasSelected}
             handleChange={handleVisiblityChange}
+            handleAddOwner={handleAddOwner}
             value={Visibility.public}
             element="button"
           />
