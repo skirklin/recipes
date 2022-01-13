@@ -14,7 +14,7 @@ interface DeleteProps {
 }
 
 function DeleteButton(props: DeleteProps) {
-  const { state } = useContext(Context)
+  const { state, dispatch } = useContext(Context)
   const { writeable } = state;
   const navigate = useNavigate()
 
@@ -27,7 +27,7 @@ function DeleteButton(props: DeleteProps) {
   }
 
   async function del() {
-    deleteBox(state, boxId)
+    deleteBox(state, boxId, dispatch)
     navigate(`/`)
   }
 

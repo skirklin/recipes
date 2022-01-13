@@ -10,7 +10,7 @@ interface VisibilityProps {
     disabled?: boolean
     value: Visibility
     handleChange: (e: { key: string }) => void
-    handleAddOwner: (newOwner: string) => void
+    handleAddOwner: (newOwnerEmail: string) => void
 }
 
 export default function VisibilityControl(props: VisibilityProps) {

@@ -151,24 +151,21 @@ export async function getRecipe(state: AppState, boxId: BoxId | undefined, recip
   return recipe
 }
 
-export async function getRecipes(state: AppState, boxId: BoxId) {
-  const box = state.boxes.get(boxId)
-  let recipes: Map<string, RecipeEntry>
+export async function getRecipes(state: AppState, box: BoxEntry) {
   const user = state.authUser;
-  if (box === undefined) {
-    if (user !== null) {
-      // a query where box === public also works.
-      const colRef = collection(db, "boxes", boxId, "recipes").withConverter(recipeConverter)
-      const ownedQuery = await getDocs(query(colRef, where("owners", "array-contains", user.uid)))
-      const publicQuery = await getDocs(query(colRef, where("visibility", "==", "public")))
-      let pairs: [string, RecipeEntry][] = ownedQuery.docs.map(doc => [doc.id, doc.data()])
-      pairs = pairs.concat(publicQuery.docs.map(doc => [doc.id, doc.data()]))
-      recipes = new Map<string, RecipeEntry>(pairs)
-    } else {
-      recipes = new Map<string, RecipeEntry>()
-    }
+  const recipes = new Map<string, RecipeEntry>()
+  if (user === null) {
+    return recipes
+  }
+  const colRef = collection(db, "boxes", box.id as string, "recipes").withConverter(recipeConverter)
+  if (box.visibility === "public" || box.owners.includes(user.uid)) {
+    (await getDocs(colRef))
+      .docs.forEach(doc => recipes.set(doc.id, doc.data()));
   } else {
-    recipes = box.recipes
+    (await getDocs(query(colRef, where("owners", "array-contains", user.uid))))
+      .docs.forEach(doc => recipes.set(doc.id, doc.data()));
+    (await getDocs(query(colRef, where("visibility", "==", "public"))))
+      .docs.forEach(doc => recipes.set(doc.id, doc.data()));
   }
   return recipes
 }
@@ -180,7 +177,7 @@ export async function getBox(state: AppState, boxId: BoxId) {
     return undefined
   }
   const box = boxDoc.data()
-  box.recipes = await getRecipes(state, boxId)
+  box.recipes = await getRecipes(state, box)
   return box
 }
 
@@ -291,18 +288,20 @@ export function createNewBox(user: User) {
   return new BoxEntry({ name }, [user.uid], Visibility.private, user.uid, undefined)
 }
 
-export async function deleteRecipe(state: AppState, boxId: BoxId, recipeId: RecipeId) {
+export async function deleteRecipe(state: AppState, boxId: BoxId, recipeId: RecipeId, dispatch: React.Dispatch<ActionType>) {
   if (recipeId.startsWith("uniqueId=")) {
     const box = state.boxes.get(boxId)
     if (box !== undefined) {
       box.recipes.delete(recipeId)
     }
   } else {
+    dispatch({ type: "REMOVE_RECIPE", boxId, recipeId })
     deleteDoc(doc(db, "boxes", boxId, "recipes", recipeId))
   }
 }
 
-export async function deleteBox(state: AppState, boxId: BoxId) {
+export async function deleteBox(state: AppState, boxId: BoxId, dispatch: React.Dispatch<ActionType>) {
+  dispatch({ type: "REMOVE_BOX", boxId })
   deleteDoc(doc(db, "boxes", boxId))
 }
 

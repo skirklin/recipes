@@ -102,7 +102,7 @@ export function RecipeTable(props: RecipeTableProps) {
   async function del() {
     selectedRows.forEach(
       (value: RowType) => {
-        deleteRecipe(state, value.boxId, value.recipeId)
+        deleteRecipe(state, value.boxId, value.recipeId, dispatch)
       }
     )
   }
@@ -123,10 +123,10 @@ export function RecipeTable(props: RecipeTableProps) {
     )
   }
 
-  function handleAddOwner(newOwner: string) {
+  function handleAddOwner(newOwnerEmail: string) {
     selectedRows.forEach(
       (value: RowType) => {
-        addRecipeOwner({ boxId: value.boxId, recipeId: value.recipeId, newOwner })
+        addRecipeOwner({ boxId: value.boxId, recipeId: value.recipeId, newOwnerEmail })
       }
     )
   }

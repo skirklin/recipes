@@ -76,8 +76,8 @@ function ActionMenu(props: RecipeCardProps) {
     setRecipeVisiblity(boxId, recipeId, e.key as Visibility)
   }
 
-  function handleAddOwner(newOwner: string) {
-    addRecipeOwner({ boxId, recipeId, newOwner })
+  function handleAddOwner(newOwnerEmail: string) {
+    addRecipeOwner({ boxId, recipeId, newOwnerEmail })
   }
 
   const menu = (

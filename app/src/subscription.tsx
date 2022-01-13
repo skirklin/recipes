@@ -1,13 +1,13 @@
 import React from 'react';
 import { User } from "firebase/auth";
-import { getDoc, onSnapshot, doc, setDoc, DocumentData, DocumentSnapshot, collection, QuerySnapshot } from "firebase/firestore";
+import { getDoc, onSnapshot, doc, setDoc, DocumentSnapshot, collection, QuerySnapshot } from "firebase/firestore";
 import 'antd/dist/antd.css'; // or 'antd/dist/antd.less'
 
 import { ActionType, BoxId, UnsubMap, Visibility } from './types';
 
 import { db } from './backend'
 import { addBox, subscribeToBox } from './utils';
-import { boxConverter, BoxEntry, RecipeEntry, userConverter, UserEntry } from './storage';
+import { boxConverter, BoxEntry, recipeConverter, RecipeEntry, userConverter, UserEntry } from './storage';
 
 async function initializeUser(user: User) {
   const userRef = doc(db, "users", user.uid).withConverter(userConverter);
@@ -47,13 +47,11 @@ async function handleUserSnapshot(
   unsubMap: UnsubMap,
 ) {
   const user = snapshot.data()
-  console.log(user)
   if (user === undefined) {
     return
   }
 
   dispatch({ type: "ADD_USER", user })
-  console.log({user})
 
   user.boxes.forEach(
     (bid: string) => {
@@ -62,7 +60,7 @@ async function handleUserSnapshot(
         const boxUnsub = onSnapshot(
           boxRef.withConverter(boxConverter), (snapshot) => handleBoxSnapshot(snapshot, dispatch, unsubMap))
 
-        const recipesRef = collection(db, "boxes", boxRef.id, "recipes")
+        const recipesRef = collection(db, "boxes", boxRef.id, "recipes").withConverter(recipeConverter)
         const recipesUnsub = onSnapshot(recipesRef, (snapshot) => handleRecipesSnapshot(snapshot, dispatch, boxRef.id))
         unsubMap.boxMap.set(boxRef.id, { recipesUnsub, boxUnsub })
       }
@@ -70,13 +68,14 @@ async function handleUserSnapshot(
   )
 }
 
-async function handleRecipesSnapshot(snapshot: QuerySnapshot<DocumentData>, dispatch: React.Dispatch<ActionType>, boxId: BoxId) {
+async function handleRecipesSnapshot(snapshot: QuerySnapshot<RecipeEntry>, dispatch: React.Dispatch<ActionType>, boxId: BoxId) {
   const changes = snapshot.docChanges()
   for (const change of changes) {
+    console.log({change})
     const doc = change.doc;
     const data = doc.data()
     if (change.type === "added" || change.type === "modified") {
-      dispatch({ type: "ADD_RECIPE", recipeId: doc.id, boxId, payload: data as RecipeEntry })
+      dispatch({ type: "ADD_RECIPE", recipeId: doc.id, boxId, payload: data })
     } else {
       dispatch({ type: "REMOVE_RECIPE", recipeId: doc.id, boxId })
     }
@@ -101,7 +100,7 @@ async function handleBoxSnapshot(
 
 
 export function unsubscribe(unsubMap: UnsubMap) {
-  console.log("unsubscribing")
+  console.log("unsubscribing everything")
   unsubMap.userUnsub && unsubMap.userUnsub();
   unsubMap.boxesUnsub && unsubMap.boxesUnsub();
   for (const box of unsubMap.boxMap.values()) {

@@ -9,7 +9,7 @@ import { AddOwnerModal } from '../Modals/AddOwnerModal';
 interface AddOwnerProps {
   element: "button" | "menu"
   disabled?: boolean
-  handleOk: (newOwner: string) => void
+  handleOk: (newOwnerEmail: string) => void
 }
 
 function AddOwnerButton(props: AddOwnerProps) {
