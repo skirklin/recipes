@@ -5,7 +5,7 @@ import axios from 'axios';
 import * as jsdom from 'jsdom';
 import { initializeApp } from 'firebase-admin/app';
 import { getAuth } from 'firebase-admin/auth';
-import { getFirestore } from 'firebase-admin/firestore';
+import { FieldValue, getFirestore } from 'firebase-admin/firestore';
 
 const app = initializeApp();
 const db = getFirestore(app);
@@ -97,7 +97,7 @@ export const addRecipeOwner = functions.https.onCall(async (data) => {
   }
   auth.getUserByEmail(newOwnerEmail)
     .then((user) => {
-      docRef.update({ owners: [...recipe.owners, user.uid] })
+      docRef.update({ owners: FieldValue.arrayUnion(user.uid) })
     })
     .catch((error) => {
       console.log(error)
@@ -105,7 +105,7 @@ export const addRecipeOwner = functions.https.onCall(async (data) => {
         email: newOwnerEmail,
       })
         .then((user) => {
-          docRef.update({ owners: [...recipe.owners, user.uid] })
+          docRef.update({ owners: FieldValue.arrayUnion(user.uid) })
         })
         .catch((error) => {
           console.log(error)
@@ -128,7 +128,7 @@ export const addBoxOwner = functions.https.onCall(async (data) => {
 
   auth.getUserByEmail(newOwnerEmail)
     .then((user) => {
-      docRef.update({ owners: [...box.owners, user.uid] })
+      docRef.update({ owners: FieldValue.arrayUnion(user.uid) })
     })
     .catch((error) => {
       console.log(error)
@@ -136,7 +136,7 @@ export const addBoxOwner = functions.https.onCall(async (data) => {
         email: newOwnerEmail,
       })
         .then((user) => {
-          docRef.update({ owners: [...box.owners, user.uid] })
+          docRef.update({ owners: FieldValue.arrayUnion(user.uid) })
         })
         .catch((error) => {
           console.log(error)

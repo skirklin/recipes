@@ -45,7 +45,6 @@ function Box(props: BoxProps) {
     return <div>Unable to find boxId={boxId}</div>
   }
   const recipes = box.recipes;
-  console.log(box)
   const data: RowType[] = []
   for (const [recipeId, recipe] of recipes.entries()) {
     data.push({ boxName: box.data.name, recipeId, boxId, recipe, key: `recipeId=${recipeId}_boxId=${boxId}` })
@@ -55,8 +54,8 @@ function Box(props: BoxProps) {
     setBoxVisiblity(boxId, e.key as Visibility)
   }
 
-  function handleAddOwner(newOwner: string) {
-    addBoxOwner({boxId, newOwner})
+  function handleAddOwner(newOwnerEmail: string) {
+    addBoxOwner({boxId, newOwnerEmail})
   }
 
 

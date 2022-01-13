@@ -3,7 +3,7 @@ import { Menu, Popconfirm } from 'antd';
 import { useContext } from 'react';
 import { Context } from '../context';
 import { useNavigate } from 'react-router-dom';
-import { deleteRecipe, getAppUserFromState, getRecipeFromState } from '../utils';
+import { deleteRecipe, getAppUserFromState, getBoxFromState, getRecipeFromState } from '../utils';
 import { ActionButton } from '../StyledComponents';
 import { BoxId, RecipeId } from '../types';
 
@@ -15,8 +15,9 @@ interface DeleteProps {
 }
 
 function DeleteButton(props: DeleteProps) {
-  const { state } = useContext(Context)
+  const { state, dispatch } = useContext(Context)
   const { writeable } = state;
+  const box = getBoxFromState(state, props.boxId)
   const recipe = getRecipeFromState(state, props.boxId, props.recipeId)
 
   const navigate = useNavigate()
@@ -24,14 +25,18 @@ function DeleteButton(props: DeleteProps) {
   const { recipeId, boxId, element } = props;
   const user = getAppUserFromState(state)
 
-  if (recipe === undefined || user === undefined || !recipe.owners.includes(user.id)) {
+  if (recipe === undefined || box === undefined || user === undefined) {
+    return null
+  }
+  if (!(recipe.owners.includes(user.id) || box.owners.includes(user.id))) {
     return null
   }
 
 
   async function del() {
-    deleteRecipe(state, boxId, recipeId)
-    navigate(`/boxes/${boxId}`)
+    deleteRecipe(state, boxId, recipeId, dispatch).then(
+      () => navigate(`/boxes/${boxId}`)
+    )
   }
 
   let elt;

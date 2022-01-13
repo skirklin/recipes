@@ -8,10 +8,12 @@ import NewBoxButton from '../Buttons/NewBox';
 
 import './BoxTable.css';
 import { Context } from "../context";
-import { deleteBox } from "../utils";
+import { deleteBox, setBoxVisiblity } from "../utils";
 import { DeleteOutlined } from "@ant-design/icons";
-import { BoxId } from "../types";
+import { BoxId, Visibility } from "../types";
 import { UserEntry } from "../storage";
+import VisibilityControl from "../Buttons/Visibility";
+import { addBoxOwner } from "../backend";
 
 export type RowType = {
   name: string
@@ -46,7 +48,7 @@ interface BoxTableProps {
 }
 
 export function BoxTable(props: BoxTableProps) {
-  const { state } = useContext(Context)
+  const { state, dispatch } = useContext(Context)
   const { writeable } = state;
 
   const { rows } = props;
@@ -74,16 +76,34 @@ export function BoxTable(props: BoxTableProps) {
   async function del() {
     selectedRows.forEach(
       (value: RowType) => {
-        deleteBox(state, value.boxId)
+        deleteBox(state, value.boxId, dispatch)
       }
     )
   }
   const hasSelected = (selectedRows.length > 0)
+
+  function handleVisiblityChange(e: { key: string }) {
+    selectedRows.forEach(
+      (value: RowType) => {
+        setBoxVisiblity(value.boxId, e.key as Visibility)
+      }
+    )
+  }
+
+  function handleAddOwner(newOwnerEmail: string) {
+    selectedRows.forEach(
+      (value: RowType) => {
+        addBoxOwner({ boxId: value.boxId, newOwnerEmail })
+      }
+    )
+  }
+
+
   return (
     <div>
-      <div style={{display: "flex"}}>
+      <div style={{ display: "flex" }}>
 
-        <RecipeActionGroup style={{marginLeft: "auto"}}>
+        <RecipeActionGroup style={{ marginLeft: "auto" }}>
           <NewBoxButton disabled={!writeable} />
           <Popconfirm
             title={`Are you sure to delete ${selectedRowKeys.length > 1 ? "these recipes" : "this recipe"}s`}
@@ -92,6 +112,14 @@ export function BoxTable(props: BoxTableProps) {
             disabled={!writeable || !hasSelected}
             cancelText="No"
           >
+            <VisibilityControl
+              disabled={!writeable || !hasSelected}
+              handleChange={handleVisiblityChange}
+              handleAddOwner={handleAddOwner}
+              value={Visibility.public}
+              element="button"
+            />
+
             <ActionButton disabled={!writeable || !hasSelected} title="Delete recipes" icon={<DeleteOutlined />}>Delete</ActionButton>
           </Popconfirm>
         </RecipeActionGroup>
