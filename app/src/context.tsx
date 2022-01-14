@@ -2,7 +2,7 @@ import _ from 'lodash';
 import { createContext } from 'react';
 import { BoxEntry, RecipeEntry, UserEntry } from './storage';
 import { ActionType, AppState } from './types';
-import { createNewBox, getRecipeFromState, setRecipeInState } from './utils';
+import { createNewBox, createTempBox, getRecipeFromState, setRecipeInState } from './utils';
 
 
 export type ContextType = {
@@ -78,11 +78,11 @@ export function recipeBoxReducer(prevState: AppState, action: ActionType): AppSt
       return state
     }
     case "ADD_RECIPE": {
-      if (action.boxId === undefined || (action.recipeId === undefined) || prevState.authUser === null) {
+      if (action.boxId === undefined || (action.recipeId === undefined)) {
         console.warn("ADD_RECIPE requires a boxId and recipeId.")
         return prevState
       }
-      newBox = { ...(prevState.boxes.get(action.boxId) || createNewBox(prevState.authUser)) }
+      newBox = { ...(prevState.boxes.get(action.boxId) || createTempBox(action.boxId)) }
       if (action.payload === undefined) {
         console.warn("ADD_RECIPE requires a payload.")
         return prevState

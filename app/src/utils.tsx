@@ -288,6 +288,11 @@ export function createNewBox(user: User) {
   return new BoxEntry({ name }, [user.uid], Visibility.private, user.uid, undefined)
 }
 
+export function createTempBox(boxId: BoxId) {
+  const name = "New box"
+  return new BoxEntry({ name }, [], Visibility.private, "", boxId)
+}
+
 export async function deleteRecipe(state: AppState, boxId: BoxId, recipeId: RecipeId, dispatch: React.Dispatch<ActionType>) {
   if (recipeId.startsWith("uniqueId=")) {
     const box = state.boxes.get(boxId)

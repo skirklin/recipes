@@ -13,7 +13,7 @@ function Main() {
 
   const { dispatch, state } = useContext(Context)
   const { authUser } = state;
-
+  console.log(authUser)
   useEffect(
     () => {
       if (authUser === null) {

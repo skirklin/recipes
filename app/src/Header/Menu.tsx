@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { Button } from 'antd';
 
 import { getAuth, signOut } from 'firebase/auth';
-import { InboxOutlined, LogoutOutlined } from '@ant-design/icons';
+import { InboxOutlined, LoginOutlined, LogoutOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import './Header.css';
 
@@ -31,17 +31,29 @@ const StyledButton = styled(Button)`
 function Header() {
   const navigate = useNavigate()
   const user = getAuth().currentUser
-  if (user === null) {
-    return null
-  }
+  console.log(user)
 
-  return (
-    <MenuArea>
-      <div style={{ marginRight: "10px", display: "inline-block" }}>{user.displayName}</div>
-      <StyledButton title="Manage boxes" onClick={() => navigate('/boxes')} icon={<InboxOutlined /> } />
-      <StyledButton title="Logout" style={{}} onClick={() => signOut(getAuth())} icon={<LogoutOutlined />} className="recipes-icon" />
+  if (user === null || user.isAnonymous) {
+    return <MenuArea>
+      <StyledButton
+        title="Login"
+        onClick={() => navigate("/login")}
+        icon={<LoginOutlined />}
+        className="recipes-icon"
+      >Login</StyledButton>
     </MenuArea>
-  );
+  } else {
+    return <MenuArea>
+      <div style={{ marginRight: "10px", display: "inline-block" }}>{user.displayName}</div>
+      <StyledButton title="Manage boxes" onClick={() => navigate('/boxes')} icon={<InboxOutlined />} />
+      <StyledButton
+        title="Logout"
+        onClick={() => signOut(getAuth())}
+        icon={<LogoutOutlined />}
+        className="recipes-icon"
+      >Logout</StyledButton>
+    </MenuArea>
+  }
 }
 
 export default Header;

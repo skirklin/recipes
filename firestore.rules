@@ -12,17 +12,17 @@ service cloud.firestore {
 
     match /boxes/{box} {
       allow read: if resource == null 
-        || request.auth.uid in resource.data.owners 
-        || resource.data.visibility != 'private';
+        || resource.data.visibility != 'private'
+        || request.auth.uid in resource.data.owners;
       allow write: if resource == null 
         || request.auth.uid in resource.data.owners;
 
       match /recipes/{recipe} {
         allow read: if resource == null 
-          || request.auth.uid in resource.data.owners
-          || request.auth.uid in get(/databases/$(database)/documents/boxes/$(box)).data.owners
           || get(/databases/$(database)/documents/boxes/$(box)).data.visibility != 'private'
-          || resource.data.visibility != 'private';
+          || resource.data.visibility != 'private'
+          || (request.auth != null && request.auth.uid in resource.data.owners)
+          || (request.auth != null && request.auth.uid in get(/databases/$(database)/documents/boxes/$(box)).data.owners);
         allow write: if resource == null 
           || request.auth.uid in get(/databases/$(database)/documents/boxes/$(box)).data.owners 
           || request.auth.uid in resource.data.owners;

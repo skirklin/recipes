@@ -1,7 +1,7 @@
 import React, { useContext, useEffect } from 'react';
 import styled from 'styled-components';
 
-import { GoogleAuthProvider, EmailAuthProvider, onAuthStateChanged, getAuth, FacebookAuthProvider } from "firebase/auth";
+import { GoogleAuthProvider, EmailAuthProvider, onAuthStateChanged, getAuth } from "firebase/auth";
 
 import StyledFirebaseAuth from 'react-firebaseui/StyledFirebaseAuth';
 import { Context } from './context';
@@ -31,7 +31,7 @@ const uiConfig = {
   },
 };
 
-function Auth(props: {children: JSX.Element}) {
+function Auth(props: { children: JSX.Element }) {
   const { dispatch, state } = useContext(Context)
   const { authUser } = state;
 
@@ -43,7 +43,7 @@ function Auth(props: {children: JSX.Element}) {
     return () => {
       dispatch({ type: "SET_AUTH_USER", authUser: null });
       unregisterAuthObserver(); // Make sure we un-register Firebase observers when the component unmounts.
-    } 
+    }
   }, [dispatch]);
 
   if (authUser === null) {
