@@ -1,41 +1,40 @@
 import React, { useContext, useState } from 'react';
 import styled from 'styled-components';
-import { LinkOutlined } from '@ant-design/icons';
 import { Context } from '../context';
 import { Title } from '../StyledComponents';
-import { getAppUserFromState, getRecipeFromState } from '../utils';
-import { RecipeCardProps } from './RecipeCard';
+import { getAppUserFromState, getBoxFromState } from '../utils';
+import { BoxProps } from './BoxView';
 import { Input } from 'antd';
 
 const EditableTitle = styled(Input)`
   font-size: 2em;
   font-weight: bold;
   font-family: sans-serif;
-  display: inline;
-  outline: none;
   padding-left: 5px;
   margin-bottom: 0px;
   height: fit-content;
   width: fit-content;
+  display: inline;
+  outline: none;
 `
 
-function RecipeName(props: RecipeCardProps) {
-  const { recipeId, boxId } = props;
+function BoxName(props: BoxProps) {
+  const { boxId } = props;
   const [editable, setEditablePrimitive] = useState(false);
   const { state, dispatch } = useContext(Context);
-  const recipe = getRecipeFromState(state, boxId, recipeId)
+  const box = getBoxFromState(state, boxId)
 
   const setEditable = (value: boolean) => {
     const user = getAppUserFromState(state)
-    if (state.writeable && user && recipe && recipe.owners.includes(user.id)) {
+    if (state.writeable && user && box && box.owners.includes(user.id)) {
       setEditablePrimitive(value)
     }
   }
 
-  const rd = recipe ? (recipe.changed ? recipe.changed : recipe.data) : { name: "", url: "" }
+  const rd = box ? (box.changed ? box.changed : box.data) : { name: "", url: "" }
   const name = rd.name as string
   const [value, setValue] = useState<string>(name);
-  if (recipe === undefined) { return null }
+  if (box === undefined) { return null }
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     if (e !== undefined) {
@@ -45,13 +44,9 @@ function RecipeName(props: RecipeCardProps) {
 
   function confirmChange() {
     if (name !== value) {
-      dispatch({ type: "SET_RECIPE_NAME", recipeId, boxId, payload: value });
+      dispatch({ type: "SET_BOX_NAME", boxId, payload: value });
     }
     setEditable(false);
-  }
-  let link = null;
-  if (rd.url) {
-    link = <a href={rd.url.toString()} target="_blank" rel="noreferrer"><LinkOutlined /></a>
   }
   if (editable) {
     return (
@@ -60,16 +55,15 @@ function RecipeName(props: RecipeCardProps) {
         autoFocus
         onChange={(e) => handleChange(e)}
         onKeyUp={(e) => { if (e.code === "Escape" || e.code === "Enter") { confirmChange() } }}
-        onBlur={() => confirmChange()}
-      />
+        onBlur={() => confirmChange()} />
     )
   } else {
     return (
       <Title onDoubleClick={() => setEditable(true)}>
-        {name} {link}
+        {name}
       </Title>
     )
   }
 }
 
-export default RecipeName;
+export default BoxName;

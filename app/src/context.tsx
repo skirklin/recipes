@@ -2,7 +2,7 @@ import _ from 'lodash';
 import { createContext } from 'react';
 import { BoxEntry, RecipeEntry, UserEntry } from './storage';
 import { ActionType, AppState } from './types';
-import { createNewBox, getRecipeFromState, setRecipeInState } from './utils';
+import { createNewBox, getBoxFromState, getRecipeFromState, setBoxInState, setRecipeInState } from './utils';
 
 
 export type ContextType = {
@@ -47,6 +47,26 @@ function handleRecipeChange(key: string, prevState: AppState, action: ActionType
     recipe.changed = _.cloneDeep(recipe.data)
   }
   recipe.changed = { ...(recipe.changed), [key]: action.payload }
+  return newState
+}
+
+
+function handleBoxChange(key: string, prevState: AppState, action: ActionType) {
+  console.log({ key, action })
+  if (action.boxId === undefined) {
+    console.warn("Can't change a recipe property without passing recipeId and boxId.")
+    return prevState
+  }
+  const box = getBoxFromState(prevState, action.boxId)
+  if (box === undefined) {
+    return prevState
+  }
+
+  const newState = { ...prevState }
+  if (box.changed === undefined) {
+    box.changed = _.cloneDeep(box.data)
+  }
+  box.changed = { ...(box.changed), [key]: action.payload }
   return newState
 }
 
@@ -136,7 +156,7 @@ export function recipeBoxReducer(prevState: AppState, action: ActionType): AppSt
       return { ...prevState, boxes: new Map() }
     case 'SET_READONLY':
       return { ...prevState, writeable: action.payload as boolean }
-    case 'SET_NAME': {
+    case 'SET_RECIPE_NAME': {
       return handleRecipeChange("name", prevState, action)
     }
     case 'SET_INGREDIENTS': {
@@ -168,6 +188,21 @@ export function recipeBoxReducer(prevState: AppState, action: ActionType): AppSt
       setRecipeInState(newState, action.boxId, action.recipeId, recipe)
       return newState
     }
+    case 'SET_BOX_NAME': {
+      return handleBoxChange("name", prevState, action)
+    }
+    case 'RESET_BOX': {
+      if (action.boxId === undefined) return prevState
+      const box = getBoxFromState(prevState, action.boxId)
+      if (box === undefined) return prevState
+      const newState = { ...prevState }
+      if (box.changed !== undefined) {
+        box.changed = undefined
+      }
+      setBoxInState(newState, action.boxId, box)
+      return newState
+    }
+
     default:
       return prevState
   }
