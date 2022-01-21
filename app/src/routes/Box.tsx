@@ -2,14 +2,9 @@ import { useContext, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { Context } from "../context";
 
-import { getBox, getBoxFromState, setBoxVisiblity } from "../utils";
-import { RecipeTable, RowType } from "../RecipeTable/RecipeTable"
-import { IndexCardTopLine, RecipeActionGroup, Title } from "../StyledComponents";
-import { BoxId, Visibility } from "../types";
-import DeleteBox from '../Buttons/DeleteBox';
-import SubscribeButton from "../Buttons/Subscribe";
-import VisibilityControl from "../Buttons/Visibility";
-import { addBoxOwner } from "../backend";
+import { getBox, getBoxFromState } from "../utils";
+import { BoxId } from "../types";
+import BoxView from '../BoxView/BoxView'
 
 interface BoxProps {
   boxId: BoxId
@@ -18,7 +13,6 @@ interface BoxProps {
 function Box(props: BoxProps) {
   const { boxId } = props;
   const { state, dispatch } = useContext(Context)
-  const { writeable, authUser } = state
 
   useEffect(() => {
     (async () => {
@@ -37,48 +31,15 @@ function Box(props: BoxProps) {
   )
   const box = getBoxFromState(state, boxId)
 
-  if (authUser === null) {
-    return null
-  }
-
   if (box === undefined) {
-    return <div>Unable to find boxId={boxId}</div>
+    return <div>Unable to find box.</div>
   }
-  const recipes = box.recipes;
-  const data: RowType[] = []
-  for (const [recipeId, recipe] of recipes.entries()) {
-    data.push({ boxName: box.data.name, recipeId, boxId, recipe, key: `recipeId=${recipeId}_boxId=${boxId}` })
-  }
-
-  function handleVisiblityChange(e: { key: string }) {
-    setBoxVisiblity(boxId, e.key as Visibility)
-  }
-
-  function handleAddOwner(newOwnerEmail: string) {
-    addBoxOwner({boxId, newOwnerEmail})
-  }
-
-
   return (
-    <div>
-      <div style={{ display: "flex" }}>
-        <Title>{box.data.name}</Title>
-        <RecipeActionGroup>
-          <SubscribeButton boxId={boxId} />
-          <VisibilityControl
-            value={box.visibility}
-            element="button"
-            handleChange={handleVisiblityChange}
-            handleAddOwner={handleAddOwner}
-            disabled={!(writeable && box.owners.includes(authUser.uid))}
-          />
-          <DeleteBox boxId={boxId} element="button" />
-        </RecipeActionGroup>
-      </div>
-      <IndexCardTopLine />
-      <RecipeTable recipes={data} writeable={writeable && box.owners.includes(authUser.uid)} boxId={boxId} />
-    </div>
+    <>
+      <BoxView {...props} />
+    </>
   )
+
 }
 
 export default function RoutedBox() {

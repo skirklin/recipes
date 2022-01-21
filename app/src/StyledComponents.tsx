@@ -7,6 +7,8 @@ export const Title = styled.h1`
   display: inline;
   padding-left: 5px;
   margin-bottom: 0px;
+  font-weight: bold;
+  font-family: sans-serif;
 `
 
 export const ActionButton = styled(Button)`
@@ -41,12 +43,4 @@ export const IndexCardBottomLine = styled.hr`
 `
 
 export const StyledTextArea = styled(Input.TextArea)`
-  &:focus {
-    border: none;
-    box-shadow: none;
-  }
-  &:hover {
-    border: none;
-    box-shadow: none;
-  }
 `

@@ -42,6 +42,7 @@ export const recipeConverter = {
 
 export class BoxEntry {
     data: BoxType;
+    changed?: BoxType;
     id: string | undefined;
     owners: string[];
     creator: string;
