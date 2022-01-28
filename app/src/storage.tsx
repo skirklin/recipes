@@ -8,6 +8,7 @@ export class RecipeEntry {
     data: Recipe;
     changed?: Recipe;
     owners: string[];
+    editing: boolean;
     creator: UserId;
     visibility: Visibility;
 
@@ -17,6 +18,7 @@ export class RecipeEntry {
         this.creator = creator
         this.owners = owners;
         this.visibility = visibility;
+        this.editing = false;
     }
     toString() {
         return `Recipe: ${this.data.name}`;

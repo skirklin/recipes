@@ -22,6 +22,7 @@ import { useContext } from 'react';
 import { Context } from '../context';
 import { getRecipeFromState, setRecipeVisiblity } from '../utils';
 import { addRecipeOwner } from '../backend';
+import EditButton from '../Buttons/EditRecipe';
 
 
 const RecipeBody = styled.div`
@@ -57,6 +58,7 @@ function ActionBar(props: RecipeCardProps) {
       <DeleteButton {...props} element="button" />
       <DownloadButton {...props} element="button" />
       <ForkButton {...props} element="button" />
+      <EditButton {...props} element="button" />
       <VisibilityControl {...props}
         handleAddOwner={handleAddOwner}
         handleChange={handleVisiblityChange} value={recipe.visibility} element="button" />
@@ -85,6 +87,7 @@ function ActionMenu(props: RecipeCardProps) {
       <DeleteButton {...props} element="menu" />
       <DownloadButton {...props} element="menu" />
       <ForkButton {...props} element="menu" />
+      <EditButton {...props} element="menu" />
       <VisibilityControl
         {...props}
         handleAddOwner={handleAddOwner}

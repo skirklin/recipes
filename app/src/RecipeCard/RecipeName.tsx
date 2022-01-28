@@ -21,9 +21,9 @@ const EditableTitle = styled(Input)`
 
 function RecipeName(props: RecipeCardProps) {
   const { recipeId, boxId } = props;
-  const [editable, setEditablePrimitive] = useState(false);
   const { state, dispatch } = useContext(Context);
   const recipe = getRecipeFromState(state, boxId, recipeId)
+  const [editable, setEditablePrimitive] = useState(false);
 
   const setEditable = (value: boolean) => {
     const user = getAppUserFromState(state)
@@ -53,7 +53,7 @@ function RecipeName(props: RecipeCardProps) {
   if (rd.url) {
     link = <a href={rd.url.toString()} target="_blank" rel="noreferrer"><LinkOutlined /></a>
   }
-  if (editable) {
+  if (editable || recipe.editing) {
     return (
       <EditableTitle type="text"
         defaultValue={name}

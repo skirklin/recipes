@@ -54,7 +54,7 @@ function IngredientList(props: RecipeCardProps) {
       </ul>
     )
   }
-  if (editable) {
+  if (editable || recipe.editing) {
     return (
       <StyledTextArea
         defaultValue={ingredientsToStr(ingredients)}

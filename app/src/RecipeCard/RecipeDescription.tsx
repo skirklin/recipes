@@ -45,7 +45,7 @@ function RecipeDescription(props: RecipeCardProps) {
     textAreaProps = {}
   }
 
-  if (editable) {
+  if (editable || recipe.editing) {
     return (
       <StyledTextArea
         autoSize

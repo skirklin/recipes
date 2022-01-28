@@ -64,7 +64,7 @@ function InstructionList(props: RecipeCardProps) {
     setEditable(false)
   }
 
-  if (editable) {
+  if (editable || recipe.editing) {
     return (
       <RecipeStepsArea>
 
