@@ -35,13 +35,14 @@ function SaveButton(props: RecipeCardProps) {
     const newRecipe = _.cloneDeep(recipe)
     newRecipe.data = recipe.changed
     newRecipe.changed = undefined
+    newRecipe.editing = false
     if (recipeId.startsWith("uniqueId=")) {
       const docRef = await addRecipe(boxId, newRecipe, dispatch)
       dispatch({type: "REMOVE_RECIPE", recipeId, boxId}) // removes the local-only version of the recipe
       navigate(`/boxes/${boxId}/recipes/${docRef.id}`)
     } else {
       docRef = doc(db, "boxes", boxId, "recipes", recipeId).withConverter(recipeConverter)
-      console.log({ docRef, newRecipe })
+      dispatch({type: "ADD_RECIPE", recipeId, boxId, payload: newRecipe})
       await setDoc(docRef, newRecipe)
     }
   }

@@ -39,7 +39,7 @@ function Notes(props: RecipeCardProps) {
     setEditable(false)
   }
 
-  if (editable) {
+  if (editable || recipe.editing) {
     return (
       <NotesArea>
         <StyledTextArea

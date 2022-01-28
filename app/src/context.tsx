@@ -82,14 +82,14 @@ export function recipeBoxReducer(prevState: AppState, action: ActionType): AppSt
       }
       if (authUser !== prevState.authUser) {
         console.log("clearing state")
-        return {...initState(), authUser}
+        return { ...initState(), authUser }
       } else {
         return prevState
       }
     }
     case "ADD_USER": {
       const user = action.user
-      if (user === undefined ) {
+      if (user === undefined) {
         console.warn("ADD_USER requires userId and user.")
         return prevState
       }
@@ -177,14 +177,24 @@ export function recipeBoxReducer(prevState: AppState, action: ActionType): AppSt
     case 'SET_INSTRUCTIONS': {
       return handleRecipeChange("recipeInstructions", prevState, action)
     }
+    case 'SET_EDITABLE': {
+      if (action.recipeId === undefined || action.boxId === undefined) return prevState
+
+      const newState = { ...prevState }
+      const recipe = getRecipeFromState(prevState, action.boxId, action.recipeId)
+      if (recipe === undefined) return prevState
+      recipe.editing = true;
+      recipe.changed = _.cloneDeep(recipe.data)
+      setRecipeInState(newState, action.boxId, action.recipeId, recipe)
+      return newState
+    }
     case 'RESET_RECIPE': {
       if (action.recipeId === undefined || action.boxId === undefined) return prevState
       const recipe = getRecipeFromState(prevState, action.boxId, action.recipeId)
       if (recipe === undefined) return prevState
       const newState = { ...prevState }
-      if (recipe.changed !== undefined) {
-        recipe.changed = undefined
-      }
+      recipe.changed = undefined
+      recipe.editing = false
       setRecipeInState(newState, action.boxId, action.recipeId, recipe)
       return newState
     }

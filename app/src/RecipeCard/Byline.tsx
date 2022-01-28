@@ -48,7 +48,7 @@ function Byline(props: RecipeCardProps) {
     }
     setEditable(false);
   }
-  if (editable) {
+  if (editable || recipe.editing) {
     return (
       <StyledByline>
         <span>Author:</span>
