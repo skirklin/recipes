@@ -25,14 +25,19 @@ export default function VisibilityControl(props: VisibilityProps) {
             break;
     }
 
+    const privateItem = (
+        <Menu.Item onClick={e => handleChange(e)} key={Visibility.private} icon={<BookOutlined />}>
+            Make private
+        </Menu.Item>
+    )
+    const publicItem = (
+        <Menu.Item onClick={e => handleChange(e)} key={Visibility.public} icon={<GlobalOutlined />}>
+            Make visible
+        </Menu.Item>
+    )
     const menu = (
         <Menu>
-            <Menu.Item onClick={e => handleChange(e)} key={Visibility.private} icon={<BookOutlined />}>
-                Private
-            </Menu.Item>
-            <Menu.Item onClick={e => handleChange(e)} key={Visibility.public} icon={<GlobalOutlined />}>
-                Public
-            </Menu.Item>
+            {value === Visibility.public ? privateItem : publicItem}
             <AddOwnerButton element="menu" handleOk={handleAddOwner} />
         </Menu>
     );

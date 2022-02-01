@@ -2,8 +2,8 @@ import { useContext, useState } from 'react';
 import styled from 'styled-components';
 import { Context } from '../context';
 import { StyledTextArea } from '../StyledComponents';
-import { getAppUserFromState, getRecipeFromState } from '../utils';
-import { RecipeCardProps } from './RecipeCard';
+import { getRecipeFromState } from '../utils';
+import { getEditableSetter, RecipeCardProps } from './RecipeCard';
 
 
 const Description = styled.div`
@@ -23,12 +23,7 @@ function RecipeDescription(props: RecipeCardProps) {
 
   const recipe = getRecipeFromState(state, boxId, recipeId)
   if (recipe === undefined) { return null }
-  const setEditable = (value: boolean) => {
-    const user = getAppUserFromState(state)
-    if (state.writeable && user && recipe.owners.includes(user.id)) {
-      setEditablePrimitive(value)
-    }
-  }
+  const setEditable = getEditableSetter(state, recipeId, boxId, setEditablePrimitive)
 
   const description = recipe.changed ? recipe.changed.description : recipe.data.description
   function handleChange(value: string) {

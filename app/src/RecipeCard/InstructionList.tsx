@@ -1,9 +1,9 @@
 import { useContext, useState } from 'react';
 import styled from 'styled-components';
 import { Recipe } from 'schema-dts';
-import { getAppUserFromState, getRecipeFromState, instructionsToStr, strToInstructions } from '../utils';
+import { getRecipeFromState, instructionsToStr, strToInstructions } from '../utils';
 import { Context } from '../context';
-import { RecipeCardProps } from './RecipeCard';
+import { getEditableSetter, RecipeCardProps } from './RecipeCard';
 import { StyledTextArea } from '../StyledComponents';
 
 
@@ -48,12 +48,7 @@ function InstructionList(props: RecipeCardProps) {
   }
 
   if (recipe === undefined) { return null }
-  const setEditable = (value: boolean) => {
-    const user = getAppUserFromState(state)
-    if (state.writeable && user && recipe.owners.includes(user.id)) {
-      setEditablePrimitive(value)
-    }
-  }
+  const setEditable = getEditableSetter(state, recipeId, boxId, setEditablePrimitive)
 
   const instructions = recipe.changed ? recipe.changed.recipeInstructions : recipe.data.recipeInstructions;
 

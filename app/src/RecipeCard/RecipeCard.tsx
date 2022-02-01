@@ -11,7 +11,7 @@ import DeleteButton from '../Buttons/DeleteRecipe'
 import DownloadButton from '../Buttons/DownloadRecipe';
 import VisibilityControl from '../Buttons/Visibility';
 import ForkButton from '../Buttons/ForkRecipe';
-import { BoxId, RecipeId, Visibility } from '../types';
+import { AppState, BoxId, RecipeId, Visibility } from '../types';
 import { IndexCardBottomLine, IndexCardTopLine, RecipeActionGroup } from '../StyledComponents';
 import ByLine from './Byline';
 import Tags from './Tags';
@@ -20,7 +20,7 @@ import { Dropdown, Menu } from 'antd';
 import { BarsOutlined } from '@ant-design/icons';
 import { useContext } from 'react';
 import { Context } from '../context';
-import { getRecipeFromState, setRecipeVisiblity } from '../utils';
+import { canUpdateRecipe, getAppUserFromState, getBoxFromState, getRecipeFromState, setRecipeVisiblity } from '../utils';
 import { addRecipeOwner } from '../backend';
 import EditButton from '../Buttons/EditRecipe';
 
@@ -28,6 +28,17 @@ import EditButton from '../Buttons/EditRecipe';
 const RecipeBody = styled.div`
   margin: 5px
 `
+
+export function getEditableSetter(state: AppState, recipeId: RecipeId, boxId: BoxId, setEditable: (value: boolean) => void) {
+  return (value: boolean) => {
+    const user = getAppUserFromState(state)
+    const recipe = getRecipeFromState(state, boxId, recipeId)
+    const box = getBoxFromState(state, boxId)
+    if (state.writeable && canUpdateRecipe(recipe, box, user)) {
+      setEditable(value)
+    }
+  }
+}
 
 export interface RecipeCardProps {
   recipeId: RecipeId

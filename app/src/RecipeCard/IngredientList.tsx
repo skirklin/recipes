@@ -1,10 +1,11 @@
-import { useState, useContext } from 'react';
+import { useState, useContext, CSSProperties } from 'react';
 import styled from 'styled-components';
 import { Recipe } from 'schema-dts';
-import { getAppUserFromState, getRecipeFromState, ingredientsToStr, strToIngredients } from '../utils';
+import { canUpdateRecipe, getAppUserFromState, getBoxFromState, getRecipeFromState, ingredientsToStr, strToIngredients } from '../utils';
 import { Context } from '../context';
 import { RecipeCardProps } from './RecipeCard';
 import { StyledTextArea } from '../StyledComponents';
+import { useMediaQuery } from 'react-responsive';
 
 
 const Ingredient = styled.li`
@@ -17,23 +18,39 @@ function IngredientList(props: RecipeCardProps) {
   const { recipeId, boxId } = props;
   const { state, dispatch } = useContext(Context);
   const recipe = getRecipeFromState(state, boxId, recipeId)
-  if (recipe === undefined) {
+  const box = getBoxFromState(state, boxId)
+  const isTabletOrMobile = useMediaQuery({ query: '(max-width: 1224px)' })
+
+  if (recipe === undefined || box === undefined) {
     return null
   }
 
-  const ingredientsStyle = {
+  const baseIngredientsStyle = {
     outline: "none",
     padding: "10px",
     margin: "0px 0px 0px 30px",
     backgroundColor: "var(--pale-spring-bud)",
     display: "inline-block",
-    width: "fit-content",
-    minWidth: "50%",
+  }
+  let ingredientsStyle: CSSProperties
+  if (isTabletOrMobile) {
+    ingredientsStyle = {
+      ...baseIngredientsStyle
+      ,
+      width: "fit-content",
+      minWidth: "50%",
+    }
+  } else {
+    ingredientsStyle = {
+      ...baseIngredientsStyle,
+      width: "100%"
+
+    }
   }
 
   const setEditable = (value: boolean) => {
     const user = getAppUserFromState(state)
-    if (state.writeable && user && recipe.owners.includes(user.id)) {
+    if (state.writeable && canUpdateRecipe(recipe, box, user)) {
       setEditablePrimitive(value)
     }
   }
@@ -54,6 +71,7 @@ function IngredientList(props: RecipeCardProps) {
       </ul>
     )
   }
+
   if (editable || recipe.editing) {
     return (
       <StyledTextArea

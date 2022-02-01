@@ -1,7 +1,7 @@
 import { useContext, useState } from 'react';
-import { commentToStr, strToComment, getRecipeFromState, getAppUserFromState } from '../utils';
+import { commentToStr, strToComment, getRecipeFromState } from '../utils';
 import { Context } from '../context';
-import { RecipeCardProps } from './RecipeCard';
+import { getEditableSetter, RecipeCardProps } from './RecipeCard';
 import styled from 'styled-components';
 import { StyledTextArea } from '../StyledComponents';
 
@@ -22,12 +22,8 @@ function Notes(props: RecipeCardProps) {
   }
 
   if (recipe === undefined) { return null }
-  const setEditable = (value: boolean) => {
-    const user = getAppUserFromState(state)
-    if (state.writeable && user && recipe.owners.includes(user.id)) {
-      setEditablePrimitive(value)
-    }
-  }
+  const setEditable = getEditableSetter(state, recipeId, boxId, setEditablePrimitive)
+
 
   const rd = recipe.changed ? recipe.changed : recipe.data
   const comment = commentToStr(rd.comment)
