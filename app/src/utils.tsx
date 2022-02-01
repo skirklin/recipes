@@ -359,3 +359,9 @@ export async function setBoxVisiblity(boxId: BoxId, visibility: Visibility) {
 export async function setRecipeVisiblity(boxId: BoxId, recipeId: RecipeId, visibility: Visibility) {
   updateDoc(doc(db, "boxes", boxId, "recipes", recipeId), { visibility })
 }
+
+export function canUpdateRecipe(recipe: RecipeEntry | undefined, box: BoxEntry | undefined, user: UserEntry | undefined) {
+  if (user === undefined || recipe === undefined || box === undefined) return false
+  const owner = recipe.owners.includes(user.id) || box.owners.includes(user.id)
+  return owner
+}

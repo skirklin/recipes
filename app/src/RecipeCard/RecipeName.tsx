@@ -3,8 +3,8 @@ import styled from 'styled-components';
 import { LinkOutlined } from '@ant-design/icons';
 import { Context } from '../context';
 import { Title } from '../StyledComponents';
-import { getAppUserFromState, getRecipeFromState } from '../utils';
-import { RecipeCardProps } from './RecipeCard';
+import { getRecipeFromState } from '../utils';
+import { getEditableSetter, RecipeCardProps } from './RecipeCard';
 import { Input } from 'antd';
 
 const EditableTitle = styled(Input)`
@@ -25,12 +25,8 @@ function RecipeName(props: RecipeCardProps) {
   const recipe = getRecipeFromState(state, boxId, recipeId)
   const [editable, setEditablePrimitive] = useState(false);
 
-  const setEditable = (value: boolean) => {
-    const user = getAppUserFromState(state)
-    if (state.writeable && user && recipe && recipe.owners.includes(user.id)) {
-      setEditablePrimitive(value)
-    }
-  }
+  const setEditable = getEditableSetter(state, recipeId, boxId, setEditablePrimitive)
+
 
   const rd = recipe ? (recipe.changed ? recipe.changed : recipe.data) : { name: "", url: "" }
   const name = rd.name as string

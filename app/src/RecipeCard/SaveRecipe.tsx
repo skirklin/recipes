@@ -7,7 +7,7 @@ import { useNavigate } from 'react-router-dom';
 
 import { db } from '../backend';
 import { Context } from '../context';
-import { addRecipe, getAppUserFromState, getRecipeFromState } from '../utils';
+import { addRecipe, canUpdateRecipe, getAppUserFromState, getBoxFromState, getRecipeFromState } from '../utils';
 import { RecipeCardProps } from './RecipeCard';
 import _ from 'lodash';
 import { recipeConverter } from '../storage';
@@ -20,10 +20,11 @@ function SaveButton(props: RecipeCardProps) {
   const { state, dispatch } = useContext(Context);
   const { recipeId, boxId } = props;
   const recipe = getRecipeFromState(state, boxId, recipeId)
+  const box = getBoxFromState(state, boxId)
   const user = getAppUserFromState(state)
   const navigate = useNavigate()
 
-  if (recipe === undefined) {
+  if (recipe === undefined || box === undefined) {
     return null
   }
 
@@ -48,7 +49,7 @@ function SaveButton(props: RecipeCardProps) {
   }
 
   let writeable = false;
-  if (state.writeable && user && recipe.owners.includes(user.id) && recipe !== undefined) {
+  if (state.writeable &&  canUpdateRecipe(recipe, box, user)) {
     writeable = true;
   }
 

@@ -1,9 +1,9 @@
 import { Input } from 'antd';
-import React, { useContext, useState } from 'react';
+import { useContext, useState } from 'react';
 import styled from 'styled-components';
 import { Context } from '../context';
-import { getRecipeFromState, authorToStr, getAppUserFromState, strToAuthor } from '../utils';
-import { RecipeCardProps } from './RecipeCard';
+import { getRecipeFromState, authorToStr, strToAuthor } from '../utils';
+import { getEditableSetter, RecipeCardProps } from './RecipeCard';
 
 const EditableByline = styled(Input)`
   font-style: italic;
@@ -33,12 +33,7 @@ function Byline(props: RecipeCardProps) {
   const recipe = getRecipeFromState(state, boxId, recipeId)
   if (recipe === undefined) { return null }
 
-  const setEditable = (value: boolean) => {
-    const user = getAppUserFromState(state)
-    if (state.writeable && user && recipe.owners.includes(user.id)) {
-      setEditablePrimitive(value)
-    }
-  }
+  const setEditable = getEditableSetter(state, recipeId, boxId, setEditablePrimitive)
 
   const rd = recipe.changed ? recipe.changed : recipe.data
   const byline = authorToStr(rd.author)
