@@ -25,12 +25,14 @@ function RecipeName(props: RecipeCardProps) {
   const recipe = getRecipeFromState(state, boxId, recipeId)
   const [editable, setEditablePrimitive] = useState(false);
 
+  const name = recipe ? recipe.getName() : undefined
+  const [value, setValue] = useState(name);
   const setEditable = getEditableSetter(state, recipeId, boxId, setEditablePrimitive)
+  if (recipe === undefined) {
+    return null
+  }
 
-
-  const rd = recipe ? (recipe.changed ? recipe.changed : recipe.data) : { name: "", url: "" }
-  const name = rd.name as string
-  const [value, setValue] = useState<string>(name);
+  const url = recipe.getData().url
   if (recipe === undefined) { return null }
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -46,8 +48,8 @@ function RecipeName(props: RecipeCardProps) {
     setEditable(false);
   }
   let link = null;
-  if (rd.url) {
-    link = <a href={rd.url.toString()} target="_blank" rel="noreferrer"><LinkOutlined /></a>
+  if (url) {
+    link = <a href={url.toString()} target="_blank" rel="noreferrer"><LinkOutlined /></a>
   }
   if (editable || recipe.editing) {
     return (

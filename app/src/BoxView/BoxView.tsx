@@ -34,7 +34,7 @@ export default function BoxView(props: BoxProps) {
   const recipes = box.recipes;
   const data: RowType[] = []
   for (const [recipeId, recipe] of recipes.entries()) {
-    data.push({ boxName: box.data.name, recipeId, boxId, recipe, key: `recipeId=${recipeId}_boxId=${boxId}` })
+    data.push({ box, recipe, key: `recipeId=${recipeId}_boxId=${boxId}` })
   }
 
   function handleVisiblityChange(e: { key: string }) {

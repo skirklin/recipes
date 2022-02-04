@@ -12,7 +12,7 @@ function Contents() {
   const data: RowType[] = []
   for (const [boxId, box] of state.boxes.entries()) {
     for (const [recipeId, recipe] of box.recipes.entries()) {
-      data.push({ boxName: box.data.name, recipeId, boxId, recipe, key: `recipeId=${recipeId}_boxId=${boxId}` })
+      data.push({ box, recipe, key: `recipeId=${recipeId}_boxId=${boxId}` })
     }
   }
 

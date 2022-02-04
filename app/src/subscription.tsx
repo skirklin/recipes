@@ -13,7 +13,7 @@ async function initializeUser(user: User) {
   const userRef = doc(db, "users", user.uid).withConverter(userConverter);
   const userDoc = await getDoc(userRef)
   if (!userDoc.exists() && !user.isAnonymous) {
-    await setDoc(userRef, new UserEntry(user.displayName || "Anonymous", Visibility.private, [], userRef.id));
+    await setDoc(userRef, new UserEntry(user.displayName || "Anonymous", Visibility.private, [], new Date(), userRef.id));
     const newUser = await getDoc(userRef)
     if (newUser.exists()) {
       const userEntry = newUser.data()
