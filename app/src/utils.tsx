@@ -1,4 +1,4 @@
-import { getAuth, signOut, User } from 'firebase/auth';
+import { getAuth, signOut } from 'firebase/auth';
 import { addDoc, arrayRemove, arrayUnion, collection, deleteDoc, doc, getDoc, getDocs, query, updateDoc, where } from 'firebase/firestore';
 import _ from 'lodash';
 import { Comment, Recipe } from "schema-dts"
@@ -244,7 +244,7 @@ export async function uploadRecipes(boxId: BoxId, user: UserEntry) {
       f.text().then(
         (text: string) => {
           const jsonobj = JSON.parse(text) as Recipe
-          const recipe = new RecipeEntry(jsonobj, [user.id], Visibility.private, user.id, undefined)
+          const recipe = new RecipeEntry(jsonobj, [user.id], Visibility.private, user.id, "placeholder", new Date(), new Date(), user.id)
           addRecipe(boxId, recipe, null)
         })
     })
@@ -263,7 +263,7 @@ export async function addBox(user: UserEntry, name: string, dispatch: React.Disp
   }
   const boxesCol = collection(db, "boxes").withConverter(boxConverter)
   const boxData = { name }
-  const box = new BoxEntry(boxData, [user.id], Visibility.private, user.id, undefined)
+  const box = new BoxEntry(boxData, [user.id], Visibility.private, user.id, "placeholder", new Date(), new Date(), user.id)
   const userRef = doc(db, "users", user.id)
   const boxRef = await addDoc(boxesCol, box)
   await updateDoc(userRef, { boxes: arrayUnion(boxRef) })
@@ -279,13 +279,13 @@ export function createNewRecipe(user: UserEntry) {
     "recipeIngredient": [],
     "description": "",
   }
-  return new RecipeEntry(data, owners, Visibility.private, user.id, undefined)
+  return new RecipeEntry(data, owners, Visibility.private, user.id, "placeholder", new Date(), new Date(), user.id)
 }
 
 
-export function createNewBox(user: User) {
+export function createNewBox(user: UserEntry) {
   const name = "New box"
-  return new BoxEntry({ name }, [user.uid], Visibility.private, user.uid, undefined)
+  return new BoxEntry({ name }, [user.id], Visibility.private, user.id, "placeholder", new Date(), new Date(), user.id)
 }
 
 export async function deleteRecipe(state: AppState, boxId: BoxId, recipeId: RecipeId, dispatch: React.Dispatch<ActionType>) {
@@ -364,4 +364,11 @@ export function canUpdateRecipe(recipe: RecipeEntry | undefined, box: BoxEntry |
   if (user === undefined || recipe === undefined || box === undefined) return false
   const owner = recipe.owners.includes(user.id) || box.owners.includes(user.id)
   return owner
+}
+
+export function decodeStr(s: string | undefined) {
+  if (s === undefined) {
+    return undefined
+  }
+  return s.replace("&#39;", "'")
 }

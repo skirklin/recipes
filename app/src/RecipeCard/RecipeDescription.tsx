@@ -25,7 +25,7 @@ function RecipeDescription(props: RecipeCardProps) {
   if (recipe === undefined) { return null }
   const setEditable = getEditableSetter(state, recipeId, boxId, setEditablePrimitive)
 
-  const description = recipe.changed ? recipe.changed.description : recipe.data.description
+  const description = recipe.getDescription()
   function handleChange(value: string) {
     if (value !== description) {
       dispatch({ type: "SET_DESCRIPTION", recipeId, boxId, payload: value });
@@ -35,7 +35,7 @@ function RecipeDescription(props: RecipeCardProps) {
 
   let textAreaProps;
   if (description !== undefined) {
-    textAreaProps = { defaultValue: description.toString() }
+    textAreaProps = { defaultValue: description }
   } else {
     textAreaProps = {}
   }

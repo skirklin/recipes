@@ -2,7 +2,7 @@ import _ from 'lodash';
 import { createContext } from 'react';
 import { BoxEntry, RecipeEntry, UserEntry } from './storage';
 import { ActionType, AppState } from './types';
-import { createNewBox, getBoxFromState, getRecipeFromState, setBoxInState, setRecipeInState } from './utils';
+import { getBoxFromState, getRecipeFromState, setBoxInState, setRecipeInState } from './utils';
 
 
 export type ContextType = {
@@ -98,17 +98,22 @@ export function recipeBoxReducer(prevState: AppState, action: ActionType): AppSt
       return state
     }
     case "ADD_RECIPE": {
-      if (action.boxId === undefined || (action.recipeId === undefined) || prevState.authUser === null) {
+      if (action.boxId === undefined || (action.recipeId === undefined)) {
         console.warn("ADD_RECIPE requires a boxId and recipeId.")
         return prevState
       }
-      newBox = { ...(prevState.boxes.get(action.boxId) || createNewBox(prevState.authUser)) }
+      const prevBox = prevState.boxes.get(action.boxId)
+      if (prevBox === undefined) {
+        console.warn(`Attempted to add recipe to non-existent box: ${action.boxId}`)
+        return prevState
+      }
+      const box = prevBox.clone()
       if (action.payload === undefined) {
         console.warn("ADD_RECIPE requires a payload.")
         return prevState
       }
-      newBox.recipes = new Map([...newBox.recipes, [action.recipeId, action.payload as RecipeEntry]])
-      state = { ...prevState, boxes: new Map([...prevState.boxes, [action.boxId, newBox as BoxEntry]]) }
+      box.recipes = new Map([...box.recipes, [action.recipeId, action.payload as RecipeEntry]])
+      state = { ...prevState, boxes: new Map([...prevState.boxes, [action.boxId, box]]) }
       return state
     }
     case "ADD_BOX": {

@@ -16,6 +16,9 @@ export type BoxStoreType = {
   creator: string,
   owners: string[], // user ids
   visibility: Visibility,
+  created: Date,
+  updated: Date,
+  lastUpdatedBy: string, // user id
   data: BoxType
 }
 
@@ -23,12 +26,16 @@ export type RecipeStoreType = {
   creator: string,
   data: Recipe,
   visibility: Visibility,
+  created: Date,
+  updated: Date,
+  lastUpdatedBy: string, // user id
   owners: string[], // user ids
 }
 
 export type UserStoreType = {
   name: string,
   visibility: Visibility,
+  lastSeen: Date,
   boxes: DocumentReference<BoxEntry>[],
 }
 
@@ -48,13 +55,13 @@ export type ActionType = {
   userId?: UserId
   user?: UserEntry
   authUser?: User | null
-  payload?: RecipeEntry 
-  | BoxEntry 
-  | Map<string, BoxEntry> 
-  | Map<string, RecipeEntry> 
-  | boolean 
-  | string 
-  | Recipe["recipeIngredient"] 
+  payload?: RecipeEntry
+  | BoxEntry
+  | Map<string, BoxEntry>
+  | Map<string, RecipeEntry>
+  | boolean
+  | string
+  | Recipe["recipeIngredient"]
   | Recipe["recipeInstructions"]
   | Recipe["recipeCategory"]
   | Recipe["author"]

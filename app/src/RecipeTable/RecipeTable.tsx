@@ -15,9 +15,8 @@ import { Context } from '../context';
 import { PickBoxModal } from '../Modals/PickBoxModal';
 import { ActionButton } from '../StyledComponents';
 import './RecipeTable.css'
-import { Recipe } from 'schema-dts';
-import { RecipeEntry } from '../storage';
-import { BoxId, RecipeId, Visibility } from '../types';
+import { BoxEntry, RecipeEntry } from '../storage';
+import { BoxId, Visibility } from '../types';
 import styled from 'styled-components';
 import { useMediaQuery } from 'react-responsive'
 import VisibilityControl from '../Buttons/Visibility';
@@ -44,10 +43,8 @@ function sortfunc(a: string, b: string) {
 }
 
 export interface RowType {
-  boxName: string
+  box: BoxEntry,
   recipe: RecipeEntry
-  boxId: BoxId
-  recipeId: RecipeId
   key: string
 }
 
@@ -56,10 +53,6 @@ interface RecipeTableProps {
   writeable: boolean
   boxId?: string
 }
-
-const getName = (name: Recipe["name"]) => name === undefined ? "" : name.toString()
-
-
 
 
 export function RecipeTable(props: RecipeTableProps) {
@@ -88,12 +81,12 @@ export function RecipeTable(props: RecipeTableProps) {
 
   const onNameCell = (record: RowType, rowIndex: number | undefined) => {
     return {
-      onClick: () => navigate(`/boxes/${record.boxId}/recipes/${record.recipeId}`),
+      onClick: () => navigate(`/boxes/${record.box.id}/recipes/${record.recipe.id}`),
     }
   }
   const onBoxCell = (record: RowType, rowIndex: number | undefined) => {
     return {
-      onClick: () => navigate(`/boxes/${record.boxId}`),
+      onClick: () => navigate(`/boxes/${record.box.id}`),
     }
   }
 
@@ -102,7 +95,7 @@ export function RecipeTable(props: RecipeTableProps) {
   async function del() {
     selectedRows.forEach(
       (value: RowType) => {
-        deleteRecipe(state, value.boxId, value.recipeId, dispatch)
+        deleteRecipe(state, value.box.id, value.recipe.id, dispatch)
       }
     )
     setSelectedRowKeys([])
@@ -121,7 +114,7 @@ export function RecipeTable(props: RecipeTableProps) {
   function handleVisiblityChange(e: { key: string }) {
     selectedRows.forEach(
       (value: RowType) => {
-        setRecipeVisiblity(value.boxId, value.recipeId, e.key as Visibility)
+        setRecipeVisiblity(value.box.id, value.recipe.id, e.key as Visibility)
       }
     )
   }
@@ -129,7 +122,7 @@ export function RecipeTable(props: RecipeTableProps) {
   function handleAddOwner(newOwnerEmail: string) {
     selectedRows.forEach(
       (value: RowType) => {
-        addRecipeOwner({ boxId: value.boxId, recipeId: value.recipeId, newOwnerEmail })
+        addRecipeOwner({ boxId: value.box.id, recipeId: value.recipe.id, newOwnerEmail })
       }
     )
   }
@@ -156,8 +149,8 @@ export function RecipeTable(props: RecipeTableProps) {
     {
       key: 'name',
       title: 'Name',
-      dataIndex: ['recipe', 'data', 'name'],
-      sorter: (a: RowType, b: RowType) => sortfunc(getName(a.recipe.data.name), getName(b.recipe.data.name)),
+      render: (value, record) => <div>{record.recipe.getName()}</div>,
+      sorter: (a: RowType, b: RowType) => sortfunc(a.recipe.getName() || "", b.recipe.getName() || ""),
       onCell: onNameCell,
       className: "recipe-table-clickable-column",
     }
@@ -168,8 +161,8 @@ export function RecipeTable(props: RecipeTableProps) {
       {
         key: 'box',
         title: 'Box',
-        dataIndex: ['boxName'],
         onCell: onBoxCell,
+        render: (value, record) => <div>{record.box.getName()}</div>,
         className: "recipe-table-clickable-column",
       }
     )
@@ -196,7 +189,7 @@ export function RecipeTable(props: RecipeTableProps) {
       {
         key: 'description',
         title: 'Description',
-        dataIndex: ['recipe', 'data', 'description'],
+        render: (value, record) => <div>{record.recipe.getDescription()}</div>,
       }
     )
   }
