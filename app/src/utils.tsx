@@ -105,7 +105,7 @@ export function strToComment(text: string): Comment {
   return { "@type": "Comment", text }
 }
 
-export function categoriesToTags(categories: Recipe["recipeCategory"]) {
+export function parseCategories(categories: Recipe["recipeCategory"]): string[] {
   if (categories === undefined) {
     return []
   } else if (typeof categories === "string") {
@@ -115,7 +115,7 @@ export function categoriesToTags(categories: Recipe["recipeCategory"]) {
   }
 }
 
-export function tagsToCategories(tags: string[]): Recipe["recipeCategory"] {
+export function formatCategories(tags: string[]): Recipe["recipeCategory"] {
   return tags
 }
 

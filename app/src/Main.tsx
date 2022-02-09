@@ -8,6 +8,7 @@ import Header from './Header/Header';
 import { Outlet } from 'react-router-dom';
 
 import { subscribeToUser, unsubscribe } from './subscription';
+import { Spin } from 'antd';
 
 function Main() {
 
@@ -37,7 +38,9 @@ function Main() {
   return (
     <>
       <Header />
-      <Outlet />
+      <Spin spinning={state.loading}>
+        <Outlet />
+      </Spin>
     </>
   );
 }

@@ -1,6 +1,6 @@
 import React from 'react';
 import { User } from "firebase/auth";
-import { getDoc, onSnapshot, doc, setDoc, DocumentSnapshot, collection, QuerySnapshot } from "firebase/firestore";
+import { getDoc, onSnapshot, doc, setDoc, DocumentSnapshot, collection, QuerySnapshot, updateDoc } from "firebase/firestore";
 import 'antd/dist/antd.css'; // or 'antd/dist/antd.less'
 
 import { ActionType, BoxId, UnsubMap, Visibility } from './types';
@@ -28,17 +28,20 @@ async function initializeUser(user: User) {
 
 export async function subscribeToUser(user: User, dispatch: React.Dispatch<ActionType>, unsubMap: UnsubMap) {
   console.log("subscribing to user", user)
+  dispatch({type: "SET_LOADING", payload: true})
   // fetch any boxes associated with this user
   if (user === null) {
     return
   }
 
   const userRef = await initializeUser(user)
+  updateDoc(userRef, {lastSeen: new Date()})
   
   // subscription for changes to user
   unsubMap.userUnsub = onSnapshot(userRef.withConverter(userConverter),
     snapshot => (handleUserSnapshot(snapshot, dispatch, unsubMap))
   )
+  dispatch({type: "SET_LOADING", payload: false})
 }
 
 async function handleUserSnapshot(
@@ -50,6 +53,7 @@ async function handleUserSnapshot(
   if (user === undefined) {
     return
   }
+  dispatch({type: "SET_LOADING", payload: true})
 
   dispatch({ type: "ADD_USER", user })
 
@@ -66,12 +70,13 @@ async function handleUserSnapshot(
       }
     }
   )
+  dispatch({type: "SET_LOADING", payload: false})
+
 }
 
 async function handleRecipesSnapshot(snapshot: QuerySnapshot<RecipeEntry>, dispatch: React.Dispatch<ActionType>, boxId: BoxId) {
   const changes = snapshot.docChanges()
   for (const change of changes) {
-    console.log({change})
     const doc = change.doc;
     const data = doc.data()
     if (change.type === "added" || change.type === "modified") {
