@@ -10,12 +10,12 @@ import Filterbox from './Filterbox';
 import NewButton from '../Buttons/NewRecipe';
 import UploadButton from '../Buttons/UploadRecipes';
 import ImportButton from '../Buttons/ImportRecipes';
-import { addRecipe, categoriesToTags, deleteRecipe, setRecipeVisiblity } from '../utils';
+import { addRecipe, parseCategories, deleteRecipe, getAppUserFromState, setRecipeVisiblity } from '../utils';
 import { Context } from '../context';
 import { PickBoxModal } from '../Modals/PickBoxModal';
 import { ActionButton } from '../StyledComponents';
 import './RecipeTable.css'
-import { BoxEntry, RecipeEntry } from '../storage';
+import { BoxEntry, RecipeEntry, UserEntry } from '../storage';
 import { BoxId, Visibility } from '../types';
 import styled from 'styled-components';
 import { useMediaQuery } from 'react-responsive'
@@ -66,8 +66,15 @@ export function RecipeTable(props: RecipeTableProps) {
   const { state, dispatch } = useContext(Context)
   const [filteredRows, setFilteredRows] = useState<RowType[]>([])
   const [tagFilter, setTagFilter] = useState<string[]>()
+  const user = getAppUserFromState(state)
 
-  useEffect(() => setFilteredRows(recipes), [recipes])
+  useEffect(() => {
+    const sortedRecipes = _.sortBy(recipes, row => row.recipe.updated)
+    setFilteredRows(sortedRecipes)
+  },
+    [recipes]
+  )
+
 
   const onSelectChange = (selectedRowKeys: Key[], selectedRows: RowType[]) => {
     setSelectedRowKeys(selectedRowKeys);
@@ -130,7 +137,7 @@ export function RecipeTable(props: RecipeTableProps) {
   const allTags = new Set<string>()
   filteredRows.forEach(
     (row) => {
-      categoriesToTags(row.recipe.data.recipeCategory).forEach(
+      parseCategories(row.recipe.data.recipeCategory).forEach(
         t => allTags.add(t)
       )
     }
@@ -143,6 +150,31 @@ export function RecipeTable(props: RecipeTableProps) {
 
   function addTagToFilter(t: string) {
     setTagFilter([...(tagFilter || []), t])
+  }
+
+  function getTags(recipe: RecipeEntry) {
+    console.log("getTags for", recipe)
+    
+    function hasSeen(r: RecipeEntry, u: UserEntry) {
+      return r.updated < u.lastSeen
+  }
+    const tags: JSX.Element[] = [];
+    if (user === undefined) return tags
+    if (!hasSeen(recipe, user)) {
+      if (recipe.created > user.lastSeen) {
+         tags.push(<PointerTag color={"red"} onClick={() => addTagToFilter("__new__")}>New</PointerTag>)
+        } else {
+        tags.push(<PointerTag color={"yellow"} onClick={() => addTagToFilter("__updated__")}>Updated</PointerTag>)
+      }
+    } else {
+      console.log("user has seen", user, recipe)
+    }
+    for (const cat of parseCategories(recipe.data.recipeCategory)) {
+      tags.push(
+        <PointerTag onClick={() => addTagToFilter(cat)}>{cat}</PointerTag>
+      )
+    }
+    return tags
   }
 
   const columns: ColumnsType<RowType> = [
@@ -173,13 +205,10 @@ export function RecipeTable(props: RecipeTableProps) {
     {
       key: 'tags',
       title: 'Tags',
-      dataIndex: ['recipe', 'data', 'recipeCategory'],
-      render: (tags) => {
-        return Array.prototype.map.call(categoriesToTags(tags), t => <PointerTag onClick={() => addTagToFilter(t)}>{t}</PointerTag>)
-      },
+      render: (value, record) => getTags(record.recipe),
       filters: [...allTags].map(t => ({ text: t, value: t })),
       filterSearch: allTags.size > 10,
-      onFilter: (value, row) => categoriesToTags(row.recipe.data.recipeCategory).includes(value),
+      onFilter: (value, row) => typeof (value) === "string" && parseCategories(row.recipe.data.recipeCategory).includes(value),
       filteredValue: tagFilter,
     }
   )
@@ -192,6 +221,10 @@ export function RecipeTable(props: RecipeTableProps) {
         render: (value, record) => <div>{record.recipe.getDescription()}</div>,
       }
     )
+  }
+
+  if (user === undefined) {
+    return null
   }
 
   return (

@@ -44,6 +44,7 @@ export type AppState = {
   users: Map<string, UserEntry>
   authUser: User | null
   writeable: boolean
+  loading: boolean
 }
 
 export type ActionType = {

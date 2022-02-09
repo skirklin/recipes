@@ -3,7 +3,7 @@ import { Input, Tag } from 'antd';
 import { useContext, useState } from 'react';
 import styled from 'styled-components';
 import { Context } from '../context';
-import { categoriesToTags, tagsToCategories, getRecipeFromState, getAppUserFromState } from '../utils';
+import { parseCategories, formatCategories, getRecipeFromState, getAppUserFromState } from '../utils';
 import { RecipeCardProps } from './RecipeCard';
 import { useMediaQuery } from 'react-responsive'
 
@@ -20,13 +20,13 @@ function Tags(props: RecipeCardProps) {
 
   const recipe = getRecipeFromState(state, boxId, recipeId)
   const rd = recipe ? (recipe.changed ? recipe.changed : recipe.data) : { recipeCategory: [] }
-  const tags = categoriesToTags(rd.recipeCategory)
+  const tags = parseCategories(rd.recipeCategory)
   const isTabletOrMobile = useMediaQuery({ query: '(max-width: 1224px)' })
 
   if (recipe === undefined || isTabletOrMobile) { return null }
 
   function setTags(tags: string[]) {
-    dispatch({ type: "SET_CATEGORIES", recipeId, boxId, payload: tagsToCategories(tags) })
+    dispatch({ type: "SET_CATEGORIES", recipeId, boxId, payload: formatCategories(tags) })
   }
 
   const user = getAppUserFromState(state);
