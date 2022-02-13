@@ -244,7 +244,16 @@ export async function uploadRecipes(boxId: BoxId, user: UserEntry) {
       f.text().then(
         (text: string) => {
           const jsonobj = JSON.parse(text) as Recipe
-          const recipe = new RecipeEntry(jsonobj, [user.id], Visibility.private, user.id, "placeholder", new Date(), new Date(), user.id)
+          const recipe = new RecipeEntry(
+            jsonobj,
+            [user.id],
+            Visibility.private,
+            user.id,
+            "placeholder",
+            new Date(),
+            new Date(),
+            user.id,
+          )
           addRecipe(boxId, recipe, null)
         })
     })
@@ -279,7 +288,16 @@ export function createNewRecipe(user: UserEntry) {
     "recipeIngredient": [],
     "description": "",
   }
-  return new RecipeEntry(data, owners, Visibility.private, user.id, "placeholder", new Date(), new Date(), user.id)
+  return new RecipeEntry(
+    data,
+    owners,
+    Visibility.private,
+    user.id,
+    "placeholder",
+    new Date(),
+    new Date(),
+    user.id
+  )
 }
 
 

@@ -69,7 +69,7 @@ export function RecipeTable(props: RecipeTableProps) {
   const user = getAppUserFromState(state)
 
   useEffect(() => {
-    const sortedRecipes = _.sortBy(recipes, row => row.recipe.updated)
+    const sortedRecipes = _.sortBy(recipes, row => -row.recipe.updated)
     setFilteredRows(sortedRecipes)
   },
     [recipes]
@@ -153,21 +153,17 @@ export function RecipeTable(props: RecipeTableProps) {
   }
 
   function getTags(recipe: RecipeEntry) {
-    console.log("getTags for", recipe)
-    
     function hasSeen(r: RecipeEntry, u: UserEntry) {
       return r.updated < u.lastSeen
-  }
+    }
     const tags: JSX.Element[] = [];
     if (user === undefined) return tags
     if (!hasSeen(recipe, user)) {
-      if (recipe.created > user.lastSeen) {
-         tags.push(<PointerTag color={"red"} onClick={() => addTagToFilter("__new__")}>New</PointerTag>)
-        } else {
+      if (recipe.created > user.lastSeen ) {
+        tags.push(<PointerTag color={"red"} onClick={() => addTagToFilter("__new__")}>New</PointerTag>)
+      } else {
         tags.push(<PointerTag color={"yellow"} onClick={() => addTagToFilter("__updated__")}>Updated</PointerTag>)
       }
-    } else {
-      console.log("user has seen", user, recipe)
     }
     for (const cat of parseCategories(recipe.data.recipeCategory)) {
       tags.push(

@@ -22,26 +22,25 @@ async function initializeUser(user: User) {
         await subscribeToBox(newUser.data() || null, userBoxRef.id)
       }
     }
-  }
+  } 
   return userRef
 }
 
 export async function subscribeToUser(user: User, dispatch: React.Dispatch<ActionType>, unsubMap: UnsubMap) {
   console.log("subscribing to user", user)
-  dispatch({type: "SET_LOADING", payload: true})
+  dispatch({ type: "INCR_LOADING" })
   // fetch any boxes associated with this user
   if (user === null) {
     return
   }
 
   const userRef = await initializeUser(user)
-  updateDoc(userRef, {lastSeen: new Date()})
-  
+
   // subscription for changes to user
   unsubMap.userUnsub = onSnapshot(userRef.withConverter(userConverter),
     snapshot => (handleUserSnapshot(snapshot, dispatch, unsubMap))
   )
-  dispatch({type: "SET_LOADING", payload: false})
+  dispatch({ type: "DECR_LOADING" })
 }
 
 async function handleUserSnapshot(
@@ -53,10 +52,11 @@ async function handleUserSnapshot(
   if (user === undefined) {
     return
   }
-  dispatch({type: "SET_LOADING", payload: true})
+  dispatch({ type: "INCR_LOADING" })
 
   dispatch({ type: "ADD_USER", user })
-
+  
+  // user.lastSeen = getAuth().user.lastLoginTime
   user.boxes.forEach(
     (bid: string) => {
       if (!unsubMap.boxMap.has(bid)) {
@@ -70,7 +70,7 @@ async function handleUserSnapshot(
       }
     }
   )
-  dispatch({type: "SET_LOADING", payload: false})
+  dispatch({ type: "DECR_LOADING" })
 
 }
 

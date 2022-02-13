@@ -17,7 +17,7 @@ export function initState(): AppState {
       writeable: true,
       users: new Map<string, UserEntry>(),
       authUser: null,
-      loading: false,
+      loading: 0,
     }
   )
 }
@@ -72,11 +72,15 @@ function handleBoxChange(key: string, prevState: AppState, action: ActionType) {
 }
 
 export function recipeBoxReducer(prevState: AppState, action: ActionType): AppState {
-  console.log("action", { action, prevState })
   let newBox: BoxEntry, state: AppState
   switch (action.type) {
-    case "SET_LOADING": {
-      return { ...prevState, loading: action.payload as boolean }
+    case "INCR_LOADING": {
+      console.log(prevState.loading + 1)
+      return { ...prevState, loading: prevState.loading + 1 }
+    }
+    case "DECR_LOADING": {
+      console.log(prevState.loading - 1)
+      return { ...prevState, loading: prevState.loading - 1 }
     }
     case "SET_AUTH_USER": {
       const authUser = action.authUser
