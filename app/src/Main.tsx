@@ -38,7 +38,7 @@ function Main() {
   return (
     <>
       <Header />
-      <Spin spinning={state.loading}>
+      <Spin spinning={state.loading > 0}>
         <Outlet />
       </Spin>
     </>

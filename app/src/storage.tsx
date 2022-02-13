@@ -208,7 +208,9 @@ export class UserEntry {
         this.boxes = boxes
         this.lastSeen = lastSeen
         this.id = id
+
     }
+
 }
 
 
