@@ -106,7 +106,7 @@ function ActionMenu(props: RecipeCardProps) {
         value={recipe.visibility} element="menu" />
     </Menu>
   )
-  return <Dropdown overlay={menu} ><BarsOutlined style={{ marginLeft: "auto", fontSize: "2em", padding: "5px" }} /></Dropdown>
+  return <Dropdown overlay={menu} trigger={["click", "hover"]} ><BarsOutlined style={{ marginLeft: "auto", fontSize: "2em", padding: "5px" }} /></Dropdown>
 }
 
 function RecipeActions(props: RecipeCardProps) {
