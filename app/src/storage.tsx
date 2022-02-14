@@ -69,7 +69,7 @@ export class RecipeEntry {
         } else if (this.updated > user.lastSeen) {
             return <Tag color={"orange"}>Updated</Tag>
         } else {
-            return <div/>
+            return <div />
         }
     }
 
@@ -200,17 +200,17 @@ export class UserEntry {
     visibility: Visibility
     boxes: BoxId[]
     lastSeen: Date
+    newSeen: Date
     id: string
 
-    constructor(name: string, visibility: Visibility, boxes: BoxId[], lastSeen: Date, id: string) {
+    constructor(name: string, visibility: Visibility, boxes: BoxId[], lastSeen: Date, newSeen: Date, id: string) {
         this.name = name
         this.visibility = visibility
         this.boxes = boxes
         this.lastSeen = lastSeen
+        this.newSeen = newSeen
         this.id = id
-
     }
-
 }
 
 
@@ -220,6 +220,7 @@ export const userConverter = {
             name: user.name,
             visibility: user.visibility,
             lastSeen: user.lastSeen,
+            newSeen: user.newSeen,
             boxes: user.boxes.map(bid => doc(db, "boxes", bid)),
         };
     },
@@ -231,6 +232,7 @@ export const userConverter = {
             data.visibility,
             boxIds,
             data.lastSeen,
+            data.newSeen,
             snapshot.id
         )
     }

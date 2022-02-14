@@ -13,7 +13,7 @@ function Boxes() {
 
   const rows: RowType[] = Array.from(boxes).map(([key, value]) => ({
     name: value.data.name,
-    owners: value.owners.map(uid => getUserFromState(state, uid) || new UserEntry("Anonymous", Visibility.private, [], new Date(), uid)),
+    owners: value.owners.map(uid => getUserFromState(state, uid) || new UserEntry("Anonymous", Visibility.private, [], new Date(), new Date(), uid)),
     numRecipes: value.recipes.size,
     boxId: key,
     key: key,

@@ -36,6 +36,7 @@ export type UserStoreType = {
   name: string,
   visibility: Visibility,
   lastSeen: Date,
+  newSeen: Date,
   boxes: DocumentReference<BoxEntry>[],
 }
 

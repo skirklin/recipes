@@ -12,8 +12,8 @@ import { boxConverter, BoxEntry, recipeConverter, RecipeEntry, userConverter, Us
 async function initializeUser(user: User) {
   const userRef = doc(db, "users", user.uid).withConverter(userConverter);
   const userDoc = await getDoc(userRef)
-  if (!userDoc.exists() && !user.isAnonymous) {
-    await setDoc(userRef, new UserEntry(user.displayName || "Anonymous", Visibility.private, [], new Date(), userRef.id));
+  if (!userDoc.exists()) {
+    await setDoc(userRef, new UserEntry(user.displayName || "Anonymous", Visibility.private, [], new Date(), new Date(), userRef.id));
     const newUser = await getDoc(userRef)
     if (newUser.exists()) {
       const userEntry = newUser.data()
@@ -22,7 +22,10 @@ async function initializeUser(user: User) {
         await subscribeToBox(newUser.data() || null, userBoxRef.id)
       }
     }
-  } 
+  } else {
+    const data = userDoc.data()
+    await updateDoc(userRef, { newSeen: new Date(), lastSeen: data.newSeen || new Date() })
+  }
   return userRef
 }
 
@@ -55,8 +58,7 @@ async function handleUserSnapshot(
   dispatch({ type: "INCR_LOADING" })
 
   dispatch({ type: "ADD_USER", user })
-  
-  // user.lastSeen = getAuth().user.lastLoginTime
+
   user.boxes.forEach(
     (bid: string) => {
       if (!unsubMap.boxMap.has(bid)) {
