@@ -1,6 +1,7 @@
 import { getAuth, signOut } from 'firebase/auth';
-import { addDoc, arrayRemove, arrayUnion, collection, deleteDoc, doc, getDoc, getDocs, query, updateDoc, where } from 'firebase/firestore';
+import { addDoc, arrayRemove, arrayUnion, collection, deleteDoc, doc, getDoc, getDocs, query, setDoc, updateDoc, where } from 'firebase/firestore';
 import _ from 'lodash';
+import React from 'react';
 import { Comment, Recipe } from "schema-dts"
 import { db } from './backend';
 import { boxConverter, BoxEntry, recipeConverter, RecipeEntry, userConverter, UserEntry } from './storage';
@@ -316,6 +317,13 @@ export async function deleteRecipe(state: AppState, boxId: BoxId, recipeId: Reci
     dispatch({ type: "REMOVE_RECIPE", boxId, recipeId })
     deleteDoc(doc(db, "boxes", boxId, "recipes", recipeId))
   }
+}
+
+
+export async function saveRecipe(boxId: BoxId, recipeId: RecipeId, recipe: RecipeEntry, dispatch: React.Dispatch<ActionType>) {
+  const docRef = doc(db, "boxes", boxId, "recipes", recipeId).withConverter(recipeConverter)
+  setDoc(docRef, recipe)
+  return docRef
 }
 
 export async function deleteBox(state: AppState, boxId: BoxId, dispatch: React.Dispatch<ActionType>) {

@@ -1,16 +1,13 @@
 import styled from 'styled-components';
 import { SaveOutlined } from '@ant-design/icons';
 import { Button } from 'antd';
-import { doc, setDoc } from 'firebase/firestore';
 import { useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import { db } from '../backend';
 import { Context } from '../context';
-import { addRecipe, canUpdateRecipe, getAppUserFromState, getBoxFromState, getRecipeFromState } from '../utils';
+import { addRecipe, saveRecipe, canUpdateRecipe, getAppUserFromState, getBoxFromState, getRecipeFromState } from '../utils';
 import { RecipeCardProps } from './RecipeCard';
 import _ from 'lodash';
-import { recipeConverter } from '../storage';
 
 const StyledButton = styled(Button)`
   background-color: lightgreen;
@@ -30,21 +27,22 @@ function SaveButton(props: RecipeCardProps) {
 
   const save = async () => {
     let docRef;
-    if (recipe.changed === undefined) {
+    if (recipe.changed === undefined || user === undefined ) {
       return
     }
     const newRecipe = _.cloneDeep(recipe)
     newRecipe.data = recipe.changed
     newRecipe.changed = undefined
     newRecipe.editing = false
+    newRecipe.lastUpdatedBy = user.id
+    newRecipe.updated = new Date()
     if (recipeId.startsWith("uniqueId=")) {
-      const docRef = await addRecipe(boxId, newRecipe, dispatch)
+      docRef = await addRecipe(boxId, newRecipe, dispatch)
+      newRecipe.created = newRecipe.updated
       dispatch({type: "REMOVE_RECIPE", recipeId, boxId}) // removes the local-only version of the recipe
       navigate(`/boxes/${boxId}/recipes/${docRef.id}`)
     } else {
-      docRef = doc(db, "boxes", boxId, "recipes", recipeId).withConverter(recipeConverter)
-      dispatch({type: "ADD_RECIPE", recipeId, boxId, payload: newRecipe})
-      await setDoc(docRef, newRecipe)
+      docRef = await saveRecipe(boxId, recipeId, newRecipe, dispatch)
     }
   }
 
