@@ -12,7 +12,7 @@ import { BoxId, Visibility } from '../types';
 import { addRecipe, getAppUserFromState } from '../utils';
 
 interface ImportProps {
-  boxId: BoxId
+  boxId: BoxId | undefined
   isVisible: boolean
   setIsVisible: (isVisible: boolean) => void
 }
@@ -47,23 +47,20 @@ function ImportModal(props: ImportProps) {
     if (user === undefined) {
       return
     }
-    const response = (await getRecipes({ url: value })) as {data: {error?: string, recipes: string}}
+    const response = (await getRecipes({ url: value })) as { data: { error?: string, recipes: string } }
     const data = response.data
 
     if (data.error) {
       alert(data.error)
     }
     const recipes = JSON.parse(data.recipes)
+    const now = new Date()
     const fullRecipes = recipes.map(
       (recipe: Recipe) => {
         delete recipe.review
         delete recipe.comment
         delete recipe.commentCount
-        return {
-          data: recipe as unknown as Recipe,
-          visibility: Visibility.private,
-          owners: [user.id]
-        }
+        return new RecipeEntry(recipe, [user.id], Visibility.private, user.id, "", now, now, user.id)
       }
     )
     setDiscovered([...discovered, ...fullRecipes])
@@ -77,12 +74,18 @@ function ImportModal(props: ImportProps) {
     return remover
   }
 
-  function addRecipes() {
+  function addRecipes(boxId: string) {
+
     discovered.forEach(recipe => addRecipe(boxId, recipe, dispatch))
     setDiscovered([]);
     setValue("");
     setIsVisible(false);
   }
+
+  if (boxId === undefined) {
+    return null
+  }
+
 
   const possibleRecipes = discovered.map((recipe, i) => { return <PossibleRecipe recipe={recipe} remove={makeRemover(i)} /> })
   return (
@@ -94,7 +97,7 @@ function ImportModal(props: ImportProps) {
       />
       <Spin spinning={spinning}><Button onClick={() => import_()}>Read URL</Button></Spin>
       {possibleRecipes}
-      <Button onClick={() => addRecipes()}>Add recipes</Button>
+      <Button onClick={() => addRecipes(boxId)}>Add recipes</Button>
     </Modal >
   )
 }

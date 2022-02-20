@@ -21,7 +21,7 @@ export default function ImportButton(props: ImportProps) {
     function handlePickBox(boxId: BoxId) {
         setBoxId(boxId);
         setIsPickBoxVisible(false);
-        importFlow()
+        setIsImportVisible(true);
     }
 
     let elt;
@@ -47,15 +47,9 @@ export default function ImportButton(props: ImportProps) {
             setIsImportVisible(true)
         }
     }
-    if (boxId === undefined) {
-        return (<>
-            {elt}
-            <PickBoxModal setIsVisible={setIsPickBoxVisible} isVisible={isPickBoxVisible} handleOk={handlePickBox} />
-        </>)
-    } else {
-        return (<>
-            <ImportModal boxId={boxId} setIsVisible={setIsImportVisible} isVisible={isImportVisible} />
-            {elt}
-        </>)
-    }
+    return (<>
+        {elt}
+        <PickBoxModal setIsVisible={setIsPickBoxVisible} isVisible={isPickBoxVisible} handleOk={handlePickBox} />
+        <ImportModal boxId={boxId} setIsVisible={setIsImportVisible} isVisible={isImportVisible} />
+    </>)
 }
