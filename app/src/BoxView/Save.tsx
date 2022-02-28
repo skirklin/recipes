@@ -33,7 +33,6 @@ function SaveButton(props: BoxProps) {
     newBox.data = box.changed
     newBox.changed = undefined
     const docRef = doc(db, "boxes", boxId).withConverter(boxConverter)
-    console.log({ docRef, newRecipe: newBox })
     await setDoc(docRef, newBox)
   }
 

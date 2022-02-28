@@ -1,5 +1,5 @@
 import { Tag } from "antd";
-import { doc, DocumentSnapshot, SnapshotOptions } from "firebase/firestore";
+import { doc, DocumentSnapshot, SnapshotOptions, Timestamp } from "firebase/firestore";
 import _ from "lodash";
 import { Recipe } from "schema-dts";
 import { db } from "./backend";
@@ -7,6 +7,7 @@ import { BoxType, BoxStoreType, RecipeStoreType, Visibility, UserStoreType, BoxI
 import { decodeStr } from "./utils";
 
 const DUMMY_FIRST_DATE = new Date(2022, 0, 0)
+const DUMMY_FIRST_TIMESTAMP = Timestamp.fromDate(DUMMY_FIRST_DATE)
 export class RecipeEntry {
     id: string;
     data: Recipe;
@@ -88,8 +89,8 @@ export const recipeConverter = {
             data: recipe.data,
             owners: recipe.owners,
             visibility: recipe.visibility,
-            updated: recipe.updated,
-            created: recipe.created,
+            updated: Timestamp.fromDate(recipe.updated),
+            created: Timestamp.fromDate(recipe.created),
             lastUpdatedBy: recipe.lastUpdatedBy,
             creator: recipe.creator ? recipe.creator : recipe.owners[0],
         };
@@ -102,8 +103,8 @@ export const recipeConverter = {
             rawRecipe.visibility,
             rawRecipe.creator,
             snapshot.id,
-            rawRecipe.created,
-            rawRecipe.updated,
+            (rawRecipe.created || DUMMY_FIRST_TIMESTAMP).toDate(),
+            (rawRecipe.updated || DUMMY_FIRST_TIMESTAMP).toDate(),
             rawRecipe.lastUpdatedBy,
         );
     }
@@ -174,8 +175,8 @@ export const boxConverter = {
             data: box.data,
             owners: box.owners,
             visibility: box.visibility,
-            updated: box.updated,
-            created: box.created,
+            updated: Timestamp.fromDate(box.updated),
+            created: Timestamp.fromDate(box.created),
             lastUpdatedBy: box.lastUpdatedBy,
             creator: box.creator ? box.creator : box.owners[0],
         };
@@ -188,8 +189,8 @@ export const boxConverter = {
             data.visibility,
             data.creator,
             snapshot.id,
-            data.created,
-            data.updated,
+            (data.created || DUMMY_FIRST_TIMESTAMP).toDate(),
+            (data.updated || DUMMY_FIRST_TIMESTAMP).toDate(),
             data.lastUpdatedBy
         );
     }
@@ -231,8 +232,8 @@ export const userConverter = {
             data.name,
             data.visibility,
             boxIds,
-            data.lastSeen,
-            data.newSeen,
+            (data.lastSeen  || DUMMY_FIRST_TIMESTAMP).toDate(),
+            (data.newSeen  || DUMMY_FIRST_TIMESTAMP).toDate(),
             snapshot.id
         )
     }

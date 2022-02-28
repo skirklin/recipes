@@ -75,11 +75,9 @@ export function recipeBoxReducer(prevState: AppState, action: ActionType): AppSt
   let newBox: BoxEntry, state: AppState
   switch (action.type) {
     case "INCR_LOADING": {
-      console.log(prevState.loading + 1)
       return { ...prevState, loading: prevState.loading + 1 }
     }
     case "DECR_LOADING": {
-      console.log(prevState.loading - 1)
       return { ...prevState, loading: prevState.loading - 1 }
     }
     case "SET_AUTH_USER": {
@@ -89,7 +87,6 @@ export function recipeBoxReducer(prevState: AppState, action: ActionType): AppSt
         return prevState
       }
       if (authUser !== prevState.authUser) {
-        console.log("clearing state")
         return { ...initState(), authUser }
       } else {
         return prevState

@@ -1,5 +1,5 @@
 import { User } from 'firebase/auth';
-import { DocumentReference, Unsubscribe } from 'firebase/firestore';
+import { DocumentReference, Timestamp, Unsubscribe } from 'firebase/firestore';
 import { Comment, Recipe } from 'schema-dts';
 import { BoxEntry, RecipeEntry, UserEntry } from './storage';
 
@@ -16,8 +16,8 @@ export type BoxStoreType = {
   creator: string,
   owners: string[], // user ids
   visibility: Visibility,
-  created: Date,
-  updated: Date,
+  created: Timestamp,
+  updated: Timestamp,
   lastUpdatedBy: string, // user id
   data: BoxType
 }
@@ -26,8 +26,8 @@ export type RecipeStoreType = {
   creator: string,
   data: Recipe,
   visibility: Visibility,
-  created: Date,
-  updated: Date,
+  created: Timestamp,
+  updated: Timestamp,
   lastUpdatedBy: string, // user id
   owners: string[], // user ids
 }
@@ -35,8 +35,8 @@ export type RecipeStoreType = {
 export type UserStoreType = {
   name: string,
   visibility: Visibility,
-  lastSeen: Date,
-  newSeen: Date,
+  lastSeen: Timestamp,
+  newSeen: Timestamp,
   boxes: DocumentReference<BoxEntry>[],
 }
 

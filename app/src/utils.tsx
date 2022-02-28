@@ -37,7 +37,7 @@ export function strToInstructions(str: string): Recipe["recipeInstructions"] {
       {"@type": "HowToStep", "text": "ingredient 2 blah blah blah"}
   ]
   */
-  const lines = _.filter(str.split("\n"))
+  const lines = _.filter(str.trim().split("\n"))
   return lines.map(s => ({ "@type": "HowToStep", text: s }))
 }
 
@@ -48,7 +48,7 @@ export function instructionsToStr(instructions: Recipe["recipeInstructions"]): s
   if (typeof instructions === "string") {
     return instructions.toString()
   }
-  const steps = Array.prototype.map.call(instructions, (x) => x.text.trim());
+  const steps = Array.prototype.map.call(instructions, (x) => x.text !== undefined ? x.text.trim() : "");
   return steps.join("\n\n")
 }
 

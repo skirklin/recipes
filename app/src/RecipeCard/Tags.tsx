@@ -3,7 +3,7 @@ import { Input, Tag } from 'antd';
 import { useContext, useState } from 'react';
 import styled from 'styled-components';
 import { Context } from '../context';
-import { parseCategories, formatCategories, getRecipeFromState, getAppUserFromState } from '../utils';
+import { parseCategories, formatCategories, getRecipeFromState, getAppUserFromState, getBoxFromState, canUpdateRecipe } from '../utils';
 import { RecipeCardProps } from './RecipeCard';
 import { useMediaQuery } from 'react-responsive'
 
@@ -19,18 +19,19 @@ function Tags(props: RecipeCardProps) {
   const { state, dispatch } = useContext(Context);
 
   const recipe = getRecipeFromState(state, boxId, recipeId)
+  const box = getBoxFromState(state, boxId)
   const rd = recipe ? (recipe.changed ? recipe.changed : recipe.data) : { recipeCategory: [] }
   const tags = parseCategories(rd.recipeCategory)
   const isTabletOrMobile = useMediaQuery({ query: '(max-width: 1224px)' })
 
-  if (recipe === undefined || isTabletOrMobile) { return null }
+  if (recipe === undefined || box === undefined || isTabletOrMobile) { return null }
 
   function setTags(tags: string[]) {
     dispatch({ type: "SET_CATEGORIES", recipeId, boxId, payload: formatCategories(tags) })
   }
 
   const user = getAppUserFromState(state);
-  const editable = !!(state.writeable && user && recipe && recipe.owners.includes(user.id))
+  const editable = (state.writeable && canUpdateRecipe(recipe, box, user))
 
   function onClose(idx: number) {
     const newTags = Array.prototype.filter.call(tags, (t, tidx) => idx !== tidx);

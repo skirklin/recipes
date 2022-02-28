@@ -151,15 +151,19 @@ export function RecipeTable(props: RecipeTableProps) {
   function addTagToFilter(t: string) {
     setTagFilter([...(tagFilter || []), t])
   }
+  if (user !== undefined) {
+    console.log("User last seen:", user.lastSeen)
+  }
 
   function getTags(recipe: RecipeEntry) {
     function hasSeen(r: RecipeEntry, u: UserEntry) {
       return r.updated < u.lastSeen
     }
+    console.log(recipe.getName(), { created: recipe.created, updated: recipe.updated })
     const tags: JSX.Element[] = [];
     if (user === undefined) return tags
     if (!hasSeen(recipe, user)) {
-      if (recipe.created > user.lastSeen ) {
+      if (recipe.created > user.lastSeen) {
         tags.push(<PointerTag color={"red"} onClick={() => addTagToFilter("__new__")}>New</PointerTag>)
       } else {
         tags.push(<PointerTag color={"yellow"} onClick={() => addTagToFilter("__updated__")}>Updated</PointerTag>)
