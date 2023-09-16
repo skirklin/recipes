@@ -159,7 +159,7 @@ export function RecipeTable(props: RecipeTableProps) {
     function hasSeen(r: RecipeEntry, u: UserEntry) {
       return r.updated < u.lastSeen
     }
-    console.log(recipe.getName(), { created: recipe.created, updated: recipe.updated })
+    // console.log(recipe.getName(), { created: recipe.created, updated: recipe.updated })
     const tags: JSX.Element[] = [];
     if (user === undefined) return tags
     if (!hasSeen(recipe, user)) {
