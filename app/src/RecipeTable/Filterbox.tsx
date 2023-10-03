@@ -66,8 +66,8 @@ function Filterbox(props: FilterboxProps) {
     } else {
       const result = index.search(e.target.value)
       const idxs: number[] = [];
-      const rows: RowType[] = [];
-      result.forEach((obj: { result: any[] }) => obj.result.forEach(elt => {
+      let rows: RowType[] = [];
+      result.forEach((obj: { result: number[] }) => obj.result.forEach(elt => {
         if (!idxs.includes(elt)) {
           idxs.push(elt);
           rows.push(data[elt])
@@ -75,6 +75,9 @@ function Filterbox(props: FilterboxProps) {
       }))
       console.log("found!")
       console.log(idxs)
+      if (rows.length === 0)  {
+        rows = _.filter(data, (row) => filterFunc(row, e.target.value))
+      }
       if (rows.length > 0) setFilteredRows(rows)
     }
   }
