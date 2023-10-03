@@ -8,6 +8,9 @@ const Container = styled.div`
   background-color: var(--mint-cream);
   padding: 5px;
   display: flex;
+  border-bottom: black;
+  border-bottom-style: solid;
+  border-bottom-width: thin;
 `
 
 function Header() {
