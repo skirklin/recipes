@@ -10,3 +10,6 @@ ui-debug.log
 # firebase
 **/.firebase
 **/.firebaserc
+
+# Windows metadata
+*:Zone.Identifier
