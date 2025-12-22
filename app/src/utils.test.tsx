@@ -174,8 +174,16 @@ describe('category parsing', () => {
 });
 
 describe('decodeStr', () => {
-  it('decodes HTML apostrophe entity', () => {
+  it('decodes HTML decimal apostrophe entity', () => {
     expect(decodeStr("It&#39;s delicious")).toBe("It's delicious");
+  });
+
+  it('decodes HTML hex apostrophe entity', () => {
+    expect(decodeStr("P. F. Chang&#x27;s")).toBe("P. F. Chang's");
+  });
+
+  it('decodes multiple entities', () => {
+    expect(decodeStr("Tom &amp; Jerry&#x27;s &quot;Best&quot; Show")).toBe("Tom & Jerry's \"Best\" Show");
   });
 
   it('returns undefined for undefined input', () => {

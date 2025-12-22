@@ -10,6 +10,7 @@ const NotesArea = styled.div`
   margin: 10px;
   padding: 10px;
   display: block;
+  white-space: pre-wrap;  /* Preserves whitespace and line breaks */
 `
 
 

@@ -115,9 +115,13 @@ export function formatCategories(tags: string[]): Recipe["recipeCategory"] {
   return tags
 }
 
-export function decodeStr(s: string | undefined) {
+export function decodeStr(s: string | undefined): string | undefined {
   if (s === undefined) {
     return undefined
   }
-  return s.replace("&#39;", "'")
+  // Use the browser's built-in HTML decoder to handle all entities
+  // (&#x27;, &#39;, &amp;, &quot;, etc.)
+  const textarea = document.createElement('textarea');
+  textarea.innerHTML = s;
+  return textarea.value;
 }

@@ -1,5 +1,6 @@
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import { Spin } from "antd";
 import { Context } from "../context";
 
 import { getBox } from "../firestore";
@@ -14,33 +15,46 @@ interface BoxProps {
 function Box(props: BoxProps) {
   const { boxId } = props;
   const { state, dispatch } = useContext(Context)
+  const [loading, setLoading] = useState(true);
+  const [fetchAttempted, setFetchAttempted] = useState(false);
+
+  const box = getBoxFromState(state, boxId)
 
   useEffect(() => {
+    let cancelled = false;
+
     (async () => {
-      /* if the box is not present in the app cache, fetch it and add it to 
-      state. This will trigger a re-render, but only once 
-      since subsequent changes shouldn't trigger a new fetch. */
-      let box = getBoxFromState(state, boxId)
-      if (box === undefined) {
-        box = await getBox(state, boxId)
-        if (box !== undefined) {
-          dispatch({ type: "ADD_BOX", payload: box, boxId })
+      if (box === undefined && !fetchAttempted) {
+        setLoading(true);
+        const fetchedBox = await getBox(state, boxId)
+        if (!cancelled) {
+          if (fetchedBox !== undefined) {
+            dispatch({ type: "ADD_BOX", payload: fetchedBox, boxId })
+          }
+          setFetchAttempted(true);
+          setLoading(false);
         }
+      } else if (box !== undefined) {
+        setLoading(false);
       }
     })()
-  }, [state, boxId, dispatch]
-  )
-  const box = getBoxFromState(state, boxId)
+
+    return () => { cancelled = true; }
+  }, [state, boxId, dispatch, box, fetchAttempted])
+
+  if (loading && box === undefined) {
+    return <Spin tip="Loading box..."><div style={{ minHeight: 200 }} /></Spin>
+  }
 
   if (box === undefined) {
     return <div>Unable to find box.</div>
   }
+
   return (
     <>
       <BoxView {...props} />
     </>
   )
-
 }
 
 export default function RoutedBox() {

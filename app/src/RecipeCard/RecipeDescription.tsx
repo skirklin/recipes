@@ -8,12 +8,13 @@ import { getEditableSetter, RecipeCardProps } from './RecipeCard';
 
 const Description = styled.div`
   font-style: italic;
-  display: inline-flex;
+  display: inline-block;
   font-family: sans-serif;
   font-size: 16px;
   padding: 0px;
   margin: 0px 20px;
-  minWidth: 60%;
+  min-width: 60%;
+  white-space: pre-wrap;  /* Preserves whitespace and line breaks */
 `
 
 function RecipeDescription(props: RecipeCardProps) {
