@@ -217,7 +217,7 @@ export function RecipeTable(props: RecipeTableProps) {
         onCell: onBoxCell,
         render: (value, record) => <BoxName>{record.box.getName()}</BoxName>,
         className: "recipe-table-clickable-column",
-        width: 80,
+        width: 150,
       }
     )
   }
