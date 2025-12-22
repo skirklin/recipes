@@ -20,7 +20,9 @@ import { Dropdown, Menu } from 'antd';
 import { BarsOutlined } from '@ant-design/icons';
 import { useContext } from 'react';
 import { Context } from '../context';
-import { canUpdateRecipe, getAppUserFromState, getBoxFromState, getRecipeFromState, setRecipeVisiblity } from '../utils';
+import { setRecipeVisiblity } from '../firestore';
+import { getAppUserFromState, getBoxFromState, getRecipeFromState } from '../state';
+import { canUpdateRecipe } from '../utils';
 import { addRecipeOwner } from '../backend';
 import EditButton from '../Buttons/EditRecipe';
 

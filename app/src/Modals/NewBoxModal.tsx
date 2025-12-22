@@ -1,6 +1,7 @@
 import { Input, Modal } from "antd"
 import { useContext, useState } from "react"
-import { addBox, getAppUserFromState } from '../utils';
+import { addBox } from '../firestore';
+import { getAppUserFromState } from '../state';
 import { Context } from "../context";
 import { DocumentReference } from "firebase/firestore";
 import { BoxEntry } from "../storage";

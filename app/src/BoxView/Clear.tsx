@@ -3,7 +3,7 @@ import styled from 'styled-components';
 
 import { Button } from 'antd';
 import { Context } from '../context';
-import { getBoxFromState } from '../utils';
+import { getBoxFromState } from '../state';
 import { BoxProps } from './BoxView';
 
 const StyledButton = styled(Button)`

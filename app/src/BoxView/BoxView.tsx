@@ -1,7 +1,8 @@
 import { useContext } from "react";
 import { Context } from "../context";
 
-import { getBoxFromState, setBoxVisiblity } from "../utils";
+import { setBoxVisiblity } from "../firestore";
+import { getBoxFromState } from "../state";
 import { RecipeTable, RowType } from "../RecipeTable/RecipeTable"
 import { IndexCardTopLine, RecipeActionGroup } from "../StyledComponents";
 import { BoxId, Visibility } from "../types";

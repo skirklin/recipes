@@ -6,7 +6,7 @@ import { useContext } from 'react';
 
 import { db } from '../backend';
 import { Context } from '../context';
-import { getAppUserFromState, getBoxFromState } from '../utils';
+import { getAppUserFromState, getBoxFromState } from '../state';
 import _ from 'lodash';
 import { boxConverter } from '../storage';
 import { BoxProps } from './BoxView';

@@ -3,7 +3,8 @@ import { Menu, Popconfirm } from 'antd';
 import { useContext } from 'react';
 import { Context } from '../context';
 import { useNavigate } from 'react-router-dom';
-import { deleteRecipe, getAppUserFromState, getBoxFromState, getRecipeFromState } from '../utils';
+import { deleteRecipe } from '../firestore';
+import { getAppUserFromState, getBoxFromState, getRecipeFromState } from '../state';
 import { ActionButton } from '../StyledComponents';
 import { BoxId, RecipeId } from '../types';
 

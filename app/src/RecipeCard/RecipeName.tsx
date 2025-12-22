@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { LinkOutlined } from '@ant-design/icons';
 import { Context } from '../context';
 import { Title } from '../StyledComponents';
-import { getRecipeFromState } from '../utils';
+import { getRecipeFromState } from '../state';
 import { getEditableSetter, RecipeCardProps } from './RecipeCard';
 import { Input } from 'antd';
 

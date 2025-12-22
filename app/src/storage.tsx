@@ -4,7 +4,7 @@ import _ from "lodash";
 import { Recipe } from "schema-dts";
 import { db } from "./backend";
 import { BoxType, BoxStoreType, RecipeStoreType, Visibility, UserStoreType, BoxId, UserId } from "./types";
-import { decodeStr } from "./utils";
+import { decodeStr } from "./converters";
 
 const DUMMY_FIRST_DATE = new Date(2022, 0, 0)
 const DUMMY_FIRST_TIMESTAMP = Timestamp.fromDate(DUMMY_FIRST_DATE)

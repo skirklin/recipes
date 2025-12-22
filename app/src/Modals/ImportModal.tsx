@@ -9,7 +9,8 @@ import { getRecipes } from '../backend';
 import { Context } from '../context';
 import { RecipeEntry } from '../storage';
 import { BoxId, Visibility } from '../types';
-import { addRecipe, getAppUserFromState } from '../utils';
+import { addRecipe } from '../firestore';
+import { getAppUserFromState } from '../state';
 
 interface ImportProps {
   boxId: BoxId | undefined

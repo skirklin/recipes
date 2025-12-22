@@ -2,7 +2,8 @@ import { Input } from 'antd';
 import { useContext, useState } from 'react';
 import styled from 'styled-components';
 import { Context } from '../context';
-import { getRecipeFromState, authorToStr, strToAuthor } from '../utils';
+import { authorToStr, strToAuthor } from '../converters';
+import { getRecipeFromState } from '../state';
 import { getEditableSetter, RecipeCardProps } from './RecipeCard';
 
 const EditableByline = styled(Input)`

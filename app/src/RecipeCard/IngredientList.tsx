@@ -1,7 +1,9 @@
 import { useState, useContext, CSSProperties } from 'react';
 import styled from 'styled-components';
 import { Recipe } from 'schema-dts';
-import { canUpdateRecipe, getAppUserFromState, getBoxFromState, getRecipeFromState, ingredientsToStr, strToIngredients } from '../utils';
+import { ingredientsToStr, strToIngredients } from '../converters';
+import { getAppUserFromState, getBoxFromState, getRecipeFromState } from '../state';
+import { canUpdateRecipe } from '../utils';
 import { Context } from '../context';
 import { RecipeCardProps } from './RecipeCard';
 import { StyledTextArea } from '../StyledComponents';

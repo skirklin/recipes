@@ -4,7 +4,8 @@ import { useContext } from 'react';
 import { Context } from '../context';
 import { ActionButton } from '../StyledComponents';
 import { BoxId, RecipeId } from '../types';
-import { getRecipeFromState, download} from '../utils';
+import { getRecipeFromState } from '../state';
+import { download } from '../utils';
 
 interface DownloadProps {
   recipeId: RecipeId

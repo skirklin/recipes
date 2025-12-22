@@ -16,7 +16,6 @@
 
 ## Pending - Code/Architecture
 
-- [ ] Split large files (utils.tsx ~400 lines, context.tsx ~550 lines)
 - [ ] Add error boundaries
 
 ## Notes

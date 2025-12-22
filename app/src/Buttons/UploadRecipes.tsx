@@ -1,7 +1,8 @@
 import { UploadOutlined } from "@ant-design/icons";
 import { useContext, useState } from "react";
 import { PickBoxModal } from "../Modals/PickBoxModal";
-import { getAppUserFromState, uploadRecipes } from "../utils";
+import { uploadRecipes } from "../firestore";
+import { getAppUserFromState } from "../state";
 import { ActionButton } from "../StyledComponents";
 import { BoxId } from "../types";
 import { Menu } from "antd";

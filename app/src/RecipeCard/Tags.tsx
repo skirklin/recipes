@@ -3,7 +3,9 @@ import { Input, Tag } from 'antd';
 import React, { useContext, useState } from 'react';
 import styled from 'styled-components';
 import { Context } from '../context';
-import { parseCategories, formatCategories, getRecipeFromState, getAppUserFromState, getBoxFromState, canUpdateRecipe } from '../utils';
+import { parseCategories, formatCategories } from '../converters';
+import { getRecipeFromState, getAppUserFromState, getBoxFromState } from '../state';
+import { canUpdateRecipe } from '../utils';
 import { RecipeCardProps } from './RecipeCard';
 import { useMediaQuery } from 'react-responsive'
 

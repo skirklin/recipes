@@ -2,7 +2,8 @@ import { EditFilled } from '@ant-design/icons';
 import { useContext } from 'react';
 
 import { Context } from '../context';
-import { canUpdateRecipe, getAppUserFromState, getBoxFromState, getRecipeFromState } from '../utils';
+import { getAppUserFromState, getBoxFromState, getRecipeFromState } from '../state';
+import { canUpdateRecipe } from '../utils';
 import { ActionButton } from '../StyledComponents';
 import { RecipeCardProps } from '../RecipeCard/RecipeCard';
 import { Menu } from 'antd';

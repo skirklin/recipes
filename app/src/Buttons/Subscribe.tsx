@@ -1,6 +1,7 @@
 import { useContext } from 'react';
 import { Context } from '../context';
-import { getAppUserFromState, getBoxFromState, subscribeToBox, unsubscribeFromBox } from '../utils';
+import { subscribeToBox, unsubscribeFromBox } from '../firestore';
+import { getAppUserFromState, getBoxFromState } from '../state';
 import { ActionButton } from '../StyledComponents';
 import { BoxId } from '../types';
 

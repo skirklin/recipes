@@ -2,7 +2,7 @@ import { useContext, useState } from 'react';
 import styled from 'styled-components';
 import { Context } from '../context';
 import { StyledTextArea } from '../StyledComponents';
-import { getRecipeFromState } from '../utils';
+import { getRecipeFromState } from '../state';
 import { getEditableSetter, RecipeCardProps } from './RecipeCard';
 
 

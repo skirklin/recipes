@@ -2,7 +2,8 @@ import { useContext, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { Context } from "../context";
 
-import { getBox, getBoxFromState } from "../utils";
+import { getBox } from "../firestore";
+import { getBoxFromState } from "../state";
 import { BoxId } from "../types";
 import BoxView from '../BoxView/BoxView'
 

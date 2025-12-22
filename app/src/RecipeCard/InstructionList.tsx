@@ -1,7 +1,8 @@
 import React, { useContext, useState } from 'react';
 import styled from 'styled-components';
 import { Recipe } from 'schema-dts';
-import { getRecipeFromState, instructionsToStr, strToInstructions } from '../utils';
+import { instructionsToStr, strToInstructions } from '../converters';
+import { getRecipeFromState } from '../state';
 import { Context } from '../context';
 import { getEditableSetter, RecipeCardProps } from './RecipeCard';
 import { StyledTextArea } from '../StyledComponents';

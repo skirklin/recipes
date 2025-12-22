@@ -1,5 +1,6 @@
 import { useContext, useState } from 'react';
-import { commentToStr, strToComment, getRecipeFromState } from '../utils';
+import { commentToStr, strToComment } from '../converters';
+import { getRecipeFromState } from '../state';
 import { Context } from '../context';
 import { getEditableSetter, RecipeCardProps } from './RecipeCard';
 import styled from 'styled-components';

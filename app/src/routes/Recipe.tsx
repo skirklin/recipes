@@ -2,7 +2,8 @@ import { useContext, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { Context } from '../context';
 import RecipeCard from '../RecipeCard/RecipeCard';
-import { getRecipe, getRecipeFromState } from '../utils';
+import { getRecipe } from '../firestore';
+import { getRecipeFromState } from '../state';
 import { RecipeEntry } from '../storage';
 import { BoxId, RecipeId } from '../types';
 

@@ -12,13 +12,15 @@ import {
   strToComment,
   parseCategories,
   formatCategories,
+  decodeStr,
+} from './converters';
+import {
   getRecipeFromState,
   getBoxFromState,
   getUserFromState,
   getAppUserFromState,
-  canUpdateRecipe,
-  decodeStr,
-} from './utils';
+} from './state';
+import { canUpdateRecipe } from './utils';
 
 describe('ingredient conversions', () => {
   it('converts multiline string to ingredient array', () => {

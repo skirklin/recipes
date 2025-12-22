@@ -5,7 +5,7 @@ import { getDoc, onSnapshot, doc, setDoc, DocumentSnapshot, collection, QuerySna
 import { ActionType, BoxId, UnsubMap, Visibility } from './types';
 
 import { db } from './backend'
-import { addBox, subscribeToBox } from './utils';
+import { addBox, subscribeToBox } from './firestore';
 import { boxConverter, BoxEntry, recipeConverter, RecipeEntry, userConverter, UserEntry } from './storage';
 
 async function initializeUser(user: User) {

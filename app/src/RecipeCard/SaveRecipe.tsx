@@ -5,7 +5,9 @@ import { useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { Context } from '../context';
-import { addRecipe, saveRecipe, canUpdateRecipe, getAppUserFromState, getBoxFromState, getRecipeFromState } from '../utils';
+import { addRecipe, saveRecipe } from '../firestore';
+import { getAppUserFromState, getBoxFromState, getRecipeFromState } from '../state';
+import { canUpdateRecipe } from '../utils';
 import { RecipeCardProps } from './RecipeCard';
 import _ from 'lodash';
 

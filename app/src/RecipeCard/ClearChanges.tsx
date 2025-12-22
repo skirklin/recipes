@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import { Button } from 'antd';
 import { Context } from '../context';
 import { RecipeCardProps } from './RecipeCard';
-import { getRecipeFromState } from '../utils';
+import { getRecipeFromState } from '../state';
 
 const StyledButton = styled(Button)`
 `

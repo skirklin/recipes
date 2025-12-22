@@ -2,7 +2,7 @@ import React, { useContext, useState } from 'react';
 import styled from 'styled-components';
 import { Context } from '../context';
 import { Title } from '../StyledComponents';
-import { getAppUserFromState, getBoxFromState } from '../utils';
+import { getAppUserFromState, getBoxFromState } from '../state';
 import { BoxProps } from './BoxView';
 import { Input } from 'antd';
 

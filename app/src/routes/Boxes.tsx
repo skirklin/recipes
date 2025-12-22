@@ -2,7 +2,7 @@ import { useContext } from "react"
 import { Context } from "../context"
 import { RowType, BoxTable } from '../BoxTable/BoxTable'
 import { Title } from "../StyledComponents";
-import { getUserFromState } from "../utils";
+import { getUserFromState } from "../state";
 import { UserEntry } from "../storage";
 import { Visibility } from "../types";
 

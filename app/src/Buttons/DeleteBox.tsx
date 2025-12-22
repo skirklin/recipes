@@ -3,7 +3,8 @@ import { Menu, Popconfirm } from 'antd';
 import { useContext } from 'react';
 import { Context } from '../context';
 import { useNavigate } from 'react-router-dom';
-import { deleteBox, getAppUserFromState, getBoxFromState } from '../utils';
+import { deleteBox } from '../firestore';
+import { getAppUserFromState, getBoxFromState } from '../state';
 import { ActionButton } from '../StyledComponents';
 import { BoxId } from '../types';
 
