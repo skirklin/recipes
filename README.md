@@ -1,5 +1,5 @@
-# recipes
+# Recipe Box
 
-A chrome extension for "clipping" a recipe from the web. Saves the application/ld+json data to a file of your choosing. 
+A web app for storing and organizing your recipe collection. Import recipes from URLs or add them manually, then browse, search, and share with others.
 
-A simple single-page-app for viewing a collection of such snipped data. Has no backend, just a viewer for your own locally saved recipes.
+Built with React, Firebase, and Firestore.

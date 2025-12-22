@@ -16,7 +16,6 @@
 
 ## Pending - Code/Architecture
 
-- [ ] Upgrade Chrome extension to Manifest v3
 - [ ] Split large files (utils.tsx ~400 lines, context.tsx ~550 lines)
 - [ ] Add error boundaries
 
