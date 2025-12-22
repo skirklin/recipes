@@ -18,7 +18,7 @@
 
 ## Future Enhancements
 
-- [ ] Show notification highlighting "keep screen on" button for users who haven't seen it yet (track via user's lastSeen/newSeen dates)
+- [x] Show notification highlighting "keep screen on" button for users who haven't seen it yet
 
 ## Notes
 

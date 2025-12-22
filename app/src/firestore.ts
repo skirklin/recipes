@@ -159,3 +159,7 @@ export async function setBoxVisiblity(boxId: BoxId, visibility: Visibility) {
 export async function setRecipeVisiblity(boxId: BoxId, recipeId: RecipeId, visibility: Visibility) {
   updateDoc(doc(db, "boxes", boxId, "recipes", recipeId), { visibility })
 }
+
+export async function setWakeLockSeen(userId: UserId) {
+  updateDoc(doc(db, "users", userId), { wakeLockSeen: true })
+}

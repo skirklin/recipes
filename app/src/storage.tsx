@@ -203,14 +203,16 @@ export class UserEntry {
     lastSeen: Date
     newSeen: Date
     id: string
+    wakeLockSeen: boolean
 
-    constructor(name: string, visibility: Visibility, boxes: BoxId[], lastSeen: Date, newSeen: Date, id: string) {
+    constructor(name: string, visibility: Visibility, boxes: BoxId[], lastSeen: Date, newSeen: Date, id: string, wakeLockSeen: boolean = false) {
         this.name = name
         this.visibility = visibility
         this.boxes = boxes
         this.lastSeen = lastSeen
         this.newSeen = newSeen
         this.id = id
+        this.wakeLockSeen = wakeLockSeen
     }
 }
 
@@ -223,6 +225,7 @@ export const userConverter = {
             lastSeen: user.lastSeen,
             newSeen: user.newSeen,
             boxes: user.boxes.map(bid => doc(db, "boxes", bid)),
+            wakeLockSeen: user.wakeLockSeen,
         };
     },
     fromFirestore: (snapshot: DocumentSnapshot, options: SnapshotOptions) => {
@@ -234,7 +237,8 @@ export const userConverter = {
             boxIds,
             (data.lastSeen  || DUMMY_FIRST_TIMESTAMP).toDate(),
             (data.newSeen  || DUMMY_FIRST_TIMESTAMP).toDate(),
-            snapshot.id
+            snapshot.id,
+            data.wakeLockSeen ?? false
         )
     }
 };
