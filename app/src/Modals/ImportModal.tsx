@@ -26,7 +26,7 @@ function PossibleRecipe(props: PossibleRecipeProps) {
   const { recipe, remove } = props;
   return (
     <div>
-      <Button onClick={() => remove()} icon={<DeleteOutlined />} />{recipe.data.name}
+      <Button onClick={() => remove()} icon={<DeleteOutlined />} />{String(recipe.data.name ?? '')}
     </div>
   )
 }

@@ -64,7 +64,8 @@ function IngredientList(props: RecipeCardProps) {
   }
 
   function formatIngredientList(ingredients: Recipe["recipeIngredient"]) {
-    const listElts = Array.prototype.map.call(ingredients || [], (ri, id) => <Ingredient key={id}>{ri}</Ingredient>)
+    const ingredientArray = Array.isArray(ingredients) ? ingredients : [];
+    const listElts = ingredientArray.map((ri, id) => <Ingredient key={id}>{String(ri)}</Ingredient>);
     return (
       <ul style={{ ...ingredientsStyle, listStylePosition: "outside", listStyleType: "none" }}>
         {listElts.length > 0 ? listElts : "Add ingredients?"}

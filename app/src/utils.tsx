@@ -48,12 +48,14 @@ export function instructionsToStr(instructions: Recipe["recipeInstructions"]): s
   if (typeof instructions === "string") {
     return instructions.toString()
   }
-  const steps = Array.prototype.map.call(instructions, (x) => x.text !== undefined ? x.text.trim() : "");
+  const instructionArray = Array.isArray(instructions) ? instructions : [];
+  const steps = instructionArray.map((x: any) => x.text !== undefined ? x.text.trim() : "");
   return steps.join("\n\n")
 }
 
 export function ingredientsToStr(ingredients: Recipe["recipeIngredient"]): string {
-  const steps = Array.prototype.map.call(ingredients, x => x.toString());
+  const ingredientArray = Array.isArray(ingredients) ? ingredients : [];
+  const steps = ingredientArray.map((x: any) => x.toString());
   return steps.join("\n")
 }
 
@@ -65,9 +67,9 @@ export function authorToStr(author: Recipe["author"]): string | undefined {
       // this is hacky, but typescript was making this brutally unpleasant and I didn't want to spend more time on it.
       return (author as { name: string }).name
     } else {
-
-      const names = Array.prototype.map.call(author,
-        (x) => {
+      const authorArray = Array.isArray(author) ? author : [];
+      const names = authorArray.map(
+        (x: any) => {
           if (x['@type'] === "Person") {
             return x['name']
           } else {
@@ -112,7 +114,7 @@ export function parseCategories(categories: Recipe["recipeCategory"]): string[] 
   } else if (typeof categories === "string") {
     return [categories]
   } else {
-    return Array.prototype.filter.call(categories, x => true)
+    return Array.isArray(categories) ? categories.map(String) : [];
   }
 }
 

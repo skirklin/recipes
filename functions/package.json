@@ -14,7 +14,7 @@
     "node": "16"
   },
   "dependencies": {
-    "axios": "^0.24.0",
+    "axios": "^1.13.2",
     "firebase": "^9.6.2",
     "firebase-admin": "^10.0.1",
     "firebase-functions": "^3.18.1",

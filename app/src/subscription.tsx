@@ -1,7 +1,6 @@
 import React from 'react';
 import { User } from "firebase/auth";
 import { getDoc, onSnapshot, doc, setDoc, DocumentSnapshot, collection, QuerySnapshot, updateDoc } from "firebase/firestore";
-import 'antd/dist/antd.css'; // or 'antd/dist/antd.less'
 
 import { ActionType, BoxId, UnsubMap, Visibility } from './types';
 

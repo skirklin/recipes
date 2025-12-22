@@ -2,9 +2,7 @@ import { Input } from "antd";
 import _ from "lodash";
 import { Recipe } from "schema-dts";
 import { RowType } from "./RecipeTable";
-
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const { Document } = require("flexsearch");
+import Document from "flexsearch/dist/module/document";
 
 interface FilterboxProps {
   setFilteredRows: (rows: RowType[]) => void,
@@ -21,12 +19,14 @@ function filterFunc(value: RowType, str: string): boolean {
     return true
   }
 
-  let matches = Array.prototype.filter.call(recipe.data.recipeIngredient, ri => ri.toString().toLowerCase().match(re))
+  const ingredients = Array.isArray(recipe.data.recipeIngredient) ? recipe.data.recipeIngredient : [];
+  let matches = ingredients.filter((ri: any) => ri.toString().toLowerCase().match(re))
   if (matches.length > 0) {
     return true
   }
 
-  matches = Array.prototype.filter.call(recipe.data.recipeInstructions, ri => (ri.text !== undefined && ri.text.toString().toLowerCase().match(re)))
+  const instructions = Array.isArray(recipe.data.recipeInstructions) ? recipe.data.recipeInstructions : [];
+  matches = instructions.filter((ri: any) => (ri.text !== undefined && ri.text.toString().toLowerCase().match(re)))
   if (matches.length > 0) {
     return true
   }

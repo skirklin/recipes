@@ -1,4 +1,4 @@
-import { useContext, useState } from 'react';
+import React, { useContext, useState } from 'react';
 import styled from 'styled-components';
 import { Recipe } from 'schema-dts';
 import { getRecipeFromState, instructionsToStr, strToInstructions } from '../utils';
@@ -28,11 +28,12 @@ function InstructionList(props: RecipeCardProps) {
   }
 
   function formatInstructionList(instructions: Recipe["recipeInstructions"]) {
-    let listElts;
+    let listElts: React.ReactNode[];
     if (typeof instructions === "string") {
       listElts = [<RecipeStep key={0}>{instructions}</RecipeStep>]
     } else {
-      listElts = Array.prototype.map.call(instructions || [], (ri, id) => <RecipeStep key={id}>{ri.text}</RecipeStep>)
+      const instructionArray = Array.isArray(instructions) ? instructions : [];
+      listElts = instructionArray.map((ri: any, id) => <RecipeStep key={id}>{String(ri.text ?? '')}</RecipeStep>);
     }
     if (listElts.length > 0) {
       return (

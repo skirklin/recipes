@@ -1,6 +1,6 @@
 import { PlusOutlined } from '@ant-design/icons';
 import { Input, Tag } from 'antd';
-import { useContext, useState } from 'react';
+import React, { useContext, useState } from 'react';
 import styled from 'styled-components';
 import { Context } from '../context';
 import { parseCategories, formatCategories, getRecipeFromState, getAppUserFromState, getBoxFromState, canUpdateRecipe } from '../utils';
@@ -34,7 +34,7 @@ function Tags(props: RecipeCardProps) {
   const editable = (state.writeable && canUpdateRecipe(recipe, box, user))
 
   function onClose(idx: number) {
-    const newTags = Array.prototype.filter.call(tags, (t, tidx) => idx !== tidx);
+    const newTags = tags.filter((_, tidx) => idx !== tidx);
     setTags(newTags);
   }
 
@@ -55,7 +55,7 @@ function Tags(props: RecipeCardProps) {
   function formatTags(tags: string[]) {
     if (tags === undefined)
       return null;
-    const elts = Array.prototype.map.call(tags,
+    const elts: React.ReactNode[] = tags.map(
       (rc, idx) => {
         if (editable && idx === editableTag) {
           return (
@@ -75,7 +75,6 @@ function Tags(props: RecipeCardProps) {
               onClose={() => onClose(idx)}
               key={idx}
               onDoubleClick={() => { setInputValue(rc); setEditableTag(idx); }}
-              visible
             >
               {rc}
             </Tag>
@@ -91,7 +90,7 @@ function Tags(props: RecipeCardProps) {
 
   return (
     <TagsArea>
-      {formatTags(Array.prototype.filter.call(tags, x => true))}
+      {formatTags([...tags])}
     </TagsArea>
   )
 }

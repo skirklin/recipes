@@ -1,6 +1,5 @@
 import { useEffect, useContext } from 'react';
 import { Unsubscribe } from "firebase/auth";
-import 'antd/dist/antd.css'; // or 'antd/dist/antd.less'
 
 import { UnsubMap } from './types';
 import { Context } from './context';
