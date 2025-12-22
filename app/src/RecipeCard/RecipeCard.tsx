@@ -6,6 +6,7 @@ import InstructionList from './InstructionList';
 import IngredientList from './IngredientList';
 import RecipeName from './RecipeName';
 import RecipeDescription from './RecipeDescription';
+import EnrichmentReview from './EnrichmentReview';
 import Notes from './Notes'
 import DeleteButton from '../Buttons/DeleteRecipe'
 import DownloadButton from '../Buttons/DownloadRecipe';
@@ -187,6 +188,7 @@ function RecipeCard(props: RecipeCardProps) {
         <ByLine {...props} />
         <Tags {...props} />
       </RecipeMeta>
+      <EnrichmentReview {...props} />
       <RecipeDescription {...props} />
       <Divider />
       <ActionButtonsRow>

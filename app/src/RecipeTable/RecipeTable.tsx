@@ -4,7 +4,7 @@ import { Popconfirm, Table, Tooltip } from 'antd';
 import { ColumnsType } from 'antd/es/table';
 
 import { Key, TableRowSelection } from 'antd/es/table/interface';
-import { DeleteOutlined, CopyOutlined } from '@ant-design/icons';
+import { DeleteOutlined, CopyOutlined, RobotOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import Filterbox from './Filterbox';
 import NewButton from '../Buttons/NewRecipe';
@@ -13,9 +13,10 @@ import ImportButton from '../Buttons/ImportRecipes';
 import { addRecipe, deleteRecipe, setRecipeVisiblity } from '../firestore';
 import { Context } from '../context';
 import { PickBoxModal } from '../Modals/PickBoxModal';
+import BatchEnrichmentModal from '../Modals/BatchEnrichmentModal';
 import { ActionButton } from '../StyledComponents';
 import './RecipeTable.css'
-import { BoxEntry } from '../storage';
+import { BoxEntry, RecipeEntry } from '../storage';
 import { BoxId, Visibility } from '../types';
 import styled from 'styled-components';
 import { useMediaQuery } from 'react-responsive'
@@ -70,6 +71,16 @@ const Description = styled.span`
   font-size: var(--font-size-sm);
 `
 
+const AIIndicator = styled.span`
+  color: #9370db;
+  margin-left: var(--space-xs);
+`
+
+const NameCell = styled.div`
+  display: flex;
+  align-items: center;
+`
+
 function sortfunc(a: string, b: string) {
   const A = a.toUpperCase(); // ignore upper and lowercase
   const B = b.toUpperCase(); // ignore upper and lowercase
@@ -101,11 +112,15 @@ export function RecipeTable(props: RecipeTableProps) {
   const [selectedRowKeys, setSelectedRowKeys] = useState<Key[]>([]);
   const [selectedRows, setSelectedRows] = useState<RowType[]>([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isBatchModalVisible, setIsBatchModalVisible] = useState(false);
   const navigate = useNavigate();
 
   const { writeable, recipes, boxId } = props;
   const { state, dispatch } = useContext(Context)
   const [filteredRows, setFilteredRows] = useState<RowType[]>()
+
+  // Count recipes with pending enrichments
+  const pendingEnrichmentCount = recipes.filter(r => r.recipe.pendingEnrichment).length;
 
   useEffect(() => {
     const sortedRecipes = _.sortBy(recipes, row => -row.recipe.updated)
@@ -177,7 +192,16 @@ export function RecipeTable(props: RecipeTableProps) {
     {
       key: 'name',
       title: 'Name',
-      render: (value, record) => <RecipeName>{record.recipe.getName()}</RecipeName>,
+      render: (value, record) => (
+        <NameCell>
+          <RecipeName>{record.recipe.getName()}</RecipeName>
+          {record.recipe.pendingEnrichment && (
+            <Tooltip title="AI suggestions available">
+              <AIIndicator><RobotOutlined /></AIIndicator>
+            </Tooltip>
+          )}
+        </NameCell>
+      ),
       sorter: (a: RowType, b: RowType) => sortfunc(a.recipe.getName() || "", b.recipe.getName() || ""),
       onCell: onNameCell,
       className: "recipe-table-clickable-column",
@@ -220,6 +244,17 @@ export function RecipeTable(props: RecipeTableProps) {
           <NewButton boxId={boxId} disabled={!writeable} element="button" />
           <UploadButton boxId={boxId} disabled={!writeable} element="button" />
           <ImportButton boxId={boxId} disabled={!writeable} element="button" />
+          {pendingEnrichmentCount > 0 && (
+            <Tooltip title={`Review ${pendingEnrichmentCount} AI suggestion${pendingEnrichmentCount > 1 ? 's' : ''}`}>
+              <ActionButton
+                onClick={() => setIsBatchModalVisible(true)}
+                icon={<RobotOutlined />}
+                style={{ color: '#9370db', borderColor: '#9370db' }}
+              >
+                AI ({pendingEnrichmentCount})
+              </ActionButton>
+            </Tooltip>
+          )}
           <VisibilityControl
             disabled={!writeable || !hasSelected}
             handleChange={handleVisiblityChange}
@@ -248,6 +283,7 @@ export function RecipeTable(props: RecipeTableProps) {
             >Copy</ActionButton>
           </Tooltip>
           <PickBoxModal handleOk={fork} isVisible={isModalVisible} setIsVisible={setIsModalVisible} />
+          <BatchEnrichmentModal open={isBatchModalVisible} onClose={() => setIsBatchModalVisible(false)} />
         </ActionsSection>
       </Toolbar>
       <Table<RowType>

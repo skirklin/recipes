@@ -3,7 +3,7 @@ import { doc, DocumentSnapshot, SnapshotOptions, Timestamp } from "firebase/fire
 import _ from "lodash";
 import { Recipe } from "schema-dts";
 import { db } from "./backend";
-import { BoxType, BoxStoreType, RecipeStoreType, Visibility, UserStoreType, BoxId, UserId } from "./types";
+import { BoxType, BoxStoreType, RecipeStoreType, Visibility, UserStoreType, BoxId, UserId, PendingEnrichment } from "./types";
 import { decodeStr } from "./converters";
 
 const DUMMY_FIRST_DATE = new Date(2022, 0, 0)
@@ -19,6 +19,7 @@ export class RecipeEntry {
     created: Date;
     updated: Date;
     lastUpdatedBy: string;
+    pendingEnrichment?: PendingEnrichment;
 
     constructor(
         data: Recipe,
@@ -28,7 +29,8 @@ export class RecipeEntry {
         id: string,
         created: Date,
         updated: Date,
-        lastUpdatedBy: string
+        lastUpdatedBy: string,
+        pendingEnrichment?: PendingEnrichment
     ) {
         this.data = data;
         this.id = id;
@@ -38,6 +40,7 @@ export class RecipeEntry {
         this.created = created || DUMMY_FIRST_DATE;
         this.updated = updated || DUMMY_FIRST_DATE;
         this.lastUpdatedBy = lastUpdatedBy || this.creator;
+        this.pendingEnrichment = pendingEnrichment;
 
         this.editing = false;
     }
@@ -51,7 +54,8 @@ export class RecipeEntry {
             this.id,
             this.created,
             this.updated,
-            this.lastUpdatedBy
+            this.lastUpdatedBy,
+            this.pendingEnrichment ? _.cloneDeep(this.pendingEnrichment) : undefined
         )
         newRecipe.editing = this.editing
         return newRecipe
@@ -85,7 +89,7 @@ export class RecipeEntry {
 
 export const recipeConverter = {
     toFirestore: (recipe: RecipeEntry): RecipeStoreType => {
-        return {
+        const result: RecipeStoreType = {
             data: recipe.data,
             owners: recipe.owners,
             visibility: recipe.visibility,
@@ -94,6 +98,10 @@ export const recipeConverter = {
             lastUpdatedBy: recipe.lastUpdatedBy,
             creator: recipe.creator ? recipe.creator : recipe.owners[0],
         };
+        if (recipe.pendingEnrichment) {
+            result.pendingEnrichment = recipe.pendingEnrichment;
+        }
+        return result;
     },
     fromFirestore: (snapshot: DocumentSnapshot, options: SnapshotOptions) => {
         const rawRecipe = snapshot.data(options) as RecipeStoreType
@@ -106,6 +114,7 @@ export const recipeConverter = {
             (rawRecipe.created || DUMMY_FIRST_TIMESTAMP).toDate(),
             (rawRecipe.updated || DUMMY_FIRST_TIMESTAMP).toDate(),
             rawRecipe.lastUpdatedBy,
+            rawRecipe.pendingEnrichment,
         );
     }
 };

@@ -13,3 +13,7 @@ ui-debug.log
 
 # Windows metadata
 *:Zone.Identifier
+
+# Service account keys (sensitive)
+service-account-key.json
+**/service-account-key.json

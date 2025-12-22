@@ -22,6 +22,14 @@ export type BoxStoreType = {
   data: BoxType
 }
 
+export type PendingEnrichment = {
+  description: string,
+  suggestedTags: string[],
+  reasoning: string,
+  generatedAt: Timestamp,
+  model: string,
+}
+
 export type RecipeStoreType = {
   creator: string,
   data: Recipe,
@@ -30,6 +38,7 @@ export type RecipeStoreType = {
   updated: Timestamp,
   lastUpdatedBy: string, // user id
   owners: string[], // user ids
+  pendingEnrichment?: PendingEnrichment,
 }
 
 export type UserStoreType = {

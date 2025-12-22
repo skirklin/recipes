@@ -1,4 +1,4 @@
-import { addDoc, arrayRemove, arrayUnion, collection, deleteDoc, doc, getDoc, getDocs, query, setDoc, updateDoc, where } from 'firebase/firestore';
+import { addDoc, arrayRemove, arrayUnion, collection, deleteDoc, deleteField, doc, getDoc, getDocs, query, setDoc, updateDoc, where } from 'firebase/firestore';
 import React from 'react';
 import { Recipe } from "schema-dts"
 import { db } from './backend';
@@ -162,4 +162,47 @@ export async function setRecipeVisiblity(boxId: BoxId, recipeId: RecipeId, visib
 
 export async function setWakeLockSeen(userId: UserId) {
   updateDoc(doc(db, "users", userId), { wakeLockSeen: true })
+}
+
+export async function applyEnrichment(
+  boxId: BoxId,
+  recipeId: RecipeId,
+  enrichment: { description: string; suggestedTags: string[] }
+) {
+  const recipeRef = doc(db, "boxes", boxId, "recipes", recipeId);
+  const recipeDoc = await getDoc(recipeRef);
+
+  if (!recipeDoc.exists()) {
+    console.warn("Recipe not found");
+    return;
+  }
+
+  const recipeData = recipeDoc.data();
+  const currentDescription = recipeData.data?.description;
+  const currentTags = recipeData.data?.recipeCategory || [];
+
+  // Merge suggested tags with existing tags (avoid duplicates)
+  const existingTags = Array.isArray(currentTags) ? currentTags : [currentTags].filter(Boolean);
+  const mergedTags = [...new Set([...existingTags, ...enrichment.suggestedTags])];
+
+  const updates: Record<string, unknown> = {
+    pendingEnrichment: deleteField(),
+  };
+
+  // Only update description if there wasn't one
+  if (!currentDescription?.trim()) {
+    updates["data.description"] = enrichment.description;
+  }
+
+  // Update tags with merged list
+  updates["data.recipeCategory"] = mergedTags;
+
+  await updateDoc(recipeRef, updates);
+}
+
+export async function rejectEnrichment(boxId: BoxId, recipeId: RecipeId) {
+  const recipeRef = doc(db, "boxes", boxId, "recipes", recipeId);
+  await updateDoc(recipeRef, {
+    pendingEnrichment: deleteField(),
+  });
 }
