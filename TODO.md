@@ -13,10 +13,8 @@
 - [x] Replace FirebaseUI with custom antd login form (removed firebaseui/react-firebaseui dependencies)
 - [x] Upgrade Node.js 17 → 20 (via nvm)
 - [x] Migrate from Create React App (react-scripts) to Vite 7 + vitest
-
-## Pending - Code/Architecture
-
-- [ ] Add error boundaries
+- [x] Split large files into focused modules
+- [x] Add error boundaries
 
 ## Notes
 

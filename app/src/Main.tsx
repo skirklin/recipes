@@ -8,6 +8,7 @@ import { Outlet } from 'react-router-dom';
 
 import { subscribeToUser, unsubscribe } from './subscription';
 import { Spin } from 'antd';
+import ErrorBoundary from './ErrorBoundary';
 
 function Main() {
 
@@ -38,7 +39,9 @@ function Main() {
     <>
       <Header />
       <Spin spinning={state.loading > 0}>
-        <Outlet />
+        <ErrorBoundary>
+          <Outlet />
+        </ErrorBoundary>
       </Spin>
     </>
   );
