@@ -11,6 +11,7 @@ let DRY_RUN = false;
 let USE_EMULATOR = false;
 let LIMIT = Infinity;
 let USER_FILTER: string | undefined;
+let BOX_FILTER: string | undefined;
 
 if (isMainScript) {
   const args = process.argv.slice(2);
@@ -20,6 +21,8 @@ if (isMainScript) {
   LIMIT = limitIndex !== -1 ? parseInt(args[limitIndex + 1], 10) : Infinity;
   const userIndex = args.indexOf("--user");
   USER_FILTER = userIndex !== -1 ? args[userIndex + 1] : undefined;
+  const boxIndex = args.indexOf("--box");
+  BOX_FILTER = boxIndex !== -1 ? args[boxIndex + 1] : undefined;
 
   if (DRY_RUN) {
     console.log("🔒 DRY RUN MODE - no changes will be written");
@@ -32,6 +35,9 @@ if (isMainScript) {
   }
   if (USER_FILTER) {
     console.log(`👤 Filtering to user: ${USER_FILTER}`);
+  }
+  if (BOX_FILTER) {
+    console.log(`📦 Filtering to box: ${BOX_FILTER}`);
   }
   console.log();
 }
@@ -152,6 +158,10 @@ export function formatRecipeForPrompt(recipe: Recipe): string {
     parts.push(`\nCurrent tags: ${currentTags.join(", ")}`);
   }
 
+  if (recipe.description?.trim()) {
+    parts.push(`\nExisting description: ${recipe.description}`);
+  }
+
   return parts.join("\n");
 }
 
@@ -163,17 +173,19 @@ async function enrichRecipe(
   const recipeText = formatRecipeForPrompt(recipe);
   const needsDescription = !recipe.description?.trim();
 
-  const prompt = `Analyze this recipe and provide:
-1. ${needsDescription ? "A brief, appetizing description (1-2 sentences)" : "The existing description is fine, just return it"}
-2. Suggested tags/categories for organization (e.g., "dinner", "vegetarian", "quick", "comfort food", "italian", etc.)
-3. Brief reasoning for your tag suggestions
+  const prompt = `Analyze this recipe and provide enrichment data.
 
 Recipe:
 ${recipeText}
 
-Respond in this exact JSON format:
+Please provide:
+1. Description: ${needsDescription ? "Write a brief, appetizing description (1-2 sentences) that captures what makes this dish appealing." : "Keep the existing description exactly as-is."}
+2. Tags: Suggest relevant tags for organization (e.g., "dinner", "vegetarian", "quick", "comfort food", "italian", "healthy", "kid-friendly", etc.)
+3. Reasoning: Briefly explain your tag choices.
+
+Respond in this exact JSON format (no markdown, just JSON):
 {
-  "description": "your description here",
+  "description": "${needsDescription ? "your new description here" : "copy the existing description exactly"}",
   "suggestedTags": ["tag1", "tag2", "tag3"],
   "reasoning": "brief explanation of tag choices"
 }`;
@@ -254,13 +266,19 @@ async function main() {
     if (processedCount >= LIMIT) break;
 
     const boxData = boxDoc.data();
+    const boxName = boxData.data?.name || boxDoc.id;
 
     // Skip boxes not owned by the filtered user
     if (userUid && !boxData.owners?.includes(userUid)) {
       continue;
     }
 
-    console.log(`\n📦 Box: ${boxData.data?.name || boxDoc.id}`);
+    // Skip boxes that don't match the box filter (case-insensitive partial match)
+    if (BOX_FILTER && !boxName.toLowerCase().includes(BOX_FILTER.toLowerCase())) {
+      continue;
+    }
+
+    console.log(`\n📦 Box: ${boxName}`);
 
     const recipesSnapshot = await db
       .collection("boxes")
@@ -308,7 +326,7 @@ async function main() {
           ? [recipe.recipeCategory]
           : [];
 
-      console.log(`     Description: ${needsDescription ? "❌ Missing" : "✓ Present"}`);
+      console.log(`     Description: ${needsDescription ? "❌ Missing" : `✓ "${recipe.description?.substring(0, 50)}${(recipe.description?.length || 0) > 50 ? '...' : ''}"`}`);
       console.log(`     Current tags: ${currentTags.length > 0 ? currentTags.join(", ") : "none"}`);
 
       try {

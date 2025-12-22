@@ -43,8 +43,11 @@ npm run enrich -- --dry-run --limit 2
 # Process only recipes owned by a specific user (by email)
 npm run enrich -- --user you@example.com --limit 2 --dry-run
 
-# Process only recipes owned by a specific user (by UID)
-npm run enrich -- --user abc123uid --limit 2
+# Process only recipes in a specific box (partial name match)
+npm run enrich -- --box "Family" --limit 2 --dry-run
+
+# Combine filters
+npm run enrich -- --user you@example.com --box "Favorites" --limit 2
 
 # Run for real (only adds pendingEnrichment field, never modifies existing data)
 npm run enrich
@@ -54,6 +57,7 @@ npm run enrich
 - `--dry-run` - Preview without writing any changes
 - `--limit N` - Process only N recipes
 - `--user <email|uid>` - Only process recipes owned by this user
+- `--box <name>` - Only process recipes in boxes matching this name (case-insensitive partial match)
 - `--emulator` - Connect to local Firebase emulator instead of production
 
 **Safety features:**
