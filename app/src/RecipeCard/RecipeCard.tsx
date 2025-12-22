@@ -12,12 +12,12 @@ import DownloadButton from '../Buttons/DownloadRecipe';
 import VisibilityControl from '../Buttons/Visibility';
 import ForkButton from '../Buttons/ForkRecipe';
 import { AppState, BoxId, RecipeId, Visibility } from '../types';
-import { IndexCardBottomLine, IndexCardTopLine, RecipeActionGroup } from '../StyledComponents';
+import { Divider, RecipeActionGroup } from '../StyledComponents';
 import ByLine from './Byline';
 import Tags from './Tags';
 import { useMediaQuery } from 'react-responsive';
 import { Dropdown, Menu } from 'antd';
-import { BarsOutlined } from '@ant-design/icons';
+import { MoreOutlined } from '@ant-design/icons';
 import { useContext } from 'react';
 import { Context } from '../context';
 import { setRecipeVisiblity } from '../firestore';
@@ -26,9 +26,41 @@ import { canUpdateRecipe } from '../utils';
 import { addRecipeOwner } from '../backend';
 import EditButton from '../Buttons/EditRecipe';
 
+const RecipeContainer = styled.article`
+  max-width: 800px;
+  margin: 0 auto;
+  padding: var(--space-md);
+`
+
+const RecipeHeader = styled.div`
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-md);
+  margin-bottom: var(--space-sm);
+`
+
+const RecipeMeta = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-sm) var(--space-lg);
+  margin-bottom: var(--space-md);
+`
 
 const RecipeBody = styled.div`
-  margin: 5px
+  display: grid;
+  grid-template-columns: minmax(200px, 1fr) 2fr;
+  gap: var(--space-lg);
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+`
+
+const ActionButtonsRow = styled.div`
+  display: flex;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-md);
 `
 
 export function getEditableSetter(state: AppState, recipeId: RecipeId, boxId: BoxId, setEditable: (value: boolean) => void) {
@@ -79,6 +111,24 @@ function ActionBar(props: RecipeCardProps) {
   )
 }
 
+const MenuButton = styled.button`
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: var(--space-sm);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-secondary);
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &:hover {
+    background-color: var(--color-bg-muted);
+    color: var(--color-text);
+  }
+`
+
 function ActionMenu(props: RecipeCardProps) {
   const { recipeId, boxId } = props;
   const { state } = useContext(Context);
@@ -108,7 +158,13 @@ function ActionMenu(props: RecipeCardProps) {
         value={recipe.visibility} element="menu" />
     </Menu>
   )
-  return <Dropdown overlay={menu} trigger={["click", "hover"]} ><BarsOutlined style={{ marginLeft: "auto", fontSize: "2em", padding: "5px" }} /></Dropdown>
+  return (
+    <Dropdown overlay={menu} trigger={["click", "hover"]}>
+      <MenuButton>
+        <MoreOutlined style={{ fontSize: "24px" }} />
+      </MenuButton>
+    </Dropdown>
+  )
 }
 
 function RecipeActions(props: RecipeCardProps) {
@@ -122,28 +178,28 @@ function RecipeActions(props: RecipeCardProps) {
 
 function RecipeCard(props: RecipeCardProps) {
   return (
-    <div>
-      <div style={{ display: "flex" }}>
+    <RecipeContainer>
+      <RecipeHeader>
         <RecipeName {...props} />
         <RecipeActions {...props} />
-      </div>
-      <div style={{ display: "flex" }}>
+      </RecipeHeader>
+      <RecipeMeta>
         <ByLine {...props} />
         <Tags {...props} />
-      </div>
-      <IndexCardTopLine />
-      <div style={{ width: "100%", paddingLeft: "5px" }}>
+      </RecipeMeta>
+      <RecipeDescription {...props} />
+      <Divider />
+      <ActionButtonsRow>
         <SaveButton {...props} />
         <ClearButton {...props} />
-      </div>
-      <RecipeDescription {...props} />
+      </ActionButtonsRow>
       <RecipeBody>
         <IngredientList {...props} />
         <InstructionList {...props} />
       </RecipeBody>
-      <IndexCardBottomLine />
+      <Divider />
       <Notes {...props} />
-    </div>
+    </RecipeContainer>
   );
 }
 

@@ -8,24 +8,40 @@ import { db } from './backend'
 import { addBox, subscribeToBox } from './firestore';
 import { boxConverter, BoxEntry, recipeConverter, RecipeEntry, userConverter, UserEntry } from './storage';
 
+// Track in-progress initializations to prevent React Strict Mode double-init
+const initializingUsers = new Set<string>();
+
 async function initializeUser(user: User) {
-  const userRef = doc(db, "users", user.uid).withConverter(userConverter);
-  const userDoc = await getDoc(userRef)
-  if (!userDoc.exists()) {
-    await setDoc(userRef, new UserEntry(user.displayName || "Anonymous", Visibility.private, [], new Date(), new Date(), userRef.id));
-    const newUser = await getDoc(userRef)
-    if (newUser.exists()) {
-      const userEntry = newUser.data()
-      const userBoxRef = await addBox(userEntry, `${user.displayName}'s box`, null);
-      if (userBoxRef !== undefined) {
-        await subscribeToBox(newUser.data() || null, userBoxRef.id)
-      }
-    }
-  } else {
-    const data = userDoc.data()
-    await updateDoc(userRef, { newSeen: new Date(), lastSeen: data.newSeen || new Date() })
+  // Prevent concurrent initialization for the same user
+  if (initializingUsers.has(user.uid)) {
+    // Wait a bit and re-fetch the user doc (another init is in progress)
+    await new Promise(resolve => setTimeout(resolve, 100));
+    const userRef = doc(db, "users", user.uid).withConverter(userConverter);
+    return userRef;
   }
-  return userRef
+
+  initializingUsers.add(user.uid);
+  try {
+    const userRef = doc(db, "users", user.uid).withConverter(userConverter);
+    const userDoc = await getDoc(userRef)
+    if (!userDoc.exists()) {
+      await setDoc(userRef, new UserEntry(user.displayName || "Anonymous", Visibility.private, [], new Date(), new Date(), userRef.id));
+      const newUser = await getDoc(userRef)
+      if (newUser.exists()) {
+        const userEntry = newUser.data()
+        const userBoxRef = await addBox(userEntry, `${user.displayName}'s box`, null);
+        if (userBoxRef !== undefined) {
+          await subscribeToBox(newUser.data() || null, userBoxRef.id)
+        }
+      }
+    } else {
+      const data = userDoc.data()
+      await updateDoc(userRef, { newSeen: new Date(), lastSeen: data.newSeen || new Date() })
+    }
+    return userRef
+  } finally {
+    initializingUsers.delete(user.uid);
+  }
 }
 
 export async function subscribeToUser(user: User, dispatch: React.Dispatch<ActionType>, unsubMap: UnsubMap) {

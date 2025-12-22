@@ -1,10 +1,11 @@
 import { useContext } from "react";
+import styled from "styled-components";
 import { Context } from "../context";
 
 import { setBoxVisiblity } from "../firestore";
 import { getBoxFromState } from "../state";
 import { RecipeTable, RowType } from "../RecipeTable/RecipeTable"
-import { IndexCardTopLine, RecipeActionGroup } from "../StyledComponents";
+import { Divider, RecipeActionGroup } from "../StyledComponents";
 import { BoxId, Visibility } from "../types";
 import DeleteBox from '../Buttons/DeleteBox';
 import SubscribeButton from "../Buttons/Subscribe";
@@ -13,6 +14,25 @@ import Name from './Name';
 import { addBoxOwner } from "../backend";
 import SaveButton from "./Save";
 import ClearButton from "./Clear";
+
+const BoxContainer = styled.div`
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--space-md);
+`
+
+const BoxHeader = styled.div`
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  margin-bottom: var(--space-sm);
+`
+
+const ActionButtonsRow = styled.div`
+  display: flex;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-md);
+`
 
 export interface BoxProps {
   boxId: BoxId
@@ -48,8 +68,8 @@ export default function BoxView(props: BoxProps) {
 
 
   return (
-    <div>
-      <div style={{ display: "flex" }}>
+    <BoxContainer>
+      <BoxHeader>
         <Name {...props} />
         <RecipeActionGroup>
           <SubscribeButton boxId={boxId} />
@@ -62,13 +82,13 @@ export default function BoxView(props: BoxProps) {
           />
           <DeleteBox boxId={boxId} element="button" />
         </RecipeActionGroup>
-      </div>
-      <div style={{ width: "100%", paddingLeft: "5px" }}>
+      </BoxHeader>
+      <ActionButtonsRow>
         <SaveButton {...props} />
         <ClearButton {...props} />
-      </div>
-      <IndexCardTopLine />
+      </ActionButtonsRow>
+      <Divider />
       <RecipeTable recipes={data} writeable={writeable && box.owners.includes(authUser.uid)} boxId={boxId} />
-    </div>
+    </BoxContainer>
   )
 }

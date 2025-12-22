@@ -1,9 +1,10 @@
-import { Popconfirm, Table } from "antd";
+import { Popconfirm, Table, Tooltip } from "antd";
 import { ColumnsType } from "antd/es/table";
 import { Key, TableRowSelection } from "antd/es/table/interface";
 import { useContext, useState } from "react";
 import { useNavigate } from 'react-router-dom';
-import { ActionButton, RecipeActionGroup } from "../StyledComponents";
+import styled from "styled-components";
+import { ActionButton } from "../StyledComponents";
 import NewBoxButton from '../Buttons/NewBox';
 
 import './BoxTable.css';
@@ -14,6 +15,32 @@ import { BoxId, Visibility } from "../types";
 import { UserEntry } from "../storage";
 import VisibilityControl from "../Buttons/Visibility";
 import { addBoxOwner } from "../backend";
+
+const TableContainer = styled.div`
+  background: var(--color-bg);
+`
+
+const Toolbar = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-xs);
+  padding: var(--space-md) 0;
+`
+
+const BoxNameCell = styled.span`
+  font-weight: 500;
+  color: var(--color-text);
+`
+
+const OwnersCell = styled.span`
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+`
+
+const CountCell = styled.span`
+  color: var(--color-text-secondary);
+`
 
 export type RowType = {
   name: string
@@ -28,17 +55,20 @@ const columns: ColumnsType<RowType> = [
     key: 'name',
     title: 'Name',
     dataIndex: 'name',
+    render: (value: string) => <BoxNameCell>{value}</BoxNameCell>,
   },
   {
     key: 'owners',
     title: 'Owners',
     dataIndex: ['owners'],
-    render: (value: UserEntry[]) => <span>{value.map(u => u.name).join(', ')}</span>,
+    render: (value: UserEntry[]) => <OwnersCell>{value.map(u => u.name).join(', ')}</OwnersCell>,
   },
   {
     key: 'numRecipes',
-    title: 'Number of recipes',
+    title: 'Recipes',
     dataIndex: 'numRecipes',
+    render: (value: number) => <CountCell>{value}</CountCell>,
+    width: 100,
   }
 ]
 
@@ -102,30 +132,31 @@ export function BoxTable(props: BoxTableProps) {
 
 
   return (
-    <div>
-      <div style={{ display: "flex" }}>
-
-        <RecipeActionGroup style={{ marginLeft: "auto" }}>
-          <NewBoxButton disabled={!writeable} />
-          <Popconfirm
-            title={`Are you sure to delete ${selectedRowKeys.length > 1 ? "these recipes" : "this recipe"}s`}
-            onConfirm={del}
-            okText="Yes"
-            disabled={!writeable || !hasSelected}
-            cancelText="No"
-          >
-            <VisibilityControl
+    <TableContainer>
+      <Toolbar>
+        <NewBoxButton disabled={!writeable} />
+        <VisibilityControl
+          disabled={!writeable || !hasSelected}
+          handleChange={handleVisiblityChange}
+          handleAddOwner={handleAddOwner}
+          value={Visibility.public}
+          element="button"
+        />
+        <Popconfirm
+          title={`Are you sure to delete ${selectedRowKeys.length > 1 ? "these boxes" : "this box"}?`}
+          onConfirm={del}
+          okText="Yes"
+          disabled={!writeable || !hasSelected}
+          cancelText="No"
+        >
+          <Tooltip title="Delete selected">
+            <ActionButton
               disabled={!writeable || !hasSelected}
-              handleChange={handleVisiblityChange}
-              handleAddOwner={handleAddOwner}
-              value={Visibility.public}
-              element="button"
-            />
-
-            <ActionButton disabled={!writeable || !hasSelected} title="Delete recipes" icon={<DeleteOutlined />}>Delete</ActionButton>
-          </Popconfirm>
-        </RecipeActionGroup>
-      </div>
+              icon={<DeleteOutlined />}
+            >Delete</ActionButton>
+          </Tooltip>
+        </Popconfirm>
+      </Toolbar>
 
       <Table<RowType>
         dataSource={rows}
@@ -133,7 +164,9 @@ export function BoxTable(props: BoxTableProps) {
         onRow={onRow}
         rowSelection={rowSelection}
         rowClassName={() => "box-row"}
+        size="middle"
+        pagination={false}
       />
-    </div>
+    </TableContainer>
   )
 }

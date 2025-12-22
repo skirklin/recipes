@@ -1,5 +1,5 @@
 import { PlusOutlined } from "@ant-design/icons";
-import { ActionButton } from "../StyledComponents";
+import { PrimaryButton } from "../StyledComponents";
 import NewBoxModal from "../Modals/NewBoxModal";
 import { useState } from "react";
 import { BoxEntry } from "../storage";
@@ -16,7 +16,7 @@ export default function NewButton(props: NewProps) {
     const [isModalVisible, setIsModalVisible] = useState(false)
 
     return (<>
-        <ActionButton title="Create new box." disabled={disabled} onClick={() => setIsModalVisible(true)} icon={<PlusOutlined />} >New</ActionButton>
+        <PrimaryButton title="Create new box." disabled={disabled} onClick={() => setIsModalVisible(true)} icon={<PlusOutlined />} >New</PrimaryButton>
         <NewBoxModal isVisible={isModalVisible} setIsVisible={setIsModalVisible} afterNewBox={afterNewBox} />
     </>)
 

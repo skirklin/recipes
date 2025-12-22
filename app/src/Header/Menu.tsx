@@ -1,34 +1,50 @@
 import styled from 'styled-components';
 
-import { Button } from 'antd';
+import { Button, Tooltip } from 'antd';
 
 import { getAuth, signOut } from 'firebase/auth';
 import { InboxOutlined, LogoutOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import './Header.css';
+import WakeLock from './WakeLock';
 
-const MenuArea = styled.div`
-  margin: 5px;
+const MenuArea = styled.nav`
   margin-left: auto;
-  font-size: 16px;
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
 `
 
-const StyledButton = styled(Button)`
+const UserName = styled.span`
+  color: rgba(255, 255, 255, 0.9);
+  font-size: var(--font-size-sm);
+  margin-right: var(--space-sm);
+`
+
+const IconButton = styled(Button)`
   background-color: transparent;
-  color: var(--jet);
+  color: white;
   border: none;
+  width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  transition: all 0.2s ease;
+
   &:hover {
-    color: var(--selective-yellow);
-    background-color: transparent;
+    color: white;
+    background-color: rgba(255, 255, 255, 0.15);
   }
   &:focus {
-    color: var(--selective-yellow);
-    background-color: transparent;
+    color: white;
+    background-color: rgba(255, 255, 255, 0.15);
   }
 `
 
 
-function Header() {
+function Menu() {
   const navigate = useNavigate()
   const user = getAuth().currentUser
   if (user === null) {
@@ -37,11 +53,16 @@ function Header() {
 
   return (
     <MenuArea>
-      <div style={{ marginRight: "10px", display: "inline-block" }}>{user.displayName}</div>
-      <StyledButton title="Manage boxes" onClick={() => navigate('/boxes')} icon={<InboxOutlined /> } />
-      <StyledButton title="Logout" style={{}} onClick={() => signOut(getAuth())} icon={<LogoutOutlined />} className="recipes-icon" />
+      <UserName>{user.displayName}</UserName>
+      <WakeLock />
+      <Tooltip title="Manage boxes">
+        <IconButton onClick={() => navigate('/boxes')} icon={<InboxOutlined />} />
+      </Tooltip>
+      <Tooltip title="Sign out">
+        <IconButton onClick={() => signOut(getAuth())} icon={<LogoutOutlined />} />
+      </Tooltip>
     </MenuArea>
   );
 }
 
-export default Header;
+export default Menu;

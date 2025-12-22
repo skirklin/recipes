@@ -7,24 +7,27 @@ import { getRecipeFromState } from '../state';
 import { getEditableSetter, RecipeCardProps } from './RecipeCard';
 
 const EditableByline = styled(Input)`
-  font-style: italic;
-  padding: 0px 0px 0px 3px;
-  outline: none;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  padding: var(--space-xs);
+  border-radius: var(--radius-sm);
+
   &:focus {
-    border: none;
-    box-shadow: none;
-  }
-  &:hover {
-    border: none;
-    box-shadow: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 2px rgba(44, 166, 164, 0.1);
   }
 `
 
 const StyledByline = styled.div`
   display: flex;
-  font-style: italic;
-  padding: 0px 0px 0px 30px;
-  outline: none;
+  align-items: center;
+  gap: var(--space-xs);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+`
+
+const Label = styled.span`
+  color: var(--color-text-muted);
 `
 
 function Byline(props: RecipeCardProps) {
@@ -44,10 +47,12 @@ function Byline(props: RecipeCardProps) {
     }
     setEditable(false);
   }
+  const placeholder = <Label>Add author?</Label>;
+
   if (editable || recipe.editing) {
     return (
       <StyledByline>
-        <span>Author:</span>
+        <Label>By</Label>
         <EditableByline type="text"
           defaultValue={byline}
           autoFocus
@@ -60,7 +65,7 @@ function Byline(props: RecipeCardProps) {
   } else {
     return (
       <StyledByline onDoubleClick={() => setEditable(true)}>
-        Author: {byline || "Add author?"}
+        <Label>By</Label> {byline || placeholder}
       </StyledByline>
     )
   }

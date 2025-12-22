@@ -8,13 +8,15 @@ import { getEditableSetter, RecipeCardProps } from './RecipeCard';
 
 const Description = styled.div`
   font-style: italic;
-  display: inline-block;
-  font-family: sans-serif;
-  font-size: 16px;
-  padding: 0px;
-  margin: 0px 20px;
-  min-width: 60%;
-  white-space: pre-wrap;  /* Preserves whitespace and line breaks */
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-base);
+  line-height: 1.6;
+  margin: var(--space-sm) 0;
+  white-space: pre-wrap;
+`
+
+const Placeholder = styled.span`
+  color: var(--color-text-muted);
 `
 
 function RecipeDescription(props: RecipeCardProps) {
@@ -48,7 +50,7 @@ function RecipeDescription(props: RecipeCardProps) {
         placeholder="Add a description?"
         autoFocus
         onKeyUp={(e) => { if (e.code === "Escape") { handleChange(e.currentTarget.value) } }}
-        style={{ display: "inline-flex", fontStyle: "italic", minWidth: "60%", fontFamily: "sans-serif", fontSize: "16px" }}
+        style={{ fontStyle: "italic" }}
         onBlur={e => handleChange(e.target.value)}
         {...textAreaProps}
       />
@@ -56,7 +58,7 @@ function RecipeDescription(props: RecipeCardProps) {
   } else {
     return (
       <Description onDoubleClick={() => setEditable(true)}>
-        {description || "Add a description?"}
+        {description || <Placeholder>Add a description?</Placeholder>}
       </Description>
     )
   }

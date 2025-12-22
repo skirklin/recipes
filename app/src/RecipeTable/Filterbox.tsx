@@ -1,8 +1,22 @@
 import { Input } from "antd";
+import { SearchOutlined } from "@ant-design/icons";
 import _ from "lodash";
 import { Recipe } from "schema-dts";
 import { RowType } from "./RecipeTable";
 import Document from "flexsearch/dist/module/document";
+import styled from "styled-components";
+
+const SearchInput = styled(Input)`
+  border-radius: var(--radius-md);
+
+  &:hover, &:focus {
+    border-color: var(--color-primary);
+  }
+
+  &:focus {
+    box-shadow: 0 0 0 2px rgba(44, 166, 164, 0.1);
+  }
+`
 
 interface FilterboxProps {
   setFilteredRows: (rows: RowType[]) => void,
@@ -31,6 +45,13 @@ function filterFunc(value: RowType, str: string): boolean {
     return true
   }
 
+  const categories = Array.isArray(recipe.data.recipeCategory) ? recipe.data.recipeCategory :
+    (typeof recipe.data.recipeCategory === 'string' ? [recipe.data.recipeCategory] : []);
+  matches = categories.filter((cat: any) => cat.toString().toLowerCase().match(re))
+  if (matches.length > 0) {
+    return true
+  }
+
   return false
 }
 
@@ -45,6 +66,7 @@ function Filterbox(props: FilterboxProps) {
         "name",
         "instructions",
         "ingredients",
+        "tags",
       ]
     }
   })
@@ -54,6 +76,7 @@ function Filterbox(props: FilterboxProps) {
         name: row.recipe.data.name,
         ingredients: row.recipe.data.recipeIngredient,
         instructions: row.recipe.data.recipeInstructions,
+        tags: row.recipe.data.recipeCategory,
       }
     )
   }
@@ -81,7 +104,15 @@ function Filterbox(props: FilterboxProps) {
       if (rows.length > 0) setFilteredRows(rows)
     }
   }
-  return <Input placeholder='Filter recipes' onChange={filterRecipes} style={{ width: "300px" }} />
+  return (
+    <SearchInput
+      placeholder="Search recipes..."
+      prefix={<SearchOutlined style={{ color: 'var(--color-text-muted)' }} />}
+      onChange={filterRecipes}
+      allowClear
+      size="large"
+    />
+  )
 }
 
 export default Filterbox

@@ -1,34 +1,73 @@
 import _ from 'lodash';
 import { useContext, useEffect, useState } from 'react';
-import { Popconfirm, Table, TablePaginationConfig, Tag } from 'antd';
+import { Popconfirm, Table, Tooltip } from 'antd';
 import { ColumnsType } from 'antd/es/table';
 
-import { FilterValue, Key, TableRowSelection } from 'antd/es/table/interface';
-import { DeleteOutlined, ForkOutlined } from '@ant-design/icons';
+import { Key, TableRowSelection } from 'antd/es/table/interface';
+import { DeleteOutlined, CopyOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import Filterbox from './Filterbox';
 import NewButton from '../Buttons/NewRecipe';
 import UploadButton from '../Buttons/UploadRecipes';
 import ImportButton from '../Buttons/ImportRecipes';
-import { parseCategories } from '../converters';
 import { addRecipe, deleteRecipe, setRecipeVisiblity } from '../firestore';
-import { getAppUserFromState } from '../state';
 import { Context } from '../context';
 import { PickBoxModal } from '../Modals/PickBoxModal';
 import { ActionButton } from '../StyledComponents';
 import './RecipeTable.css'
-import { BoxEntry, RecipeEntry, UserEntry } from '../storage';
+import { BoxEntry } from '../storage';
 import { BoxId, Visibility } from '../types';
 import styled from 'styled-components';
 import { useMediaQuery } from 'react-responsive'
 import VisibilityControl from '../Buttons/Visibility';
 import { addRecipeOwner } from '../backend';
 
+const TableContainer = styled.div`
+  background: var(--color-bg);
+`
 
-const PointerTag = styled(Tag)`
-  &:hover {
-    cursor: pointer;
+const Toolbar = styled.div`
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-md) 0;
+  flex-wrap: wrap;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: stretch;
   }
+`
+
+const SearchSection = styled.div`
+  flex: 1;
+  min-width: 200px;
+  max-width: 400px;
+
+  @media (max-width: 768px) {
+    max-width: none;
+  }
+`
+
+const ActionsSection = styled.div`
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  flex-wrap: wrap;
+`
+
+const RecipeName = styled.span`
+  font-weight: 500;
+  color: var(--color-text);
+`
+
+const BoxName = styled.span`
+  color: var(--color-text-secondary);
+`
+
+const Description = styled.span`
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
 `
 
 function sortfunc(a: string, b: string) {
@@ -66,9 +105,7 @@ export function RecipeTable(props: RecipeTableProps) {
 
   const { writeable, recipes, boxId } = props;
   const { state, dispatch } = useContext(Context)
-  const [filteredRows, setFilteredRows] = useState<RowType[]>([])
-  const [tagFilter, setTagFilter] = useState<string[]>()
-  const user = getAppUserFromState(state)
+  const [filteredRows, setFilteredRows] = useState<RowType[]>()
 
   useEffect(() => {
     const sortedRecipes = _.sortBy(recipes, row => -row.recipe.updated)
@@ -136,57 +173,15 @@ export function RecipeTable(props: RecipeTableProps) {
     )
   }
 
-  const allTags = new Set<string>()
-  filteredRows.forEach(
-    (row) => {
-      parseCategories(row.recipe.data.recipeCategory).forEach(
-        t => allTags.add(t)
-      )
-    }
-  )
-
-  function handleChange(pagination: TablePaginationConfig, filters: Record<string, FilterValue | null>, sorter: unknown) {
-    setTagFilter(filters.tags as string[] || [])
-  }
-
-
-  function addTagToFilter(t: string) {
-    setTagFilter([...(tagFilter || []), t])
-  }
-  if (user !== undefined) {
-    console.log("User last seen:", user.lastSeen)
-  }
-
-  function getTags(recipe: RecipeEntry) {
-    function hasSeen(r: RecipeEntry, u: UserEntry) {
-      return r.updated < u.lastSeen
-    }
-    // console.log(recipe.getName(), { created: recipe.created, updated: recipe.updated })
-    const tags: JSX.Element[] = [];
-    if (user === undefined) return tags
-    if (!hasSeen(recipe, user)) {
-      if (recipe.created > user.lastSeen) {
-        tags.push(<PointerTag color={"red"} onClick={() => addTagToFilter("__new__")}>New</PointerTag>)
-      } else {
-        tags.push(<PointerTag color={"yellow"} onClick={() => addTagToFilter("__updated__")}>Updated</PointerTag>)
-      }
-    }
-    for (const cat of parseCategories(recipe.data.recipeCategory)) {
-      tags.push(
-        <PointerTag onClick={() => addTagToFilter(cat)}>{cat}</PointerTag>
-      )
-    }
-    return tags
-  }
-
   const columns: ColumnsType<RowType> = [
     {
       key: 'name',
       title: 'Name',
-      render: (value, record) => <div>{record.recipe.getName()}</div>,
+      render: (value, record) => <RecipeName>{record.recipe.getName()}</RecipeName>,
       sorter: (a: RowType, b: RowType) => sortfunc(a.recipe.getName() || "", b.recipe.getName() || ""),
       onCell: onNameCell,
       className: "recipe-table-clickable-column",
+      width: 200,
     }
   ]
 
@@ -196,44 +191,32 @@ export function RecipeTable(props: RecipeTableProps) {
         key: 'box',
         title: 'Box',
         onCell: onBoxCell,
-        render: (value, record) => <div>{record.box.getName()}</div>,
+        render: (value, record) => <BoxName>{record.box.getName()}</BoxName>,
         className: "recipe-table-clickable-column",
+        width: 120,
       }
     )
   }
 
   const isTabletOrMobile = useMediaQuery({ query: '(max-width: 1224px)' })
-  columns.push(
-    {
-      key: 'tags',
-      title: 'Tags',
-      render: (value, record) => getTags(record.recipe),
-      filters: [...allTags].map(t => ({ text: t, value: t })),
-      filterSearch: allTags.size > 10,
-      onFilter: (value, row) => typeof (value) === "string" && parseCategories(row.recipe.data.recipeCategory).includes(value),
-      filteredValue: tagFilter,
-    }
-  )
-
   if (!isTabletOrMobile) {
     columns.push(
       {
         key: 'description',
         title: 'Description',
-        render: (value, record) => <div>{record.recipe.getDescription()}</div>,
+        render: (value, record) => <Description>{record.recipe.getDescription()}</Description>,
+        ellipsis: true,
       }
     )
   }
 
-  if (user === undefined) {
-    return null
-  }
-
   return (
-    <div style={{ padding: "5px" }}>
-      <div style={{ display: "flex" }}>
-        <Filterbox data={recipes} setFilteredRows={setFilteredRows} />
-        <div style={{ marginLeft: 'auto' }}>
+    <TableContainer>
+      <Toolbar>
+        <SearchSection>
+          <Filterbox data={recipes} setFilteredRows={setFilteredRows} />
+        </SearchSection>
+        <ActionsSection>
           <NewButton boxId={boxId} disabled={!writeable} element="button" />
           <UploadButton boxId={boxId} disabled={!writeable} element="button" />
           <ImportButton boxId={boxId} disabled={!writeable} element="button" />
@@ -245,31 +228,35 @@ export function RecipeTable(props: RecipeTableProps) {
             element="button"
           />
           <Popconfirm
-            title={`Are you sure to delete ${selectedRowKeys.length > 1 ? "these recipes" : "this recipe"}s`}
+            title={`Are you sure to delete ${selectedRowKeys.length > 1 ? "these recipes" : "this recipe"}?`}
             onConfirm={del}
             okText="Yes"
-            cancelText="No">
-            <ActionButton
-              disabled={!writeable || !hasSelected}
-              title="Delete recipes"
-              icon={<DeleteOutlined />}
-            >Delete</ActionButton>
+            cancelText="No"
+          >
+            <Tooltip title="Delete selected">
+              <ActionButton
+                disabled={!writeable || !hasSelected}
+                icon={<DeleteOutlined />}
+              >Delete</ActionButton>
+            </Tooltip>
           </Popconfirm>
-          <ActionButton
-            title="Copy recipes into different box"
-            onClick={() => setIsModalVisible(true)}
-            disabled={!hasSelected}
-            icon={<ForkOutlined />} >Copy</ActionButton>
+          <Tooltip title="Copy to another box">
+            <ActionButton
+              onClick={() => setIsModalVisible(true)}
+              disabled={!hasSelected}
+              icon={<CopyOutlined />}
+            >Copy</ActionButton>
+          </Tooltip>
           <PickBoxModal handleOk={fork} isVisible={isModalVisible} setIsVisible={setIsModalVisible} />
-        </div>
-      </div>
+        </ActionsSection>
+      </Toolbar>
       <Table<RowType>
         pagination={false}
         rowSelection={rowSelection}
         columns={columns}
         dataSource={filteredRows}
-        onChange={handleChange}
+        size="middle"
       />
-    </div>
+    </TableContainer>
   )
 }

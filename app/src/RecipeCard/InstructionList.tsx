@@ -7,15 +7,36 @@ import { Context } from '../context';
 import { getEditableSetter, RecipeCardProps } from './RecipeCard';
 import { StyledTextArea } from '../StyledComponents';
 
+const InstructionsSection = styled.div``
 
+const SectionTitle = styled.h3`
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-primary);
+  margin: 0 0 var(--space-md) 0;
+`
 
-const RecipeStepsArea = styled.div`
-  margin-top: 10px;
-  width: 100%;
+const InstructionsList = styled.ol`
+  margin: 0;
+  padding-left: var(--space-lg);
 `
 
 const RecipeStep = styled.li`
-  padding-bottom: 5px;
+  padding: var(--space-sm) 0;
+  line-height: 1.6;
+  font-size: var(--font-size-base);
+
+  &::marker {
+    color: var(--color-primary);
+    font-weight: 600;
+  }
+`
+
+const Placeholder = styled.span`
+  color: var(--color-text-muted);
+  font-style: italic;
 `
 
 
@@ -38,14 +59,12 @@ function InstructionList(props: RecipeCardProps) {
     }
     if (listElts.length > 0) {
       return (
-        <ol>
+        <InstructionsList>
           {listElts}
-        </ol>
+        </InstructionsList>
       )
     } else {
-      return (
-        <div>Add instructions?</div>
-      )
+      return <Placeholder>Add instructions?</Placeholder>
     }
   }
 
@@ -63,8 +82,8 @@ function InstructionList(props: RecipeCardProps) {
 
   if (editable || recipe.editing) {
     return (
-      <RecipeStepsArea>
-
+      <InstructionsSection>
+        <SectionTitle>Instructions</SectionTitle>
         <StyledTextArea
           defaultValue={instructionsToStr(instructions)}
           autoFocus
@@ -73,13 +92,14 @@ function InstructionList(props: RecipeCardProps) {
           onKeyUp={(e) => { if (e.code === "Escape") { handleChange(e.currentTarget.value) } }}
           onBlur={e => handleChange(e.target.value)}
         />
-      </RecipeStepsArea>
+      </InstructionsSection>
     )
   } else {
     return (
-      <RecipeStepsArea onDoubleClick={() => setEditable(true)}>
+      <InstructionsSection onDoubleClick={() => setEditable(true)}>
+        <SectionTitle>Instructions</SectionTitle>
         {formatInstructionList(instructions)}
-      </RecipeStepsArea>
+      </InstructionsSection>
     )
   }
 }

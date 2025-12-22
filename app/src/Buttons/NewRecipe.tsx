@@ -5,7 +5,7 @@ import { Context } from "../context";
 import { PickBoxModal } from "../Modals/PickBoxModal";
 import { getAppUserFromState } from "../state";
 import { createNewRecipe, getUniqueId } from "../utils";
-import { ActionButton } from "../StyledComponents";
+import { PrimaryButton } from "../StyledComponents";
 import { BoxId } from "../types";
 import { Menu } from "antd";
 
@@ -52,9 +52,9 @@ export default function NewButton(props: NewProps) {
     let elt;
     switch (element) {
         case "button":
-            elt = <ActionButton title="Create new recipe" disabled={disabled} onClick={newRecipeFlow} icon={<PlusOutlined />}>
+            elt = <PrimaryButton title="Create new recipe" disabled={disabled} onClick={newRecipeFlow} icon={<PlusOutlined />}>
                 New
-            </ActionButton>
+            </PrimaryButton>
             break;
         case "menu":
             elt = <Menu.Item key="newRecipe" title="Create new recipe" disabled={disabled} onClick={newRecipeFlow} icon={<PlusOutlined />} >

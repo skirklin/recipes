@@ -4,13 +4,13 @@ import './Header.css';
 import Breadcrumbs from './Breadcrumbs';
 import Menu from './Menu'
 
-const Container = styled.div`
-  background-color: var(--mint-cream);
-  padding: 5px;
+const Container = styled.header`
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-hover) 100%);
+  padding: var(--space-sm) var(--space-md);
   display: flex;
-  border-bottom: black;
-  border-bottom-style: solid;
-  border-bottom-width: thin;
+  align-items: center;
+  min-height: 56px;
+  box-shadow: var(--shadow-sm);
 `
 
 function Header() {
@@ -18,7 +18,7 @@ function Header() {
     <Container>
       <Breadcrumbs />
       <Menu />
-    </Container >
+    </Container>
   );
 }
 

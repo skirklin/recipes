@@ -11,7 +11,34 @@ import { useMediaQuery } from 'react-responsive'
 
 
 const TagsArea = styled.div`
-  margin-left: auto;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+  align-items: center;
+`
+
+const StyledTag = styled(Tag)`
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-sm);
+  padding: 2px 8px;
+  margin: 0;
+`
+
+const NewTagButton = styled(Tag)`
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-sm);
+  padding: 2px 8px;
+  margin: 0;
+  border-style: dashed;
+  background: transparent;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    color: var(--color-primary);
+    border-color: var(--color-primary);
+  }
 `
 
 function Tags(props: RecipeCardProps) {
@@ -62,30 +89,36 @@ function Tags(props: RecipeCardProps) {
         if (editable && idx === editableTag) {
           return (
             <Input
+              key={idx}
               autoFocus
               size="small"
               value={inputValue}
-              style={{ display: 'inline', width: "fit-content" }}
+              style={{ display: 'inline', width: "100px" }}
               onChange={e => setInputValue(e.target.value)}
               onBlur={() => confirmEdits(idx)}
-              onPressEnter={() => confirmEdits(idx)} />
+              onPressEnter={() => confirmEdits(idx)}
+            />
           );
         } else {
           return (
-            <Tag
+            <StyledTag
               closable={editable}
               onClose={() => onClose(idx)}
               key={idx}
               onDoubleClick={() => { setInputValue(rc); setEditableTag(idx); }}
             >
               {rc}
-            </Tag>
+            </StyledTag>
           );
         }
       }
     );
     if (editable && editableTag === undefined) {
-      elts.push(<Tag key="__new_tag__" style={{ borderStyle: "dashed", backgroundColor: "transparent" }} onClick={() => newTag()}><PlusOutlined />new tag</Tag>);
+      elts.push(
+        <NewTagButton key="__new_tag__" onClick={() => newTag()}>
+          <PlusOutlined /> Add tag
+        </NewTagButton>
+      );
     }
     return elts;
   }

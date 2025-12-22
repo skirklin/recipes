@@ -6,11 +6,31 @@ import { getEditableSetter, RecipeCardProps } from './RecipeCard';
 import styled from 'styled-components';
 import { StyledTextArea } from '../StyledComponents';
 
-const NotesArea = styled.div`
-  margin: 10px;
-  padding: 10px;
-  display: block;
-  white-space: pre-wrap;  /* Preserves whitespace and line breaks */
+const NotesSection = styled.div`
+  margin-top: var(--space-md);
+`
+
+const SectionTitle = styled.h3`
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-secondary);
+  margin: 0 0 var(--space-sm) 0;
+`
+
+const NotesContent = styled.div`
+  background-color: var(--color-bg-subtle);
+  border-radius: var(--radius-md);
+  padding: var(--space-md);
+  font-size: var(--font-size-base);
+  line-height: 1.6;
+  white-space: pre-wrap;
+`
+
+const Placeholder = styled.span`
+  color: var(--color-text-muted);
+  font-style: italic;
 `
 
 
@@ -23,9 +43,7 @@ function Notes(props: RecipeCardProps) {
     return null
   }
 
-  if (recipe === undefined) { return null }
   const setEditable = getEditableSetter(state, recipeId, boxId, setEditablePrimitive)
-
 
   const rd = recipe.changed ? recipe.changed : recipe.data
   const comment = commentToStr(rd.comment)
@@ -39,7 +57,8 @@ function Notes(props: RecipeCardProps) {
 
   if (editable || recipe.editing) {
     return (
-      <NotesArea>
+      <NotesSection>
+        <SectionTitle>Notes</SectionTitle>
         <StyledTextArea
           autoSize
           autoFocus
@@ -48,15 +67,16 @@ function Notes(props: RecipeCardProps) {
           onKeyUp={(e) => { if (e.code === "Escape") { handleChange(e.currentTarget.value) } }}
           onBlur={e => handleChange(e.target.value)}
         />
-      </NotesArea>
+      </NotesSection>
     )
   } else {
     return (
-      <NotesArea>
-        <div onDoubleClick={() => setEditable(true)}>
-          {comment || "Add a note?"}
-        </div>
-      </NotesArea>
+      <NotesSection>
+        <SectionTitle>Notes</SectionTitle>
+        <NotesContent onDoubleClick={() => setEditable(true)}>
+          {comment || <Placeholder>Add a note?</Placeholder>}
+        </NotesContent>
+      </NotesSection>
     )
   }
 }

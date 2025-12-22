@@ -15,14 +15,12 @@ function getPartMap(params: Readonly<Params<string>>, state: AppState) {
   if (boxId !== undefined) {
     const box = state.boxes.get(boxId)
     if (box !== undefined) {
-      partMap.set(boxId, box.data.name)
+      partMap.set(boxId, box.getName())
 
       if (recipeId !== undefined) {
         const recipe = box.recipes.get(recipeId)
         if (recipe !== undefined) {
-          const rname = recipe.data.name === undefined ? "" : recipe.data.name.toString()
-          partMap.set(recipeId, rname)
-
+          partMap.set(recipeId, recipe.getName())
         }
       }
     }
