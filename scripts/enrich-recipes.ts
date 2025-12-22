@@ -5,6 +5,8 @@ import { getFirestore, Timestamp } from "firebase-admin/firestore";
 import * as fs from "fs";
 import * as path from "path";
 
+const CLAUDE_MODEL = process.env.CLAUDE_MODEL || "claude-opus-4-5-20251101";
+
 // CLI arguments - only parsed when running as main script
 const isMainScript = import.meta.url === `file://${process.argv[1]}`;
 let DRY_RUN = false;
@@ -191,7 +193,7 @@ Respond in this exact JSON format (no markdown, just JSON):
 }`;
 
   const response = await client.messages.create({
-    model: "claude-sonnet-4-20250514",
+    model: CLAUDE_MODEL,
     max_tokens: 500,
     messages: [{ role: "user", content: prompt }],
   });
@@ -341,10 +343,10 @@ async function main() {
         // Create pending enrichment object
         const pendingEnrichment: PendingEnrichment = {
           description: enrichment.description,
-          suggestedTags: enrichment.suggestedTags,
+          suggestedTags: enrichment.suggestedTags.map(t => t.toLowerCase()),
           reasoning: enrichment.reasoning,
           generatedAt: Timestamp.now(),
-          model: "claude-sonnet-4-20250514",
+          model: CLAUDE_MODEL,
         };
 
         if (DRY_RUN) {

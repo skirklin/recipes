@@ -181,9 +181,9 @@ export async function applyEnrichment(
   const currentDescription = recipeData.data?.description;
   const currentTags = recipeData.data?.recipeCategory || [];
 
-  // Merge suggested tags with existing tags (avoid duplicates)
+  // Merge suggested tags with existing tags (avoid duplicates, all lowercase)
   const existingTags = Array.isArray(currentTags) ? currentTags : [currentTags].filter(Boolean);
-  const mergedTags = [...new Set([...existingTags, ...enrichment.suggestedTags])];
+  const mergedTags = [...new Set([...existingTags, ...enrichment.suggestedTags].map(t => t.toLowerCase()))];
 
   const updates: Record<string, unknown> = {
     pendingEnrichment: deleteField(),

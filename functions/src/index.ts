@@ -6,6 +6,7 @@ import * as jsdom from 'jsdom';
 import { initializeApp } from 'firebase-admin/app';
 import { getAuth } from 'firebase-admin/auth';
 import { FieldValue, getFirestore } from 'firebase-admin/firestore';
+import Anthropic from '@anthropic-ai/sdk';
 
 const app = initializeApp();
 const db = getFirestore(app);
@@ -132,4 +133,90 @@ export const addBoxOwner = functions.https.onCall(async (data) => {
   }
 
   updateOwners(docRef, newOwnerEmail)
-}) 
+})
+
+// Generate a recipe using Claude
+const CLAUDE_MODEL = process.env.CLAUDE_MODEL || "claude-opus-4-5-20251101";
+
+export const generateRecipe = functions
+  .runWith({ secrets: ["ANTHROPIC_API_KEY"] })
+  .https.onCall(async (data, context) => {
+    // Require authentication
+    if (!context.auth) {
+      throw new HttpsError("unauthenticated", "Must be logged in to generate recipes")
+    }
+
+    const { prompt } = data;
+    if (!prompt || typeof prompt !== "string") {
+      throw new HttpsError("invalid-argument", "Must provide a prompt")
+    }
+
+    const apiKey = process.env.ANTHROPIC_API_KEY;
+    if (!apiKey) {
+      throw new HttpsError("internal", "API key not configured")
+    }
+
+    const anthropic = new Anthropic({ apiKey });
+
+    const systemPrompt = `You are a helpful cooking assistant that generates recipes. When given a description of what the user wants, create a complete recipe.
+
+Return ONLY valid JSON (no markdown, no explanation) in this exact format:
+{
+  "@type": "Recipe",
+  "name": "Recipe Name",
+  "description": "A brief, appetizing description of the dish",
+  "recipeIngredient": ["ingredient 1", "ingredient 2", ...],
+  "recipeInstructions": [
+    {"@type": "HowToStep", "text": "Step 1 instructions"},
+    {"@type": "HowToStep", "text": "Step 2 instructions"},
+    ...
+  ],
+  "recipeCategory": ["category1", "category2"],
+  "recipeYield": "4 servings",
+  "prepTime": "PT15M",
+  "cookTime": "PT30M"
+}
+
+Guidelines:
+- Use clear, concise ingredient measurements
+- Write instructions as complete sentences
+- Include relevant categories (cuisine type, meal type, dietary info)
+- Be creative but practical`;
+
+    try {
+      const response = await anthropic.messages.create({
+        model: CLAUDE_MODEL,
+        max_tokens: 2000,
+        messages: [
+          { role: "user", content: `Create a recipe for: ${prompt}` }
+        ],
+        system: systemPrompt,
+      });
+
+      const text = response.content[0].type === "text" ? response.content[0].text : "";
+
+      // Parse the JSON response
+      let recipe: Recipe;
+      try {
+        // Handle potential markdown code blocks
+        let jsonStr = text.trim();
+        if (jsonStr.startsWith("```")) {
+          jsonStr = jsonStr.replace(/^```(?:json)?\n?/, "").replace(/\n?```$/, "");
+        }
+        recipe = JSON.parse(jsonStr);
+
+        // Ensure tags are lowercase
+        if (recipe.recipeCategory && Array.isArray(recipe.recipeCategory)) {
+          recipe.recipeCategory = recipe.recipeCategory.map((t: string) => t.toLowerCase());
+        }
+      } catch {
+        throw new HttpsError("internal", "Failed to parse recipe from AI response")
+      }
+
+      return { recipe };
+    } catch (error) {
+      if (error instanceof HttpsError) throw error;
+      console.error("Error generating recipe:", error);
+      throw new HttpsError("internal", "Failed to generate recipe")
+    }
+  }) 

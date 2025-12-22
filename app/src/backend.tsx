@@ -37,3 +37,4 @@ if (process.env.NODE_ENV === "development") {
 export const getRecipes = httpsCallable(functions, 'getRecipes');
 export const addBoxOwner = httpsCallable(functions, 'addBoxOwner');
 export const addRecipeOwner = httpsCallable(functions, 'addRecipeOwner');
+export const generateRecipe = httpsCallable<{ prompt: string }, { recipe: Record<string, unknown> }>(functions, 'generateRecipe');

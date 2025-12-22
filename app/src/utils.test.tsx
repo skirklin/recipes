@@ -167,9 +167,9 @@ describe('category parsing', () => {
     expect(parseCategories(undefined)).toEqual([]);
   });
 
-  it('formatCategories returns array as-is', () => {
+  it('formatCategories returns lowercase array', () => {
     const tags = ["A", "B", "C"];
-    expect(formatCategories(tags)).toBe(tags);
+    expect(formatCategories(tags)).toEqual(["a", "b", "c"]);
   });
 });
 

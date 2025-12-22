@@ -112,7 +112,7 @@ export function parseCategories(categories: Recipe["recipeCategory"]): string[] 
 }
 
 export function formatCategories(tags: string[]): Recipe["recipeCategory"] {
-  return tags
+  return tags.map(t => t.toLowerCase())
 }
 
 export function decodeStr(s: string | undefined): string | undefined {
