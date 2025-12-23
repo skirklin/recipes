@@ -1,10 +1,12 @@
-import { CheckCircleOutlined } from '@ant-design/icons';
-import { useContext } from 'react';
+import { CheckCircleOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import { useContext, useState } from 'react';
 import styled from 'styled-components';
+import { Button, Input, Modal, Popconfirm, message } from 'antd';
 import { Context } from '../context';
-import { getRecipeFromState, getUserFromState } from '../state';
+import { getAppUserFromState, getRecipeFromState, getUserFromState } from '../state';
 import { RecipeCardProps } from './RecipeCard';
 import { CookingLogEntry } from '../types';
+import { updateCookingLogEntry, deleteCookingLogEntry } from '../firestore';
 
 const LogContainer = styled.div`
   margin-top: var(--space-md);
@@ -23,7 +25,7 @@ const LogList = styled.div`
   gap: var(--space-xs);
 `
 
-const LogEntry = styled.div`
+const LogEntryContainer = styled.div`
   display: flex;
   align-items: flex-start;
   gap: var(--space-sm);
@@ -52,6 +54,18 @@ const LogNote = styled.p`
   font-style: italic;
 `
 
+const LogActions = styled.div`
+  display: flex;
+  gap: var(--space-xs);
+  flex-shrink: 0;
+`
+
+const ActionButton = styled(Button)`
+  padding: 0 var(--space-xs);
+  height: auto;
+  font-size: var(--font-size-sm);
+`
+
 const EmptyState = styled.div`
   color: var(--color-text-muted);
   font-size: var(--font-size-sm);
@@ -69,8 +83,12 @@ function formatDate(date: Date): string {
 function CookingLog(props: RecipeCardProps) {
   const { recipeId, boxId } = props;
   const { state } = useContext(Context);
+  const [editingIndex, setEditingIndex] = useState<number | null>(null);
+  const [editNote, setEditNote] = useState('');
+  const [saving, setSaving] = useState(false);
 
   const recipe = getRecipeFromState(state, boxId, recipeId);
+  const currentUser = getAppUserFromState(state);
 
   if (!recipe) {
     return null;
@@ -81,6 +99,47 @@ function CookingLog(props: RecipeCardProps) {
   const getUserName = (userId: string): string => {
     const logUser = getUserFromState(state, userId);
     return logUser?.name || 'Someone';
+  };
+
+  const canEdit = (entry: CookingLogEntry): boolean => {
+    // User can edit their own entries
+    return currentUser?.id === entry.madeBy;
+  };
+
+  const handleEditClick = (index: number, entry: CookingLogEntry) => {
+    // Convert from reversed display index to actual array index
+    const actualIndex = cookingLog.length - 1 - index;
+    setEditingIndex(actualIndex);
+    setEditNote(entry.note || '');
+  };
+
+  const handleSaveEdit = async () => {
+    if (editingIndex === null) return;
+
+    setSaving(true);
+    try {
+      await updateCookingLogEntry(boxId, recipeId, editingIndex, editNote);
+      message.success('Note updated');
+      setEditingIndex(null);
+      setEditNote('');
+    } catch (error) {
+      console.error('Failed to update note:', error);
+      message.error('Failed to update note');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleDelete = async (displayIndex: number) => {
+    // Convert from reversed display index to actual array index
+    const actualIndex = cookingLog.length - 1 - displayIndex;
+    try {
+      await deleteCookingLogEntry(boxId, recipeId, actualIndex);
+      message.success('Entry deleted');
+    } catch (error) {
+      console.error('Failed to delete entry:', error);
+      message.error('Failed to delete entry');
+    }
   };
 
   if (cookingLog.length === 0) {
@@ -96,8 +155,8 @@ function CookingLog(props: RecipeCardProps) {
     <LogContainer>
       <LogTitle>Cooking Log</LogTitle>
       <LogList>
-        {[...cookingLog].reverse().map((entry: CookingLogEntry, idx: number) => (
-          <LogEntry key={idx}>
+        {[...cookingLog].reverse().map((entry: CookingLogEntry, displayIndex: number) => (
+          <LogEntryContainer key={displayIndex}>
             <LogIcon><CheckCircleOutlined /></LogIcon>
             <LogContent>
               <LogMeta>
@@ -105,9 +164,52 @@ function CookingLog(props: RecipeCardProps) {
               </LogMeta>
               {entry.note && <LogNote>"{entry.note}"</LogNote>}
             </LogContent>
-          </LogEntry>
+            {canEdit(entry) && (
+              <LogActions>
+                <ActionButton
+                  type="text"
+                  size="small"
+                  icon={<EditOutlined />}
+                  onClick={() => handleEditClick(displayIndex, entry)}
+                />
+                <Popconfirm
+                  title="Delete this entry?"
+                  onConfirm={() => handleDelete(displayIndex)}
+                  okText="Delete"
+                  cancelText="Cancel"
+                >
+                  <ActionButton
+                    type="text"
+                    size="small"
+                    danger
+                    icon={<DeleteOutlined />}
+                  />
+                </Popconfirm>
+              </LogActions>
+            )}
+          </LogEntryContainer>
         ))}
       </LogList>
+
+      <Modal
+        title="Edit Note"
+        open={editingIndex !== null}
+        onOk={handleSaveEdit}
+        onCancel={() => {
+          setEditingIndex(null);
+          setEditNote('');
+        }}
+        confirmLoading={saving}
+        okText="Save"
+      >
+        <Input.TextArea
+          value={editNote}
+          onChange={(e) => setEditNote(e.target.value)}
+          placeholder="Add a note about how it turned out..."
+          rows={3}
+          autoFocus
+        />
+      </Modal>
     </LogContainer>
   );
 }

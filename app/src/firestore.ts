@@ -232,3 +232,59 @@ export async function addCookingLogEntry(
     cookingLog: arrayUnion(entry),
   });
 }
+
+export async function updateCookingLogEntry(
+  boxId: BoxId,
+  recipeId: RecipeId,
+  entryIndex: number,
+  note: string
+) {
+  const recipeRef = doc(db, "boxes", boxId, "recipes", recipeId);
+  const recipeDoc = await getDoc(recipeRef);
+
+  if (!recipeDoc.exists()) {
+    console.warn("Recipe not found");
+    return;
+  }
+
+  const data = recipeDoc.data();
+  const cookingLog = [...(data.cookingLog || [])];
+
+  if (entryIndex < 0 || entryIndex >= cookingLog.length) {
+    console.warn("Invalid entry index");
+    return;
+  }
+
+  cookingLog[entryIndex] = {
+    ...cookingLog[entryIndex],
+    note: note.trim() || undefined,
+  };
+
+  await updateDoc(recipeRef, { cookingLog });
+}
+
+export async function deleteCookingLogEntry(
+  boxId: BoxId,
+  recipeId: RecipeId,
+  entryIndex: number
+) {
+  const recipeRef = doc(db, "boxes", boxId, "recipes", recipeId);
+  const recipeDoc = await getDoc(recipeRef);
+
+  if (!recipeDoc.exists()) {
+    console.warn("Recipe not found");
+    return;
+  }
+
+  const data = recipeDoc.data();
+  const cookingLog = [...(data.cookingLog || [])];
+
+  if (entryIndex < 0 || entryIndex >= cookingLog.length) {
+    console.warn("Invalid entry index");
+    return;
+  }
+
+  cookingLog.splice(entryIndex, 1);
+
+  await updateDoc(recipeRef, { cookingLog });
+}

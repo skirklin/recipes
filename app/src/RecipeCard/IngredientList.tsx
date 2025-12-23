@@ -1,7 +1,7 @@
 import { useState, useContext } from 'react';
 import styled from 'styled-components';
 import { Recipe } from 'schema-dts';
-import { ingredientsToStr, strToIngredients } from '../converters';
+import { ingredientsToStr, strToIngredients, decodeStr } from '../converters';
 import { getAppUserFromState, getBoxFromState, getRecipeFromState } from '../state';
 import { canUpdateRecipe } from '../utils';
 import { Context } from '../context';
@@ -73,7 +73,7 @@ function IngredientList(props: RecipeCardProps) {
 
   function formatIngredientList(ingredients: Recipe["recipeIngredient"]) {
     const ingredientArray = Array.isArray(ingredients) ? ingredients : [];
-    const listElts = ingredientArray.map((ri, id) => <Ingredient key={id}>{String(ri)}</Ingredient>);
+    const listElts = ingredientArray.map((ri, id) => <Ingredient key={id}>{decodeStr(String(ri))}</Ingredient>);
     return (
       <IngredientsList>
         {listElts.length > 0 ? listElts : <Placeholder>Add ingredients?</Placeholder>}

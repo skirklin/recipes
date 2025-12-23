@@ -92,7 +92,7 @@ export function commentToStr(comment: Recipe["comment"]): string | undefined {
     return undefined
   } else if (typeof comment === "object") {
     if (Object.prototype.hasOwnProperty.call(comment, "text")) {
-      return (comment as { text: string }).text
+      return decodeStr((comment as { text: string }).text)
     } else {
       console.warn("Unfamiliar comment format:", comment)
     }
@@ -109,9 +109,9 @@ export function parseCategories(categories: Recipe["recipeCategory"]): string[] 
   if (categories === undefined) {
     return []
   } else if (typeof categories === "string") {
-    return [categories]
+    return [decodeStr(categories) || categories]
   } else {
-    return Array.isArray(categories) ? categories.map(String) : [];
+    return Array.isArray(categories) ? categories.map(c => decodeStr(String(c)) || String(c)) : [];
   }
 }
 

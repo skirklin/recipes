@@ -1,7 +1,7 @@
 import React, { useContext, useState } from 'react';
 import styled from 'styled-components';
 import { Recipe } from 'schema-dts';
-import { instructionsToStr, strToInstructions } from '../converters';
+import { instructionsToStr, strToInstructions, decodeStr } from '../converters';
 import { getRecipeFromState } from '../state';
 import { Context } from '../context';
 import { getEditableSetter, RecipeCardProps } from './RecipeCard';
@@ -52,10 +52,10 @@ function InstructionList(props: RecipeCardProps) {
   function formatInstructionList(instructions: Recipe["recipeInstructions"]) {
     let listElts: React.ReactNode[];
     if (typeof instructions === "string") {
-      listElts = [<RecipeStep key={0}>{instructions}</RecipeStep>]
+      listElts = [<RecipeStep key={0}>{decodeStr(instructions)}</RecipeStep>]
     } else {
       const instructionArray = Array.isArray(instructions) ? instructions : [];
-      listElts = instructionArray.map((ri: any, id) => <RecipeStep key={id}>{String(ri.text ?? '')}</RecipeStep>);
+      listElts = instructionArray.map((ri: any, id) => <RecipeStep key={id}>{decodeStr(String(ri.text ?? ''))}</RecipeStep>);
     }
     if (listElts.length > 0) {
       return (
