@@ -77,11 +77,33 @@ async function handleUserSnapshot(
     (bid: string) => {
       if (!unsubMap.boxMap.has(bid)) {
         const boxRef = doc(db, "boxes", bid).withConverter(boxConverter)
+
+        // Track whether box has been loaded to prevent race condition
+        let boxLoaded = false;
+        const pendingRecipeSnapshots: QuerySnapshot<RecipeEntry>[] = [];
+
         const boxUnsub = onSnapshot(
-          boxRef.withConverter(boxConverter), (snapshot) => handleBoxSnapshot(snapshot, dispatch, unsubMap))
+          boxRef.withConverter(boxConverter), (snapshot) => {
+            handleBoxSnapshot(snapshot, dispatch, unsubMap)
+            // Process any pending recipe snapshots after box is loaded
+            if (!boxLoaded) {
+              boxLoaded = true;
+              pendingRecipeSnapshots.forEach(recipeSnapshot => {
+                handleRecipesSnapshot(recipeSnapshot, dispatch, boxRef.id)
+              });
+              pendingRecipeSnapshots.length = 0;
+            }
+          })
 
         const recipesRef = collection(db, "boxes", boxRef.id, "recipes").withConverter(recipeConverter)
-        const recipesUnsub = onSnapshot(recipesRef, (snapshot) => handleRecipesSnapshot(snapshot, dispatch, boxRef.id))
+        const recipesUnsub = onSnapshot(recipesRef, (snapshot) => {
+          if (boxLoaded) {
+            handleRecipesSnapshot(snapshot, dispatch, boxRef.id)
+          } else {
+            // Queue until box is loaded
+            pendingRecipeSnapshots.push(snapshot);
+          }
+        })
         unsubMap.boxMap.set(boxRef.id, { recipesUnsub, boxUnsub })
       }
     }

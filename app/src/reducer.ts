@@ -18,7 +18,6 @@ export function initState(): AppState {
 import { UserEntry } from './storage';
 
 function handleRecipeChange(key: string, prevState: AppState, action: ActionType) {
-  console.log({ key, action })
   if (action.recipeId === undefined || action.boxId === undefined) {
     console.warn("Can't change a recipe property without passing recipeId and boxId.")
     return prevState
@@ -38,7 +37,6 @@ function handleRecipeChange(key: string, prevState: AppState, action: ActionType
 
 
 function handleBoxChange(key: string, prevState: AppState, action: ActionType) {
-  console.log({ key, action })
   if (action.boxId === undefined) {
     console.warn("Can't change a recipe property without passing recipeId and boxId.")
     return prevState
