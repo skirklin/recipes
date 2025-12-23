@@ -25,7 +25,7 @@ const Toolbar = styled.div`
   align-items: center;
   justify-content: flex-end;
   gap: var(--space-xs);
-  padding: var(--space-md) 0;
+  padding: var(--space-sm) 0;
 `
 
 const BoxNameCell = styled.span`

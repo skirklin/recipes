@@ -30,6 +30,18 @@ export type PendingEnrichment = {
   model: string,
 }
 
+export type CookingLogEntry = {
+  madeAt: Date,
+  madeBy: string,  // UserId
+  note?: string,
+}
+
+export type CookingLogEntryStore = {
+  madeAt: Timestamp,
+  madeBy: string,
+  note?: string,
+}
+
 export type RecipeStoreType = {
   creator: string,
   data: Recipe,
@@ -39,6 +51,7 @@ export type RecipeStoreType = {
   lastUpdatedBy: string, // user id
   owners: string[], // user ids
   pendingEnrichment?: PendingEnrichment,
+  cookingLog?: CookingLogEntryStore[],
 }
 
 export type UserStoreType = {

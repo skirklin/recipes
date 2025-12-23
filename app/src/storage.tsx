@@ -2,7 +2,7 @@ import { doc, DocumentSnapshot, SnapshotOptions, Timestamp } from "firebase/fire
 import _ from "lodash";
 import { Recipe } from "schema-dts";
 import { db } from "./backend";
-import { BoxType, BoxStoreType, RecipeStoreType, Visibility, UserStoreType, BoxId, UserId, PendingEnrichment } from "./types";
+import { BoxType, BoxStoreType, RecipeStoreType, Visibility, UserStoreType, BoxId, UserId, PendingEnrichment, CookingLogEntry } from "./types";
 import { decodeStr } from "./converters";
 
 const DUMMY_FIRST_DATE = new Date(2022, 0, 0)
@@ -19,6 +19,7 @@ export class RecipeEntry {
     updated: Date;
     lastUpdatedBy: string;
     pendingEnrichment?: PendingEnrichment;
+    cookingLog: CookingLogEntry[];
 
     constructor(
         data: Recipe,
@@ -29,7 +30,8 @@ export class RecipeEntry {
         created: Date,
         updated: Date,
         lastUpdatedBy: string,
-        pendingEnrichment?: PendingEnrichment
+        pendingEnrichment?: PendingEnrichment,
+        cookingLog?: CookingLogEntry[]
     ) {
         this.data = data;
         this.id = id;
@@ -40,6 +42,7 @@ export class RecipeEntry {
         this.updated = updated || DUMMY_FIRST_DATE;
         this.lastUpdatedBy = lastUpdatedBy || this.creator;
         this.pendingEnrichment = pendingEnrichment;
+        this.cookingLog = cookingLog || [];
 
         this.editing = false;
     }
@@ -54,7 +57,8 @@ export class RecipeEntry {
             this.created,
             this.updated,
             this.lastUpdatedBy,
-            this.pendingEnrichment ? _.cloneDeep(this.pendingEnrichment) : undefined
+            this.pendingEnrichment ? _.cloneDeep(this.pendingEnrichment) : undefined,
+            _.cloneDeep(this.cookingLog)
         )
         newRecipe.editing = this.editing
         return newRecipe
@@ -90,10 +94,22 @@ export const recipeConverter = {
         if (recipe.pendingEnrichment) {
             result.pendingEnrichment = recipe.pendingEnrichment;
         }
+        if (recipe.cookingLog && recipe.cookingLog.length > 0) {
+            result.cookingLog = recipe.cookingLog.map(entry => ({
+                madeAt: Timestamp.fromDate(entry.madeAt),
+                madeBy: entry.madeBy,
+                note: entry.note,
+            }));
+        }
         return result;
     },
     fromFirestore: (snapshot: DocumentSnapshot, options: SnapshotOptions) => {
         const rawRecipe = snapshot.data(options) as RecipeStoreType
+        const cookingLog: CookingLogEntry[] = (rawRecipe.cookingLog || []).map(entry => ({
+            madeAt: entry.madeAt.toDate(),
+            madeBy: entry.madeBy,
+            note: entry.note,
+        }));
         return new RecipeEntry(
             rawRecipe.data,
             rawRecipe.owners,
@@ -104,6 +120,7 @@ export const recipeConverter = {
             (rawRecipe.updated || DUMMY_FIRST_TIMESTAMP).toDate(),
             rawRecipe.lastUpdatedBy,
             rawRecipe.pendingEnrichment,
+            cookingLog,
         );
     }
 };

@@ -1,4 +1,4 @@
-import { addDoc, arrayRemove, arrayUnion, collection, deleteDoc, deleteField, doc, getDoc, getDocs, query, setDoc, updateDoc, where } from 'firebase/firestore';
+import { addDoc, arrayRemove, arrayUnion, collection, deleteDoc, deleteField, doc, getDoc, getDocs, query, setDoc, Timestamp, updateDoc, where } from 'firebase/firestore';
 import React from 'react';
 import { Recipe } from "schema-dts"
 import { db } from './backend';
@@ -204,5 +204,22 @@ export async function rejectEnrichment(boxId: BoxId, recipeId: RecipeId) {
   const recipeRef = doc(db, "boxes", boxId, "recipes", recipeId);
   await updateDoc(recipeRef, {
     pendingEnrichment: deleteField(),
+  });
+}
+
+export async function addCookingLogEntry(
+  boxId: BoxId,
+  recipeId: RecipeId,
+  userId: string,
+  note?: string
+) {
+  const recipeRef = doc(db, "boxes", boxId, "recipes", recipeId);
+  const entry = {
+    madeAt: Timestamp.now(),
+    madeBy: userId,
+    note: note || undefined,
+  };
+  await updateDoc(recipeRef, {
+    cookingLog: arrayUnion(entry),
   });
 }

@@ -31,8 +31,8 @@ const TableContainer = styled.div`
 const Toolbar = styled.div`
   display: flex;
   align-items: center;
-  gap: var(--space-md);
-  padding: var(--space-md) 0;
+  gap: var(--space-sm);
+  padding: var(--space-sm) 0;
   flex-wrap: wrap;
 
   @media (max-width: 768px) {
