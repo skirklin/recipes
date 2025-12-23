@@ -7,7 +7,7 @@ import { getFunctions, connectFunctionsEmulator, httpsCallable } from "firebase/
 // Configure Firebase.
 const firebaseConfig = {
   apiKey: "AIzaSyDnTpynPmWemzfi-AHzPEgu2TqZ0e-8UUA",
-  authDomain: "recipe-box-335721.firebaseapp.com",
+  authDomain: "recipes.kirkl.in",
   projectId: "recipe-box-335721",
   storageBucket: "recipe-box-335721.appspot.com",
   messagingSenderId: "779965064363",
