@@ -6,6 +6,7 @@ import { Context } from '../context';
 import { applyEnrichment, rejectEnrichment } from '../firestore';
 import { getRecipeFromState } from '../state';
 import { RecipeCardProps } from './RecipeCard';
+import { Section, SectionLabel, SuggestedDescription, TagsContainer, Reasoning } from '../Modals/EnrichmentStyles';
 
 const EnrichmentBanner = styled.div`
   background: linear-gradient(135deg, var(--color-bg-muted) 0%, rgba(147, 112, 219, 0.1) 100%);
@@ -25,35 +26,8 @@ const BannerHeader = styled.div`
   color: #9370db;
 `
 
-const Section = styled.div`
+const EnrichmentSection = styled(Section)`
   margin-bottom: var(--space-sm);
-`
-
-const SectionLabel = styled.span`
-  font-weight: 500;
-  color: var(--color-text-secondary);
-  font-size: var(--font-size-sm);
-`
-
-const SuggestedDescription = styled.p`
-  font-style: italic;
-  color: var(--color-text);
-  margin: var(--space-xs) 0;
-  padding-left: var(--space-sm);
-  border-left: 2px solid var(--color-border);
-`
-
-const TagsContainer = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-xs);
-  margin-top: var(--space-xs);
-`
-
-const Reasoning = styled.p`
-  font-size: var(--font-size-sm);
-  color: var(--color-text-secondary);
-  margin: var(--space-xs) 0 0 0;
 `
 
 const ButtonRow = styled.div`
@@ -91,21 +65,21 @@ function EnrichmentReview(props: RecipeCardProps) {
       </BannerHeader>
 
       {hasNewDescription && (
-        <Section>
+        <EnrichmentSection>
           <SectionLabel>Suggested description:</SectionLabel>
           <SuggestedDescription>{enrichment.description}</SuggestedDescription>
-        </Section>
+        </EnrichmentSection>
       )}
 
       {enrichment.suggestedTags.length > 0 && (
-        <Section>
+        <EnrichmentSection>
           <SectionLabel>Suggested tags:</SectionLabel>
           <TagsContainer>
             {enrichment.suggestedTags.map((tag, idx) => (
               <Tag key={idx} color="purple">{tag}</Tag>
             ))}
           </TagsContainer>
-        </Section>
+        </EnrichmentSection>
       )}
 
       <Reasoning>

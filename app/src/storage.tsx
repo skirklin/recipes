@@ -1,4 +1,3 @@
-import { Tag } from "antd";
 import { doc, DocumentSnapshot, SnapshotOptions, Timestamp } from "firebase/firestore";
 import _ from "lodash";
 import { Recipe } from "schema-dts";
@@ -66,16 +65,6 @@ export class RecipeEntry {
 
     getData() {
         return this.changed ? this.changed : this.data
-    }
-
-    getUserMsg(user: UserEntry) {
-        if (this.created > user.lastSeen) {
-            return <Tag color={"red"}>New</Tag>
-        } else if (this.updated > user.lastSeen) {
-            return <Tag color={"orange"}>Updated</Tag>
-        } else {
-            return <div />
-        }
     }
 
     getName() {

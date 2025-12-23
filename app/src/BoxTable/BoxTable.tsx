@@ -9,7 +9,7 @@ import NewBoxButton from '../Buttons/NewBox';
 
 import './BoxTable.css';
 import { Context } from "../context";
-import { deleteBox, setBoxVisiblity } from "../firestore";
+import { deleteBox, setBoxVisibility } from "../firestore";
 import { DeleteOutlined } from "@ant-design/icons";
 import { BoxId, Visibility } from "../types";
 import { UserEntry } from "../storage";
@@ -117,7 +117,7 @@ export function BoxTable(props: BoxTableProps) {
   function handleVisiblityChange(e: { key: string }) {
     selectedRows.forEach(
       (value: RowType) => {
-        setBoxVisiblity(value.boxId, e.key as Visibility)
+        setBoxVisibility(value.boxId, e.key as Visibility)
       }
     )
   }

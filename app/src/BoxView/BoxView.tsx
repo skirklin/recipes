@@ -2,7 +2,7 @@ import { useContext } from "react";
 import styled from "styled-components";
 import { Context } from "../context";
 
-import { setBoxVisiblity } from "../firestore";
+import { setBoxVisibility } from "../firestore";
 import { getBoxFromState } from "../state";
 import { RecipeTable, RowType } from "../RecipeTable/RecipeTable"
 import { Divider, RecipeActionGroup } from "../StyledComponents";
@@ -59,7 +59,7 @@ export default function BoxView(props: BoxProps) {
   }
 
   function handleVisiblityChange(e: { key: string }) {
-    setBoxVisiblity(boxId, e.key as Visibility)
+    setBoxVisibility(boxId, e.key as Visibility)
   }
 
   function handleAddOwner(newOwnerEmail: string) {

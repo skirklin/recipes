@@ -92,10 +92,9 @@ export function commentToStr(comment: Recipe["comment"]): string | undefined {
     return undefined
   } else if (typeof comment === "object") {
     if (Object.prototype.hasOwnProperty.call(comment, "text")) {
-      // this is hacky, but typescript was making this brutally unpleasant and I didn't want to spend more time on it.
       return (comment as { text: string }).text
     } else {
-      alert("Unfamiliar comment format, please report")
+      console.warn("Unfamiliar comment format:", comment)
     }
   }
   return undefined

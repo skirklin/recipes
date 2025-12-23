@@ -152,11 +152,11 @@ export async function deleteBox(state: AppState, boxId: BoxId, dispatch: React.D
   deleteDoc(doc(db, "boxes", boxId))
 }
 
-export async function setBoxVisiblity(boxId: BoxId, visibility: Visibility) {
+export async function setBoxVisibility(boxId: BoxId, visibility: Visibility) {
   updateDoc(doc(db, "boxes", boxId), { visibility })
 }
 
-export async function setRecipeVisiblity(boxId: BoxId, recipeId: RecipeId, visibility: Visibility) {
+export async function setRecipeVisibility(boxId: BoxId, recipeId: RecipeId, visibility: Visibility) {
   updateDoc(doc(db, "boxes", boxId, "recipes", recipeId), { visibility })
 }
 

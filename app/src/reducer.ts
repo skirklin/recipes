@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import { BoxEntry, RecipeEntry } from './storage';
+import { BoxEntry, RecipeEntry, UserEntry } from './storage';
 import { ActionType, AppState } from './types';
 import { getBoxFromState, getRecipeFromState, setBoxInState, setRecipeInState } from './state';
 
@@ -15,8 +15,6 @@ export function initState(): AppState {
     }
   )
 }
-
-import { UserEntry } from './storage';
 
 function handleRecipeChange(key: string, prevState: AppState, action: ActionType) {
   if (action.recipeId === undefined || action.boxId === undefined) {
@@ -39,7 +37,7 @@ function handleRecipeChange(key: string, prevState: AppState, action: ActionType
 
 function handleBoxChange(key: string, prevState: AppState, action: ActionType) {
   if (action.boxId === undefined) {
-    console.warn("Can't change a recipe property without passing recipeId and boxId.")
+    console.warn("Can't change a box property without passing boxId.")
     return prevState
   }
   const box = getBoxFromState(prevState, action.boxId)
@@ -140,14 +138,14 @@ export function recipeBoxReducer(prevState: AppState, action: ActionType): AppSt
         console.warn("REMOVE_RECIPE requires a boxId and a recipeId")
         return prevState
       }
-      state = { ...prevState, boxes: new Map(prevState.boxes) }
-      const box = state.boxes.get(action.boxId)
-      if (box === undefined) {
-        return state
+      const existingBox = prevState.boxes.get(action.boxId)
+      if (existingBox === undefined) {
+        return prevState
       }
-      box.recipes = new Map(box.recipes)
-      box.recipes.delete(action.recipeId)
-      return state
+      const updatedBox = existingBox.clone()
+      updatedBox.recipes = new Map(existingBox.recipes)
+      updatedBox.recipes.delete(action.recipeId)
+      return { ...prevState, boxes: new Map([...prevState.boxes, [action.boxId, updatedBox]]) }
     }
     case "SET_BOXES": {
       return { ...prevState, boxes: new Map([...prevState.boxes, ...action.payload as Map<string, BoxEntry>]) }

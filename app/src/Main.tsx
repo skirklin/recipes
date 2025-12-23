@@ -31,7 +31,7 @@ function Main() {
       }
 
       subscribeToUser(authUser, dispatch, unsubMap)
-      return () => { console.debug("Unsubscring from all."); unsubscribe(unsubMap) }
+      return () => { console.debug("Unsubscribing from all."); unsubscribe(unsubMap) }
     }, [authUser, dispatch]
   )
 

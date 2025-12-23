@@ -6,6 +6,7 @@ import { Context } from '../context';
 import { applyEnrichment, rejectEnrichment } from '../firestore';
 import { RecipeEntry } from '../storage';
 import { BoxId, RecipeId } from '../types';
+import { Section, SectionLabel, SuggestedDescription, TagsContainer, Reasoning } from './EnrichmentStyles';
 
 const EnrichmentList = styled.div`
   max-height: 60vh;
@@ -33,33 +34,8 @@ const RecipeName = styled.span`
   flex: 1;
 `
 
-const Section = styled.div`
-  margin: var(--space-xs) 0;
+const IndentedSection = styled(Section)`
   padding-left: var(--space-lg);
-`
-
-const SectionLabel = styled.span`
-  font-size: var(--font-size-sm);
-  color: var(--color-text-secondary);
-`
-
-const SuggestedDescription = styled.p`
-  font-style: italic;
-  margin: var(--space-xs) 0;
-  color: var(--color-text);
-`
-
-const TagsContainer = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-xs);
-  margin-top: var(--space-xs);
-`
-
-const Reasoning = styled.p`
-  font-size: var(--font-size-sm);
-  color: var(--color-text-muted);
-  margin: var(--space-xs) 0 0 0;
 `
 
 const ActionBar = styled.div`
@@ -254,24 +230,24 @@ function BatchEnrichmentModal({ open, onClose }: BatchEnrichmentModalProps) {
                   </ItemHeader>
 
                   {hasNewDescription && (
-                    <Section>
+                    <IndentedSection>
                       <SectionLabel>Suggested description:</SectionLabel>
                       <SuggestedDescription>"{enrichment.description}"</SuggestedDescription>
-                    </Section>
+                    </IndentedSection>
                   )}
 
-                  <Section>
+                  <IndentedSection>
                     <SectionLabel>Suggested tags:</SectionLabel>
                     <TagsContainer>
                       {enrichment.suggestedTags.map((tag, idx) => (
                         <Tag key={idx} color="purple">{tag}</Tag>
                       ))}
                     </TagsContainer>
-                  </Section>
+                  </IndentedSection>
 
-                  <Section>
+                  <IndentedSection>
                     <Reasoning><strong>Why:</strong> {enrichment.reasoning}</Reasoning>
-                  </Section>
+                  </IndentedSection>
                 </EnrichmentItem>
               );
             })}

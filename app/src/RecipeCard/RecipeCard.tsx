@@ -21,7 +21,7 @@ import { Dropdown, Menu } from 'antd';
 import { MoreOutlined } from '@ant-design/icons';
 import { useContext } from 'react';
 import { Context } from '../context';
-import { setRecipeVisiblity } from '../firestore';
+import { setRecipeVisibility } from '../firestore';
 import { getAppUserFromState, getBoxFromState, getRecipeFromState } from '../state';
 import { canUpdateRecipe } from '../utils';
 import { addRecipeOwner } from '../backend';
@@ -93,7 +93,7 @@ function ActionBar(props: RecipeCardProps) {
   }
 
   function handleVisiblityChange(e: { key: string }) {
-    setRecipeVisiblity(boxId, recipeId, e.key as Visibility)
+    setRecipeVisibility(boxId, recipeId, e.key as Visibility)
   }
   return (
     <RecipeActionGroup>
@@ -135,7 +135,7 @@ function ActionMenu(props: RecipeCardProps) {
   }
 
   function handleVisiblityChange(e: { key: string | undefined }) {
-    setRecipeVisiblity(boxId, recipeId, e.key as Visibility)
+    setRecipeVisibility(boxId, recipeId, e.key as Visibility)
   }
 
   function handleAddOwner(newOwnerEmail: string) {

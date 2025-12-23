@@ -11,7 +11,7 @@ import NewButton from '../Buttons/NewRecipe';
 import UploadButton from '../Buttons/UploadRecipes';
 import ImportButton from '../Buttons/ImportRecipes';
 import GenerateButton from '../Buttons/GenerateRecipe';
-import { addRecipe, deleteRecipe, setRecipeVisiblity } from '../firestore';
+import { addRecipe, deleteRecipe, setRecipeVisibility } from '../firestore';
 import { Context } from '../context';
 import { PickBoxModal } from '../Modals/PickBoxModal';
 import BatchEnrichmentModal from '../Modals/BatchEnrichmentModal';
@@ -176,7 +176,7 @@ export function RecipeTable(props: RecipeTableProps) {
   function handleVisiblityChange(e: { key: string }) {
     selectedRows.forEach(
       (value: RowType) => {
-        setRecipeVisiblity(value.box.id, value.recipe.id, e.key as Visibility)
+        setRecipeVisibility(value.box.id, value.recipe.id, e.key as Visibility)
       }
     )
   }
