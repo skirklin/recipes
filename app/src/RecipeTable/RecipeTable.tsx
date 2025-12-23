@@ -10,11 +10,11 @@ import Filterbox from './Filterbox';
 import NewButton from '../Buttons/NewRecipe';
 import UploadButton from '../Buttons/UploadRecipes';
 import ImportButton from '../Buttons/ImportRecipes';
+import GenerateButton from '../Buttons/GenerateRecipe';
 import { addRecipe, deleteRecipe, setRecipeVisiblity } from '../firestore';
 import { Context } from '../context';
 import { PickBoxModal } from '../Modals/PickBoxModal';
 import BatchEnrichmentModal from '../Modals/BatchEnrichmentModal';
-import GenerateRecipeModal from '../Modals/GenerateRecipeModal';
 import { ActionButton } from '../StyledComponents';
 import './RecipeTable.css'
 import { BoxEntry, RecipeEntry } from '../storage';
@@ -114,7 +114,6 @@ export function RecipeTable(props: RecipeTableProps) {
   const [selectedRows, setSelectedRows] = useState<RowType[]>([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isBatchModalVisible, setIsBatchModalVisible] = useState(false);
-  const [isGenerateModalVisible, setIsGenerateModalVisible] = useState(false);
   const navigate = useNavigate();
 
   const { writeable, recipes, boxId } = props;
@@ -246,15 +245,7 @@ export function RecipeTable(props: RecipeTableProps) {
           <NewButton boxId={boxId} disabled={!writeable} element="button" />
           <UploadButton boxId={boxId} disabled={!writeable} element="button" />
           <ImportButton boxId={boxId} disabled={!writeable} element="button" />
-          <Tooltip title="Generate recipe with AI">
-            <ActionButton
-              onClick={() => setIsGenerateModalVisible(true)}
-              disabled={!writeable}
-              icon={<RobotOutlined />}
-            >
-              Generate
-            </ActionButton>
-          </Tooltip>
+          <GenerateButton boxId={boxId} disabled={!writeable} />
           {pendingEnrichmentCount > 0 && (
             <Tooltip title={`Review ${pendingEnrichmentCount} AI suggestion${pendingEnrichmentCount > 1 ? 's' : ''}`}>
               <ActionButton
@@ -295,7 +286,6 @@ export function RecipeTable(props: RecipeTableProps) {
           </Tooltip>
           <PickBoxModal handleOk={fork} isVisible={isModalVisible} setIsVisible={setIsModalVisible} />
           <BatchEnrichmentModal open={isBatchModalVisible} onClose={() => setIsBatchModalVisible(false)} />
-          <GenerateRecipeModal boxId={boxId} isVisible={isGenerateModalVisible} setIsVisible={setIsGenerateModalVisible} />
         </ActionsSection>
       </Toolbar>
       <Table<RowType>

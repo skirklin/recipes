@@ -74,7 +74,8 @@ function GenerateRecipeModal(props: GenerateRecipeModalProps) {
 
     try {
       const response = await generateRecipe({ prompt });
-      setGeneratedRecipe(response.data.recipe as Recipe);
+      const recipe = JSON.parse(response.data.recipeJson) as Recipe;
+      setGeneratedRecipe(recipe);
     } catch (err) {
       console.error('Error generating recipe:', err);
       setError('Failed to generate recipe. Please try again.');

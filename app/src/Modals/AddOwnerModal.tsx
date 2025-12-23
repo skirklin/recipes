@@ -16,7 +16,7 @@ export function AddOwnerModal(props: PickBoxModalProps) {
   const [value, setValue] = useState("")
 
   return (
-    <Modal destroyOnClose={true} visible={isVisible} onOk={() => { handleOk(value); setIsVisible(false) }} onCancel={() => setIsVisible(false)}>
+    <Modal destroyOnHidden={true} open={isVisible} onOk={() => { handleOk(value); setIsVisible(false) }} onCancel={() => setIsVisible(false)}>
       <Input type="text" onChange={e => setValue(e.target.value)} value={value} />
     </Modal >
   );

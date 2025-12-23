@@ -45,7 +45,6 @@ async function initializeUser(user: User) {
 }
 
 export async function subscribeToUser(user: User, dispatch: React.Dispatch<ActionType>, unsubMap: UnsubMap) {
-  console.log("subscribing to user", user)
   dispatch({ type: "INCR_LOADING" })
   // fetch any boxes associated with this user
   if (user === null) {
@@ -122,7 +121,6 @@ async function handleBoxSnapshot(
 
 
 export function unsubscribe(unsubMap: UnsubMap) {
-  console.log("unsubscribing everything")
   unsubMap.userUnsub && unsubMap.userUnsub();
   unsubMap.boxesUnsub && unsubMap.boxesUnsub();
   for (const box of unsubMap.boxMap.values()) {

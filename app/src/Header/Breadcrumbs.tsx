@@ -1,4 +1,4 @@
-import { Breadcrumb, Dropdown, Menu } from 'antd';
+import { Breadcrumb, Dropdown } from 'antd';
 import { useContext } from 'react';
 import { Link, Params, useLocation, useParams } from 'react-router-dom';
 import { Context } from '../context';
@@ -7,6 +7,7 @@ import { useMediaQuery } from 'react-responsive'
 import './Header.css';
 import { AppState } from '../types';
 import { EllipsisOutlined } from '@ant-design/icons';
+import { ItemType } from 'antd/es/breadcrumb/Breadcrumb';
 
 function getPartMap(params: Readonly<Params<string>>, state: AppState) {
 
@@ -15,12 +16,14 @@ function getPartMap(params: Readonly<Params<string>>, state: AppState) {
   if (boxId !== undefined) {
     const box = state.boxes.get(boxId)
     if (box !== undefined) {
-      partMap.set(boxId, box.getName())
+      const boxName = box.getName()
+      if (boxName) partMap.set(boxId, boxName)
 
       if (recipeId !== undefined) {
         const recipe = box.recipes.get(recipeId)
         if (recipe !== undefined) {
-          partMap.set(recipeId, recipe.getName())
+          const recipeName = recipe.getName()
+          if (recipeName) partMap.set(recipeId, recipeName)
         }
       }
     }
@@ -36,21 +39,23 @@ function FullBreadcrumbs() {
 
   const pathParts = location.pathname.split('/').filter(i => i);
 
-  const extraBreadcrumbItems = pathParts.map((part, index) => {
-    const url = `/${pathParts.slice(0, index + 1).join('/')}`;
-    return (
-      <Breadcrumb.Item className="recipes-breadcrumb" key={url}>
-        <Link to={url}>{partMap.get(part) || part}</Link>
-      </Breadcrumb.Item>
-    );
-  });
+  const items: ItemType[] = [
+    {
+      key: 'home',
+      className: 'recipes-breadcrumb',
+      title: <Link to="/">Recipe box</Link>,
+    },
+    ...pathParts.map((part, index) => {
+      const url = `/${pathParts.slice(0, index + 1).join('/')}`;
+      return {
+        key: url,
+        className: 'recipes-breadcrumb',
+        title: <Link to={url}>{partMap.get(part) || part}</Link>,
+      };
+    }),
+  ];
 
-  const breadcrumbItems = [
-    <Breadcrumb.Item className="recipes-breadcrumb" key="home">
-      <Link to="/">Recipe box</Link>
-    </Breadcrumb.Item>,
-  ].concat(extraBreadcrumbItems);
-  return <Breadcrumb className="recipes-breadcrumb" >{breadcrumbItems}</Breadcrumb>
+  return <Breadcrumb className="recipes-breadcrumb" items={items} />
 }
 
 function CollapsedBreadcrumbs() {
@@ -59,27 +64,29 @@ function CollapsedBreadcrumbs() {
   const { state } = useContext(Context);
   const partMap = getPartMap(params, state)
   const pathParts = location.pathname.split('/').filter(i => i);
+
   const menuItems = pathParts.map((part, index) => {
     const url = `/${pathParts.slice(0, index + 1).join('/')}`;
-    return (
-      <Menu.Item className="recipes-breadcrumb" key={url}>
-        <Link to={url}>{partMap.get(part) || part} /</Link>
-      </Menu.Item>
-    );
+    return {
+      key: url,
+      label: <Link to={url}>{partMap.get(part) || part} /</Link>,
+    };
   });
 
-  const menu = <Menu>{menuItems}</Menu>
+  const items: ItemType[] = [
+    {
+      key: 'home',
+      className: 'recipes-breadcrumb',
+      title: <Link to="/">Recipes</Link>,
+    },
+    {
+      key: 'ellipsis',
+      className: 'recipes-breadcrumb',
+      title: <Dropdown menu={{ items: menuItems }}><EllipsisOutlined /></Dropdown>,
+    },
+  ];
 
-  const breadcrumbItems = [
-    <Breadcrumb.Item className="recipes-breadcrumb" key="home">
-      <Link to="/">Recipes</Link>
-    </Breadcrumb.Item>,
-    <Breadcrumb.Item className="recipes-breadcrumb" key="ellipsis">
-      <Dropdown overlay={menu}><EllipsisOutlined /></Dropdown>
-    </Breadcrumb.Item>
-  ]
-  return <Breadcrumb className="recipes-breadcrumb" >{breadcrumbItems}</Breadcrumb>
-
+  return <Breadcrumb className="recipes-breadcrumb" items={items} />
 }
 
 function ResponsiveBreadcrumbs() {

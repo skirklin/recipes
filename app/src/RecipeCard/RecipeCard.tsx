@@ -89,11 +89,7 @@ function ActionBar(props: RecipeCardProps) {
   }
 
   function handleAddOwner(newOwnerEmail: string) {
-    addRecipeOwner({ boxId, recipeId, newOwnerEmail }).then(
-      (result) => {
-        console.log(result)
-      }
-    )
+    addRecipeOwner({ boxId, recipeId, newOwnerEmail })
   }
 
   function handleVisiblityChange(e: { key: string }) {

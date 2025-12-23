@@ -1,5 +1,4 @@
-import * as functions from "firebase-functions";
-import { HttpsError } from "firebase-functions/v1/https";
+import { onCall, HttpsError } from "firebase-functions/v2/https";
 import { Recipe, WithContext } from "schema-dts";
 import axios from 'axios';
 import * as jsdom from 'jsdom';
@@ -7,11 +6,13 @@ import { initializeApp } from 'firebase-admin/app';
 import { getAuth } from 'firebase-admin/auth';
 import { FieldValue, getFirestore } from 'firebase-admin/firestore';
 import Anthropic from '@anthropic-ai/sdk';
+import { defineSecret } from "firebase-functions/params";
 
 const app = initializeApp();
 const db = getFirestore(app);
 
-// setup auth emulator
+// Define the secret
+const anthropicApiKey = defineSecret("ANTHROPIC_API_KEY");
 
 type RecipeWithContext = WithContext<Recipe>
 
@@ -25,7 +26,7 @@ export function getRecipesFromPage(doc: Document, url: string): Recipe[] {
 
   function isGraph(elt: Record<string, unknown>) {
     if (Object.prototype.hasOwnProperty.call(elt, "@graph")) {
-      /* the "graph" style ld+json puts objects at the root level, but 
+      /* the "graph" style ld+json puts objects at the root level, but
       cross-object references may be represented by simply referencing their ids.
       */
       return true
@@ -76,12 +77,12 @@ export function getRecipesFromPage(doc: Document, url: string): Recipe[] {
 
 }
 
-export const getRecipes = functions.https.onCall(async (data) => {
-  const url = data.url;
+export const getRecipes = onCall(async (request) => {
+  const url = request.data.url;
   if (url === undefined) {
     throw new HttpsError("internal", "must specify url")
   }
-  const tpc = await axios.get(data.url)
+  const tpc = await axios.get(request.data.url)
   const htmlDom = new jsdom.JSDOM(tpc.data);
   const recipes = getRecipesFromPage(htmlDom.window.document, url)
   return { recipes: JSON.stringify(recipes) }
@@ -111,9 +112,8 @@ async function updateOwners(docRef: FirebaseFirestore.DocumentReference<Firebase
     })
 }
 
-export const addRecipeOwner = functions.https.onCall(async (data) => {
-
-  const { recipeId, boxId, newOwnerEmail } = data;
+export const addRecipeOwner = onCall(async (request) => {
+  const { recipeId, boxId, newOwnerEmail } = request.data;
   const docRef = db.doc(`boxes/${boxId}/recipes/${recipeId}`)
   const recipe = (await docRef.get()).data()
   if (recipe === undefined) {
@@ -123,9 +123,8 @@ export const addRecipeOwner = functions.https.onCall(async (data) => {
 })
 
 
-export const addBoxOwner = functions.https.onCall(async (data) => {
-
-  const { boxId, newOwnerEmail } = data;
+export const addBoxOwner = onCall(async (request) => {
+  const { boxId, newOwnerEmail } = request.data;
   const docRef = db.doc(`boxes/${boxId}`)
   const box = (await docRef.get()).data()
   if (box === undefined) {
@@ -138,20 +137,20 @@ export const addBoxOwner = functions.https.onCall(async (data) => {
 // Generate a recipe using Claude
 const CLAUDE_MODEL = process.env.CLAUDE_MODEL || "claude-opus-4-5-20251101";
 
-export const generateRecipe = functions
-  .runWith({ secrets: ["ANTHROPIC_API_KEY"] })
-  .https.onCall(async (data, context) => {
+export const generateRecipe = onCall(
+  { secrets: [anthropicApiKey] },
+  async (request) => {
     // Require authentication
-    if (!context.auth) {
+    if (!request.auth) {
       throw new HttpsError("unauthenticated", "Must be logged in to generate recipes")
     }
 
-    const { prompt } = data;
+    const { prompt } = request.data;
     if (!prompt || typeof prompt !== "string") {
       throw new HttpsError("invalid-argument", "Must provide a prompt")
     }
 
-    const apiKey = process.env.ANTHROPIC_API_KEY;
+    const apiKey = anthropicApiKey.value();
     if (!apiKey) {
       throw new HttpsError("internal", "API key not configured")
     }
@@ -213,10 +212,12 @@ Guidelines:
         throw new HttpsError("internal", "Failed to parse recipe from AI response")
       }
 
-      return { recipe };
+      // Return as JSON string to avoid Firebase SDK decode issues with nested objects
+      return { recipeJson: JSON.stringify(recipe) };
     } catch (error) {
       if (error instanceof HttpsError) throw error;
       console.error("Error generating recipe:", error);
       throw new HttpsError("internal", "Failed to generate recipe")
     }
-  }) 
+  }
+)

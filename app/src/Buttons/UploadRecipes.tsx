@@ -1,6 +1,6 @@
 import { UploadOutlined } from "@ant-design/icons";
-import { useContext, useState } from "react";
-import { PickBoxModal } from "../Modals/PickBoxModal";
+import { useContext } from "react";
+import { useBoxAction } from "../hooks/useBoxAction";
 import { uploadRecipes } from "../firestore";
 import { getAppUserFromState } from "../state";
 import { ActionButton } from "../StyledComponents";
@@ -17,7 +17,7 @@ interface UploadProps {
 
 export default function UploadButton(props: UploadProps) {
     const { boxId, disabled, element } = props;
-    const [isModalVisible, setIsModalVisible] = useState(false)
+    const { executeWithBox, BoxPickerModal } = useBoxAction(boxId);
     const { state } = useContext(Context)
     const user = getAppUserFromState(state)
 
@@ -25,40 +25,33 @@ export default function UploadButton(props: UploadProps) {
         return null
     }
 
-    async function upload(boxId: BoxId | undefined) {
-        if (boxId === undefined || user === undefined) {
-            return // leave the modal visible until something is selected
+    const upload = (targetBoxId: BoxId) => {
+        if (user === undefined) {
+            return
         }
-        setIsModalVisible(false)
-        uploadRecipes(boxId, user)
+        uploadRecipes(targetBoxId, user)
     }
 
-    function uploadFlow() {
-        if (boxId === undefined) {
-            setIsModalVisible(true)
-        } else {
-            upload(boxId)
-        }
-    }
+    const handleClick = () => {
+        executeWithBox(upload);
+    };
 
     let elt;
     switch (element) {
         case "button":
-            elt = <ActionButton onClick={uploadFlow} title="Upload recipes from computer." icon={<UploadOutlined />} disabled={disabled} >
+            elt = <ActionButton onClick={handleClick} title="Upload recipes from computer." icon={<UploadOutlined />} disabled={disabled} >
                 Upload
             </ActionButton>
             break;
         case "menu":
-            elt = <Menu.Item key="upload" onClick={uploadFlow} title="Upload recipes from computer." icon={<UploadOutlined />} disabled={disabled} >
+            elt = <Menu.Item key="upload" onClick={handleClick} title="Upload recipes from computer." icon={<UploadOutlined />} disabled={disabled} >
                 Upload
             </Menu.Item>
             break;
     }
 
-
     return (<>
         {elt}
-        <PickBoxModal handleOk={upload} isVisible={isModalVisible} setIsVisible={setIsModalVisible} />
+        {BoxPickerModal}
     </>)
-
 }

@@ -39,7 +39,7 @@ function NewBoxModal(props: NewBoxModalProps) {
   }
 
   return (
-    <Modal visible={isVisible} onOk={handleOk} onCancel={() => setIsVisible(false)} confirmLoading={confirmLoading} >
+    <Modal open={isVisible} onOk={handleOk} onCancel={() => setIsVisible(false)} confirmLoading={confirmLoading} >
       <Input
         autoFocus
         title="Name"

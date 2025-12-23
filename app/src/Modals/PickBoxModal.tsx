@@ -89,7 +89,7 @@ export function PickBoxModal(props: PickBoxModalProps) {
     <>
       <Modal
         title="Choose a box"
-        destroyOnClose={true}
+        destroyOnHidden={true}
         open={isVisible}
         onOk={() => { handleOk(boxId) }}
         onCancel={() => setIsVisible(false)}
