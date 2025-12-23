@@ -18,7 +18,6 @@ import { addCookingLogEntry } from '../firestore';
 import { Divider, RecipeActionGroup } from '../StyledComponents';
 import ByLine from './Byline';
 import Tags from './Tags';
-import { useMediaQuery } from 'react-responsive';
 import { Button, Dropdown, Menu, Input, Modal, message } from 'antd';
 import { MoreOutlined, CheckCircleOutlined } from '@ant-design/icons';
 import { useContext, useState } from 'react';
@@ -36,13 +35,10 @@ const RecipeContainer = styled.article`
 `
 
 const RecipeHeader = styled.div`
-  margin-bottom: var(--space-sm);
-`
-
-const ActionsRow = styled.div`
   display: flex;
-  align-items: center;
-  gap: var(--space-sm);
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-md);
   margin-bottom: var(--space-sm);
 `
 
@@ -148,35 +144,6 @@ function QuickMadeIt(props: RecipeCardProps) {
   );
 }
 
-function ActionBar(props: RecipeCardProps) {
-  const { recipeId, boxId } = props;
-  const { state } = useContext(Context);
-  const recipe = getRecipeFromState(state, boxId, recipeId)
-  if (recipe === undefined) {
-    return null
-  }
-
-  function handleAddOwner(newOwnerEmail: string) {
-    addRecipeOwner({ boxId, recipeId, newOwnerEmail })
-  }
-
-  function handleVisiblityChange(e: { key: string }) {
-    setRecipeVisibility(boxId, recipeId, e.key as Visibility)
-  }
-  return (
-    <RecipeActionGroup>
-      <QuickMadeIt {...props} />
-      <DeleteButton {...props} element="button" />
-      <DownloadButton {...props} element="button" />
-      <ForkButton {...props} element="button" />
-      <EditButton {...props} element="button" />
-      <VisibilityControl {...props}
-        handleAddOwner={handleAddOwner}
-        handleChange={handleVisiblityChange} value={recipe.visibility} element="button" />
-    </RecipeActionGroup>
-  )
-}
-
 const MenuButton = styled.button`
   background: none;
   border: none;
@@ -237,22 +204,15 @@ function ActionMenu(props: RecipeCardProps) {
 }
 
 function RecipeActions(props: RecipeCardProps) {
-  const isTabletOrMobile = useMediaQuery({ query: '(max-width: 1224px)' })
-  if (isTabletOrMobile) {
-    return <ActionMenu {...props} />
-  } else {
-    return <ActionBar {...props} />
-  }
+  return <ActionMenu {...props} />
 }
 
 function RecipeCard(props: RecipeCardProps) {
   return (
     <RecipeContainer>
       <RecipeHeader>
-        <ActionsRow>
-          <RecipeActions {...props} />
-        </ActionsRow>
         <RecipeName {...props} />
+        <RecipeActions {...props} />
       </RecipeHeader>
       <RecipeMeta>
         <ByLine {...props} />
