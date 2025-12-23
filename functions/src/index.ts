@@ -7,6 +7,20 @@ import { getAuth } from 'firebase-admin/auth';
 import { FieldValue, getFirestore } from 'firebase-admin/firestore';
 import Anthropic from '@anthropic-ai/sdk';
 import { defineSecret } from "firebase-functions/params";
+// Polyfill fetch globals for Anthropic SDK
+// eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires
+const nodeFetch = require('node-fetch');
+// eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires
+const FormData = require('form-data');
+if (!globalThis.fetch) {
+  globalThis.fetch = nodeFetch;
+  globalThis.Headers = nodeFetch.Headers;
+  globalThis.Request = nodeFetch.Request;
+  globalThis.Response = nodeFetch.Response;
+}
+if (!globalThis.FormData) {
+  globalThis.FormData = FormData;
+}
 
 const app = initializeApp();
 const db = getFirestore(app);
