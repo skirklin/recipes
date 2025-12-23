@@ -164,6 +164,10 @@ export async function setWakeLockSeen(userId: UserId) {
   updateDoc(doc(db, "users", userId), { wakeLockSeen: true })
 }
 
+export async function setLastSeenUpdateVersion(userId: UserId, version: number) {
+  updateDoc(doc(db, "users", userId), { lastSeenUpdateVersion: version })
+}
+
 export async function applyEnrichment(
   boxId: BoxId,
   recipeId: RecipeId,

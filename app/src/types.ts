@@ -61,6 +61,7 @@ export type UserStoreType = {
   newSeen: Timestamp,
   boxes: DocumentReference<BoxEntry>[],
   wakeLockSeen?: boolean,
+  lastSeenUpdateVersion?: number,
 }
 
 export type AppState = {
