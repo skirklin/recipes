@@ -29,7 +29,7 @@ export default function ForkButton(props: ForkProps) {
   const addNewRecipe = async (boxId: BoxId) => {
     const clone = _.cloneDeep(recipe);
     clone.owners = [user.id]
-    const recipeRef = await addRecipe(boxId, clone, dispatch)
+    const recipeRef = await addRecipe(boxId, clone)
     navigate(`/boxes/${boxId}/recipes/${recipeRef.id}`)
   }
 

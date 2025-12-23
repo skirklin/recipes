@@ -29,7 +29,7 @@ function NewBoxModal(props: NewBoxModalProps) {
     if (newBoxName === undefined) {
       return
     }
-    const newBoxRef = await addBox(user, newBoxName, dispatch)
+    const newBoxRef = await addBox(user, newBoxName)
     if (afterNewBox !== undefined && newBoxRef !== undefined) {
       afterNewBox(newBoxRef)
     }

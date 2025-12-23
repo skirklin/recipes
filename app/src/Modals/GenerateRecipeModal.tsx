@@ -99,7 +99,7 @@ function GenerateRecipeModal(props: GenerateRecipeModalProps) {
       user.id
     );
 
-    addRecipe(boxId, recipeEntry, dispatch);
+    addRecipe(boxId, recipeEntry);
     handleClose();
   }
 

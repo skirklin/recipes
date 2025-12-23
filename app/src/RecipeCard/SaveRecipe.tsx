@@ -39,12 +39,12 @@ function SaveButton(props: RecipeCardProps) {
     newRecipe.lastUpdatedBy = user.id
     newRecipe.updated = new Date()
     if (recipeId.startsWith("uniqueId=")) {
-      docRef = await addRecipe(boxId, newRecipe, dispatch)
+      docRef = await addRecipe(boxId, newRecipe)
       newRecipe.created = newRecipe.updated
       dispatch({type: "REMOVE_RECIPE", recipeId, boxId}) // removes the local-only version of the recipe
       navigate(`/boxes/${boxId}/recipes/${docRef.id}`)
     } else {
-      docRef = await saveRecipe(boxId, recipeId, newRecipe, dispatch)
+      docRef = await saveRecipe(boxId, recipeId, newRecipe)
     }
   }
 

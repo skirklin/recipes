@@ -103,19 +103,19 @@ export async function uploadRecipes(boxId: BoxId, user: UserEntry) {
             new Date(),
             user.id,
           )
-          addRecipe(boxId, recipe, null)
+          addRecipe(boxId, recipe)
         })
     })
   }
 }
 
-export async function addRecipe(boxId: BoxId, recipe: RecipeEntry, dispatch: React.Dispatch<ActionType> | null) {
+export async function addRecipe(boxId: BoxId, recipe: RecipeEntry) {
   const colRef = collection(db, "boxes", boxId, "recipes").withConverter(recipeConverter)
   const recipeRef = await addDoc(colRef, recipe)
   return recipeRef
 }
 
-export async function addBox(user: UserEntry, name: string, dispatch: React.Dispatch<ActionType> | null) {
+export async function addBox(user: UserEntry, name: string) {
   if (user === null) {
     return undefined
   }
@@ -141,7 +141,7 @@ export async function deleteRecipe(state: AppState, boxId: BoxId, recipeId: Reci
 }
 
 
-export async function saveRecipe(boxId: BoxId, recipeId: RecipeId, recipe: RecipeEntry, dispatch: React.Dispatch<ActionType>) {
+export async function saveRecipe(boxId: BoxId, recipeId: RecipeId, recipe: RecipeEntry) {
   const docRef = doc(db, "boxes", boxId, "recipes", recipeId).withConverter(recipeConverter)
   setDoc(docRef, recipe)
   return docRef

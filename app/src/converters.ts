@@ -42,13 +42,18 @@ export function instructionsToStr(instructions: Recipe["recipeInstructions"]): s
     return instructions.toString()
   }
   const instructionArray = Array.isArray(instructions) ? instructions : [];
-  const steps = instructionArray.map((x: any) => x.text !== undefined ? x.text.trim() : "");
+  const steps = instructionArray.map((x: unknown) => {
+    if (typeof x === 'object' && x !== null && 'text' in x) {
+      return String((x as { text: unknown }).text).trim();
+    }
+    return "";
+  });
   return steps.join("\n\n")
 }
 
 export function ingredientsToStr(ingredients: Recipe["recipeIngredient"]): string {
   const ingredientArray = Array.isArray(ingredients) ? ingredients : [];
-  const steps = ingredientArray.map((x: any) => x.toString());
+  const steps = ingredientArray.map((x: unknown) => String(x));
   return steps.join("\n")
 }
 
@@ -62,9 +67,9 @@ export function authorToStr(author: Recipe["author"]): string | undefined {
     } else {
       const authorArray = Array.isArray(author) ? author : [];
       const names = authorArray.map(
-        (x: any) => {
-          if (x['@type'] === "Person") {
-            return x['name']
+        (x: unknown) => {
+          if (typeof x === 'object' && x !== null && '@type' in x && (x as Record<string, unknown>)['@type'] === "Person") {
+            return String((x as Record<string, unknown>)['name'] || "")
           } else {
             return ""
           }

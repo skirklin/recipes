@@ -79,7 +79,7 @@ function ImportModal(props: ImportProps) {
 
   function addRecipes(boxId: string) {
 
-    discovered.forEach(recipe => addRecipe(boxId, recipe, dispatch))
+    discovered.forEach(recipe => addRecipe(boxId, recipe))
     setDiscovered([]);
     setValue("");
     setIsVisible(false);

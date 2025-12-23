@@ -167,7 +167,7 @@ export function RecipeTable(props: RecipeTableProps) {
   async function fork(boxId: BoxId) {
     selectedRows.forEach(
       (value: RowType) => {
-        addRecipe(boxId, _.cloneDeep(value.recipe), dispatch)
+        addRecipe(boxId, _.cloneDeep(value.recipe))
       }
     )
     navigate(`/boxes/${boxId}`)

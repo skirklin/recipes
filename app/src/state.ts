@@ -1,4 +1,4 @@
-import { BoxEntry, RecipeEntry, UserEntry } from './storage';
+import { BoxEntry, RecipeEntry } from './storage';
 import { AppState, BoxId, RecipeId, UserId } from './types';
 
 export function getRecipeFromState(state: AppState, boxId: BoxId, recipeId: RecipeId) {

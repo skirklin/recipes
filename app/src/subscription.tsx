@@ -1,6 +1,6 @@
 import React from 'react';
 import { User } from "firebase/auth";
-import { getDoc, onSnapshot, doc, setDoc, DocumentSnapshot, collection, QuerySnapshot, updateDoc } from "firebase/firestore";
+import { getDoc, onSnapshot, doc, setDoc, DocumentSnapshot, collection, QuerySnapshot, updateDoc, arrayRemove } from "firebase/firestore";
 
 import { ActionType, BoxId, UnsubMap, Visibility } from './types';
 
@@ -29,7 +29,7 @@ async function initializeUser(user: User) {
       const newUser = await getDoc(userRef)
       if (newUser.exists()) {
         const userEntry = newUser.data()
-        const userBoxRef = await addBox(userEntry, `${user.displayName}'s box`, null);
+        const userBoxRef = await addBox(userEntry, `${user.displayName}'s box`);
         if (userBoxRef !== undefined) {
           await subscribeToBox(newUser.data() || null, userBoxRef.id)
         }
@@ -86,8 +86,15 @@ async function handleUserSnapshot(
         // Increment loading for this box's data
         dispatch({ type: "INCR_LOADING" })
 
+        const decrementOnceLoaded = () => {
+          if (boxLoaded && recipesLoaded) {
+            dispatch({ type: "DECR_LOADING" })
+          }
+        }
+
         const boxUnsub = onSnapshot(
-          boxRef.withConverter(boxConverter), (snapshot) => {
+          boxRef.withConverter(boxConverter),
+          (snapshot) => {
             handleBoxSnapshot(snapshot, dispatch, unsubMap)
             // Process any pending recipe snapshots after box is loaded
             if (!boxLoaded) {
@@ -96,29 +103,47 @@ async function handleUserSnapshot(
                 handleRecipesSnapshot(recipeSnapshot, dispatch, boxRef.id)
               });
               pendingRecipeSnapshots.length = 0;
-              // Decrement loading once both box and recipes have loaded
-              if (recipesLoaded) {
-                dispatch({ type: "DECR_LOADING" })
-              }
+              decrementOnceLoaded();
             }
-          })
+          },
+          (error) => {
+            console.error(`Error loading box ${bid}:`, error);
+            // Remove stale box reference from user's boxes array
+            const userRef = doc(db, "users", user.id);
+            updateDoc(userRef, { boxes: arrayRemove(boxRef) }).catch(e => console.error("Failed to remove stale box:", e));
+            if (!boxLoaded) {
+              boxLoaded = true;
+              decrementOnceLoaded();
+            }
+          }
+        )
 
         const recipesRef = collection(db, "boxes", boxRef.id, "recipes").withConverter(recipeConverter)
-        const recipesUnsub = onSnapshot(recipesRef, (snapshot) => {
-          if (boxLoaded) {
-            handleRecipesSnapshot(snapshot, dispatch, boxRef.id)
-          } else {
-            // Queue until box is loaded
-            pendingRecipeSnapshots.push(snapshot);
-          }
-          if (!recipesLoaded) {
-            recipesLoaded = true;
-            // Decrement loading once both box and recipes have loaded
+        const recipesUnsub = onSnapshot(
+          recipesRef,
+          (snapshot) => {
             if (boxLoaded) {
-              dispatch({ type: "DECR_LOADING" })
+              handleRecipesSnapshot(snapshot, dispatch, boxRef.id)
+            } else {
+              // Queue until box is loaded
+              pendingRecipeSnapshots.push(snapshot);
+            }
+            if (!recipesLoaded) {
+              recipesLoaded = true;
+              decrementOnceLoaded();
+            }
+          },
+          (error) => {
+            console.error(`Error loading recipes for box ${bid}:`, error);
+            // Remove stale box reference from user's boxes array
+            const userRef = doc(db, "users", user.id);
+            updateDoc(userRef, { boxes: arrayRemove(boxRef) }).catch(e => console.error("Failed to remove stale box:", e));
+            if (!recipesLoaded) {
+              recipesLoaded = true;
+              decrementOnceLoaded();
             }
           }
-        })
+        )
         unsubMap.boxMap.set(boxRef.id, { recipesUnsub, boxUnsub })
       }
     }
