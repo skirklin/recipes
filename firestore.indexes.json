@@ -1,4 +1,13 @@
 {
-  "indexes": [],
+  "indexes": [
+    {
+      "collectionGroup": "recipes",
+      "queryScope": "COLLECTION_GROUP",
+      "fields": [
+        { "fieldPath": "enrichmentStatus", "order": "ASCENDING" },
+        { "fieldPath": "created", "order": "ASCENDING" }
+      ]
+    }
+  ],
   "fieldOverrides": []
 }

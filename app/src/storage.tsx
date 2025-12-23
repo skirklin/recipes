@@ -2,7 +2,7 @@ import { doc, DocumentSnapshot, SnapshotOptions, Timestamp } from "firebase/fire
 import _ from "lodash";
 import { Recipe } from "schema-dts";
 import { db } from "./backend";
-import { BoxType, BoxStoreType, RecipeStoreType, Visibility, UserStoreType, BoxId, UserId, PendingEnrichment, CookingLogEntry } from "./types";
+import { BoxType, BoxStoreType, RecipeStoreType, Visibility, UserStoreType, BoxId, UserId, PendingEnrichment, CookingLogEntry, EnrichmentStatus } from "./types";
 import { decodeStr } from "./converters";
 
 const DUMMY_FIRST_DATE = new Date(2022, 0, 0)
@@ -20,6 +20,7 @@ export class RecipeEntry {
     lastUpdatedBy: string;
     pendingEnrichment?: PendingEnrichment;
     cookingLog: CookingLogEntry[];
+    enrichmentStatus: EnrichmentStatus;
 
     constructor(
         data: Recipe,
@@ -31,7 +32,8 @@ export class RecipeEntry {
         updated: Date,
         lastUpdatedBy: string,
         pendingEnrichment?: PendingEnrichment,
-        cookingLog?: CookingLogEntry[]
+        cookingLog?: CookingLogEntry[],
+        enrichmentStatus?: EnrichmentStatus
     ) {
         this.data = data;
         this.id = id;
@@ -43,6 +45,7 @@ export class RecipeEntry {
         this.lastUpdatedBy = lastUpdatedBy || this.creator;
         this.pendingEnrichment = pendingEnrichment;
         this.cookingLog = cookingLog || [];
+        this.enrichmentStatus = enrichmentStatus || EnrichmentStatus.needed;
 
         this.editing = false;
     }
@@ -58,7 +61,8 @@ export class RecipeEntry {
             this.updated,
             this.lastUpdatedBy,
             this.pendingEnrichment ? _.cloneDeep(this.pendingEnrichment) : undefined,
-            _.cloneDeep(this.cookingLog)
+            _.cloneDeep(this.cookingLog),
+            this.enrichmentStatus
         )
         newRecipe.editing = this.editing
         return newRecipe
@@ -90,6 +94,7 @@ export const recipeConverter = {
             created: Timestamp.fromDate(recipe.created),
             lastUpdatedBy: recipe.lastUpdatedBy,
             creator: recipe.creator ? recipe.creator : recipe.owners[0],
+            enrichmentStatus: recipe.enrichmentStatus,
         };
         if (recipe.pendingEnrichment) {
             result.pendingEnrichment = recipe.pendingEnrichment;
@@ -121,6 +126,7 @@ export const recipeConverter = {
             rawRecipe.lastUpdatedBy,
             rawRecipe.pendingEnrichment,
             cookingLog,
+            rawRecipe.enrichmentStatus,
         );
     }
 };

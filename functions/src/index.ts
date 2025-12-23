@@ -1,10 +1,11 @@
 import { onCall, HttpsError } from "firebase-functions/v2/https";
+import { onSchedule } from "firebase-functions/v2/scheduler";
 import { Recipe, WithContext } from "schema-dts";
 import axios from 'axios';
 import * as jsdom from 'jsdom';
 import { initializeApp } from 'firebase-admin/app';
 import { getAuth } from 'firebase-admin/auth';
-import { FieldValue, getFirestore } from 'firebase-admin/firestore';
+import { FieldValue, getFirestore, Timestamp } from 'firebase-admin/firestore';
 import Anthropic from '@anthropic-ai/sdk';
 import { defineSecret } from "firebase-functions/params";
 // Polyfill fetch globals for Anthropic SDK
@@ -232,6 +233,131 @@ Guidelines:
       if (error instanceof HttpsError) throw error;
       console.error("Error generating recipe:", error);
       throw new HttpsError("internal", "Failed to generate recipe")
+    }
+  }
+)
+
+// Scheduled function to enrich recipes that need it
+const ENRICHMENT_DELAY_MINUTES = 5;
+const ENRICHMENT_BATCH_SIZE = 10;
+
+export const enrichRecipes = onSchedule(
+  {
+    schedule: "every 10 minutes",
+    secrets: [anthropicApiKey],
+  },
+  async () => {
+    const apiKey = anthropicApiKey.value();
+    if (!apiKey) {
+      console.error("Anthropic API key not configured");
+      return;
+    }
+
+    // Find recipes that need enrichment and were created more than 5 minutes ago
+    const cutoffTime = Timestamp.fromDate(
+      new Date(Date.now() - ENRICHMENT_DELAY_MINUTES * 60 * 1000)
+    );
+
+    const recipesSnapshot = await db
+      .collectionGroup("recipes")
+      .where("enrichmentStatus", "==", "needed")
+      .where("created", "<", cutoffTime)
+      .limit(ENRICHMENT_BATCH_SIZE)
+      .get();
+
+    if (recipesSnapshot.empty) {
+      console.log("No recipes need enrichment");
+      return;
+    }
+
+    console.log(`Found ${recipesSnapshot.size} recipes to enrich`);
+
+    const anthropic = new Anthropic({ apiKey });
+
+    for (const recipeDoc of recipesSnapshot.docs) {
+      try {
+        const recipeData = recipeDoc.data();
+        const recipe = recipeData.data as Recipe;
+
+        // Skip if recipe already has description and tags
+        const hasDescription = recipe.description && String(recipe.description).trim();
+        const hasTags = recipe.recipeCategory &&
+          (Array.isArray(recipe.recipeCategory) ? recipe.recipeCategory.length > 0 : true);
+
+        if (hasDescription && hasTags) {
+          // Already has content, mark as skipped
+          await recipeDoc.ref.update({ enrichmentStatus: "skipped" });
+          console.log(`Skipped ${recipe.name} - already has content`);
+          continue;
+        }
+
+        // Build context from recipe
+        const ingredients = Array.isArray(recipe.recipeIngredient)
+          ? recipe.recipeIngredient.join(", ")
+          : "";
+        const instructions = Array.isArray(recipe.recipeInstructions)
+          ? recipe.recipeInstructions.map((i: { text?: string } | string) =>
+              typeof i === 'string' ? i : i.text || ''
+            ).join(" ")
+          : "";
+
+        const enrichmentPrompt = `Analyze this recipe and provide enrichment data.
+
+Recipe Name: ${recipe.name || "Unknown"}
+Ingredients: ${ingredients}
+Instructions: ${instructions}
+${recipe.description ? `Existing Description: ${recipe.description}` : ""}
+
+Return ONLY valid JSON (no markdown) with:
+{
+  "description": "A brief, appetizing 1-2 sentence description of the dish",
+  "suggestedTags": ["tag1", "tag2", "tag3"],
+  "reasoning": "Brief explanation of why you chose these tags"
+}
+
+Tags should be lowercase and include: cuisine type, meal type, main protein/ingredient, cooking method, dietary info if applicable. Aim for 3-6 relevant tags.`;
+
+        const response = await anthropic.messages.create({
+          model: CLAUDE_MODEL,
+          max_tokens: 500,
+          messages: [{ role: "user", content: enrichmentPrompt }],
+        });
+
+        const text = response.content[0].type === "text" ? response.content[0].text : "";
+
+        let enrichment;
+        try {
+          let jsonStr = text.trim();
+          if (jsonStr.startsWith("```")) {
+            jsonStr = jsonStr.replace(/^```(?:json)?\n?/, "").replace(/\n?```$/, "");
+          }
+          enrichment = JSON.parse(jsonStr);
+        } catch {
+          console.error(`Failed to parse enrichment for ${recipe.name}:`, text);
+          continue;
+        }
+
+        // Ensure tags are lowercase
+        if (enrichment.suggestedTags && Array.isArray(enrichment.suggestedTags)) {
+          enrichment.suggestedTags = enrichment.suggestedTags.map((t: string) => t.toLowerCase());
+        }
+
+        // Save pending enrichment
+        await recipeDoc.ref.update({
+          pendingEnrichment: {
+            description: enrichment.description || "",
+            suggestedTags: enrichment.suggestedTags || [],
+            reasoning: enrichment.reasoning || "",
+            generatedAt: Timestamp.now(),
+            model: CLAUDE_MODEL,
+          },
+          enrichmentStatus: "pending",
+        });
+
+        console.log(`Enriched ${recipe.name}`);
+      } catch (error) {
+        console.error(`Error enriching recipe ${recipeDoc.id}:`, error);
+      }
     }
   }
 )

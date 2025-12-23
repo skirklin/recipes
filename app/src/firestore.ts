@@ -3,7 +3,7 @@ import React from 'react';
 import { Recipe } from "schema-dts"
 import { db } from './backend';
 import { boxConverter, BoxEntry, recipeConverter, RecipeEntry, userConverter, UserEntry } from './storage';
-import { ActionType, AppState, BoxId, RecipeId, UserId, Visibility } from './types';
+import { ActionType, AppState, BoxId, EnrichmentStatus, RecipeId, UserId, Visibility } from './types';
 
 export async function getRecipe(state: AppState, boxId: BoxId | undefined, recipeId: RecipeId | undefined) {
   let recipe: RecipeEntry | undefined
@@ -142,6 +142,9 @@ export async function deleteRecipe(state: AppState, boxId: BoxId, recipeId: Reci
 
 
 export async function saveRecipe(boxId: BoxId, recipeId: RecipeId, recipe: RecipeEntry) {
+  // Reset enrichment status so the recipe gets re-enriched after user edits
+  recipe.enrichmentStatus = EnrichmentStatus.needed;
+  recipe.pendingEnrichment = undefined;
   const docRef = doc(db, "boxes", boxId, "recipes", recipeId).withConverter(recipeConverter)
   setDoc(docRef, recipe)
   return docRef
@@ -191,6 +194,7 @@ export async function applyEnrichment(
 
   const updates: Record<string, unknown> = {
     pendingEnrichment: deleteField(),
+    enrichmentStatus: EnrichmentStatus.done,
   };
 
   // Only update description if there wasn't one
@@ -208,6 +212,7 @@ export async function rejectEnrichment(boxId: BoxId, recipeId: RecipeId) {
   const recipeRef = doc(db, "boxes", boxId, "recipes", recipeId);
   await updateDoc(recipeRef, {
     pendingEnrichment: deleteField(),
+    enrichmentStatus: EnrichmentStatus.skipped,
   });
 }
 

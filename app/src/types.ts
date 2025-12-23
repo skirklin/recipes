@@ -52,6 +52,7 @@ export type RecipeStoreType = {
   owners: string[], // user ids
   pendingEnrichment?: PendingEnrichment,
   cookingLog?: CookingLogEntryStore[],
+  enrichmentStatus?: EnrichmentStatus,
 }
 
 export type UserStoreType = {
@@ -108,4 +109,11 @@ export enum Visibility {
   private = "private", // only owner can read
   // linkable = "linkable", // anyone with link can read
   public = "public", // discoverable
+}
+
+export enum EnrichmentStatus {
+  needed = "needed",     // newly created/edited, needs AI processing
+  pending = "pending",   // AI generated suggestions, waiting for user review
+  done = "done",         // user accepted enrichment
+  skipped = "skipped",   // user rejected or recipe already had content
 }
