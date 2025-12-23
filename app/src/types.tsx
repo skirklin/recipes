@@ -56,6 +56,7 @@ export type AppState = {
   authUser: User | null
   writeable: boolean
   loading: number
+  subscriptionsReady: boolean  // true once initial subscription loading completes
 }
 
 export type ActionType = {

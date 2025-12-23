@@ -11,6 +11,7 @@ export function initState(): AppState {
       users: new Map<string, UserEntry>(),
       authUser: null,
       loading: 0,
+      subscriptionsReady: false,
     }
   )
 }
@@ -61,7 +62,13 @@ export function recipeBoxReducer(prevState: AppState, action: ActionType): AppSt
       return { ...prevState, loading: prevState.loading + 1 }
     }
     case "DECR_LOADING": {
-      return { ...prevState, loading: prevState.loading - 1 }
+      const newLoading = prevState.loading - 1;
+      return {
+        ...prevState,
+        loading: newLoading,
+        // Mark subscriptions as ready once loading completes for the first time
+        subscriptionsReady: prevState.subscriptionsReady || newLoading === 0
+      }
     }
     case "SET_AUTH_USER": {
       const authUser = action.authUser

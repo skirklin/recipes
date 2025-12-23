@@ -78,9 +78,13 @@ async function handleUserSnapshot(
       if (!unsubMap.boxMap.has(bid)) {
         const boxRef = doc(db, "boxes", bid).withConverter(boxConverter)
 
-        // Track whether box has been loaded to prevent race condition
+        // Track loading state for this box
         let boxLoaded = false;
+        let recipesLoaded = false;
         const pendingRecipeSnapshots: QuerySnapshot<RecipeEntry>[] = [];
+
+        // Increment loading for this box's data
+        dispatch({ type: "INCR_LOADING" })
 
         const boxUnsub = onSnapshot(
           boxRef.withConverter(boxConverter), (snapshot) => {
@@ -92,6 +96,10 @@ async function handleUserSnapshot(
                 handleRecipesSnapshot(recipeSnapshot, dispatch, boxRef.id)
               });
               pendingRecipeSnapshots.length = 0;
+              // Decrement loading once both box and recipes have loaded
+              if (recipesLoaded) {
+                dispatch({ type: "DECR_LOADING" })
+              }
             }
           })
 
@@ -102,6 +110,13 @@ async function handleUserSnapshot(
           } else {
             // Queue until box is loaded
             pendingRecipeSnapshots.push(snapshot);
+          }
+          if (!recipesLoaded) {
+            recipesLoaded = true;
+            // Decrement loading once both box and recipes have loaded
+            if (boxLoaded) {
+              dispatch({ type: "DECR_LOADING" })
+            }
           }
         })
         unsubMap.boxMap.set(boxRef.id, { recipesUnsub, boxUnsub })

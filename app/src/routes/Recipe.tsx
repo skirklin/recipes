@@ -1,57 +1,28 @@
-import { useContext, useEffect, useState } from 'react';
+import { useContext } from 'react';
 import { useParams } from 'react-router-dom';
 import { Spin } from 'antd';
 import { Context } from '../context';
 import RecipeCard from '../RecipeCard/RecipeCard';
-import { getRecipe } from '../firestore';
 import { getRecipeFromState } from '../state';
-import { RecipeEntry } from '../storage';
 import { BoxId, RecipeId } from '../types';
 
 interface RecipeProps {
   boxId: BoxId
   recipeId: RecipeId
-  recipe?: RecipeEntry
 }
 
 
 export function Recipe(props: RecipeProps) {
   const { recipeId, boxId } = props;
-  const { state, dispatch } = useContext(Context)
-  const [loading, setLoading] = useState(true);
-  const [fetchAttempted, setFetchAttempted] = useState(false);
+  const { state } = useContext(Context)
 
   const recipe = getRecipeFromState(state, boxId, recipeId)
 
-  useEffect(() => {
-    let cancelled = false;
+  // Wait for subscriptions to fully load before showing "not found"
+  // subscriptionsReady becomes true after the first loading cycle completes
+  const isLoading = !state.subscriptionsReady || state.loading > 0;
 
-    (async () => {
-      if (recipe === undefined && !fetchAttempted) {
-        setLoading(true);
-        if (props.recipe === undefined) {
-          const fetchedRecipe = await getRecipe(state, boxId, recipeId);
-          if (!cancelled && fetchedRecipe !== undefined) {
-            dispatch({ type: "ADD_RECIPE", payload: fetchedRecipe, recipeId, boxId })
-          }
-        } else {
-          if (!cancelled) {
-            dispatch({ type: "ADD_RECIPE", payload: props.recipe, recipeId, boxId })
-          }
-        }
-        if (!cancelled) {
-          setFetchAttempted(true);
-          setLoading(false);
-        }
-      } else if (recipe !== undefined) {
-        setLoading(false);
-      }
-    })()
-
-    return () => { cancelled = true; }
-  }, [recipeId, boxId, recipe, dispatch, state, props.recipe, fetchAttempted])
-
-  if (loading && recipe === undefined) {
+  if (isLoading && recipe === undefined) {
     return <Spin tip="Loading recipe..."><div style={{ minHeight: 200 }} /></Spin>
   }
 
