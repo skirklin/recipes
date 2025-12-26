@@ -92,10 +92,16 @@ export function getRecipesFromPage(doc: Document, url: string): Recipe[] {
 
 }
 
-export const getRecipes = onCall(async (request) => {
+export const getRecipes = onCall({
+  cors: ["https://recipes.kirkl.in", "https://kirkl.in", "http://localhost:5000"],
+  invoker: "public",
+}, async (request) => {
+  if (!request.auth) {
+    throw new HttpsError("unauthenticated", "Must be logged in to import recipes")
+  }
   const url = request.data.url;
   if (url === undefined) {
-    throw new HttpsError("internal", "must specify url")
+    throw new HttpsError("invalid-argument", "must specify url")
   }
   const tpc = await axios.get(request.data.url)
   const htmlDom = new jsdom.JSDOM(tpc.data);
@@ -127,25 +133,36 @@ async function updateOwners(docRef: FirebaseFirestore.DocumentReference<Firebase
     })
 }
 
-export const addRecipeOwner = onCall(async (request) => {
+export const addRecipeOwner = onCall({
+  cors: ["https://recipes.kirkl.in", "https://kirkl.in", "http://localhost:5000"],
+  invoker: "public",
+}, async (request) => {
+  if (!request.auth) {
+    throw new HttpsError("unauthenticated", "Must be logged in to add recipe owner")
+  }
   const { recipeId, boxId, newOwnerEmail } = request.data;
   const docRef = db.doc(`boxes/${boxId}/recipes/${recipeId}`)
   const recipe = (await docRef.get()).data()
   if (recipe === undefined) {
-    throw new HttpsError("internal", "Specified recipe does not exist")
+    throw new HttpsError("not-found", "Specified recipe does not exist")
   }
   updateOwners(docRef, newOwnerEmail)
 })
 
 
-export const addBoxOwner = onCall(async (request) => {
+export const addBoxOwner = onCall({
+  cors: ["https://recipes.kirkl.in", "https://kirkl.in", "http://localhost:5000"],
+  invoker: "public",
+}, async (request) => {
+  if (!request.auth) {
+    throw new HttpsError("unauthenticated", "Must be logged in to add box owner")
+  }
   const { boxId, newOwnerEmail } = request.data;
   const docRef = db.doc(`boxes/${boxId}`)
   const box = (await docRef.get()).data()
   if (box === undefined) {
-    throw new HttpsError("internal", "Specified box does not exist")
+    throw new HttpsError("not-found", "Specified box does not exist")
   }
-
   updateOwners(docRef, newOwnerEmail)
 })
 
@@ -153,7 +170,11 @@ export const addBoxOwner = onCall(async (request) => {
 const CLAUDE_MODEL = process.env.CLAUDE_MODEL || "claude-opus-4-5-20251101";
 
 export const generateRecipe = onCall(
-  { secrets: [anthropicApiKey] },
+  {
+    secrets: [anthropicApiKey],
+    cors: ["https://recipes.kirkl.in", "https://kirkl.in", "http://localhost:5000"],
+    invoker: "public",
+  },
   async (request) => {
     // Require authentication
     if (!request.auth) {
