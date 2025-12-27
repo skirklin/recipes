@@ -224,17 +224,17 @@ export class UserEntry {
     lastSeen: Date
     newSeen: Date
     id: string
-    wakeLockSeen: boolean
+    cookingModeSeen: boolean
     lastSeenUpdateVersion: number
 
-    constructor(name: string, visibility: Visibility, boxes: BoxId[], lastSeen: Date, newSeen: Date, id: string, wakeLockSeen: boolean = false, lastSeenUpdateVersion: number = 0) {
+    constructor(name: string, visibility: Visibility, boxes: BoxId[], lastSeen: Date, newSeen: Date, id: string, cookingModeSeen: boolean = false, lastSeenUpdateVersion: number = 0) {
         this.name = name
         this.visibility = visibility
         this.boxes = boxes
         this.lastSeen = lastSeen
         this.newSeen = newSeen
         this.id = id
-        this.wakeLockSeen = wakeLockSeen
+        this.cookingModeSeen = cookingModeSeen
         this.lastSeenUpdateVersion = lastSeenUpdateVersion
     }
 }
@@ -248,7 +248,7 @@ export const userConverter = {
             lastSeen: user.lastSeen,
             newSeen: user.newSeen,
             boxes: user.boxes.map(bid => doc(db, "boxes", bid)),
-            wakeLockSeen: user.wakeLockSeen,
+            cookingModeSeen: user.cookingModeSeen,
             lastSeenUpdateVersion: user.lastSeenUpdateVersion,
         };
     },
@@ -262,7 +262,7 @@ export const userConverter = {
             (data.lastSeen  || DUMMY_FIRST_TIMESTAMP).toDate(),
             (data.newSeen  || DUMMY_FIRST_TIMESTAMP).toDate(),
             snapshot.id,
-            data.wakeLockSeen ?? false,
+            data.cookingModeSeen ?? false,
             data.lastSeenUpdateVersion ?? 0
         )
     }

@@ -163,8 +163,8 @@ export async function setRecipeVisibility(boxId: BoxId, recipeId: RecipeId, visi
   updateDoc(doc(db, "boxes", boxId, "recipes", recipeId), { visibility })
 }
 
-export async function setWakeLockSeen(userId: UserId) {
-  updateDoc(doc(db, "users", userId), { wakeLockSeen: true })
+export async function setCookingModeSeen(userId: UserId) {
+  updateDoc(doc(db, "users", userId), { cookingModeSeen: true })
 }
 
 export async function setLastSeenUpdateVersion(userId: UserId, version: number) {

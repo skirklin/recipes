@@ -6,7 +6,7 @@ import { getAuth, signOut } from 'firebase/auth';
 import { InboxOutlined, LogoutOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import './Header.css';
-import WakeLock from './WakeLock';
+import CookingMode from './CookingMode';
 
 const MenuArea = styled.nav`
   margin-left: auto;
@@ -54,7 +54,7 @@ function Menu() {
   return (
     <MenuArea>
       <UserName>{user.displayName}</UserName>
-      <WakeLock />
+      <CookingMode />
       <Tooltip title="Manage boxes">
         <IconButton onClick={() => navigate('/boxes')} icon={<InboxOutlined />} />
       </Tooltip>

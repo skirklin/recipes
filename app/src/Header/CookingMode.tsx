@@ -1,14 +1,14 @@
 import { useState, useEffect, useCallback, useContext } from 'react';
 import styled from 'styled-components';
 import { Button, Popover, Tooltip } from 'antd';
-import { BulbOutlined, BulbFilled } from '@ant-design/icons';
+import { FireOutlined, FireFilled } from '@ant-design/icons';
 import { Context } from '../context';
 import { getAppUserFromState } from '../state';
-import { setWakeLockSeen } from '../firestore';
+import { setCookingModeSeen } from '../firestore';
 
 const IconButton = styled(Button)<{ $active?: boolean; $highlight?: boolean }>`
-  background-color: ${props => props.$active ? 'var(--color-warning)' : 'transparent'};
-  color: ${props => props.$active ? 'var(--color-text)' : 'white'};
+  background-color: ${props => props.$active ? 'var(--color-accent)' : 'transparent'};
+  color: ${props => props.$active ? 'white' : 'white'};
   border: none;
   width: 36px;
   height: 36px;
@@ -22,18 +22,18 @@ const IconButton = styled(Button)<{ $active?: boolean; $highlight?: boolean }>`
   `}
 
   &:hover {
-    color: ${props => props.$active ? 'var(--color-text)' : 'white'};
-    background-color: ${props => props.$active ? 'var(--color-warning)' : 'rgba(255, 255, 255, 0.15)'};
+    color: white;
+    background-color: ${props => props.$active ? 'var(--color-accent)' : 'rgba(255, 255, 255, 0.15)'};
   }
 
   @keyframes pulse {
-    0%, 100% { box-shadow: 0 0 0 0 rgba(252, 186, 4, 0.4); }
-    50% { box-shadow: 0 0 0 8px rgba(252, 186, 4, 0); }
+    0%, 100% { box-shadow: 0 0 0 0 rgba(233, 79, 55, 0.4); }
+    50% { box-shadow: 0 0 0 8px rgba(233, 79, 55, 0); }
   }
 `
 
 const PopoverContent = styled.div`
-  max-width: 200px;
+  max-width: 220px;
 `
 
 const PopoverTitle = styled.div`
@@ -47,48 +47,58 @@ const PopoverText = styled.p`
   color: var(--color-text-secondary);
 `
 
-function WakeLock() {
+function CookingMode() {
   const [wakeLock, setWakeLock] = useState<WakeLockSentinel | null>(null);
+  const [isActive, setIsActive] = useState(false);
   const [isSupported, setIsSupported] = useState(false);
   const [showPopover, setShowPopover] = useState(false);
   const { state } = useContext(Context);
   const user = getAppUserFromState(state);
 
   useEffect(() => {
-    setIsSupported('wakeLock' in navigator);
+    // Wake lock is nice-to-have, cooking mode works without it
+    setIsSupported(true);
   }, []);
 
   // Show popover for users who haven't seen this feature
   useEffect(() => {
-    if (isSupported && user && !user.wakeLockSeen) {
-      // Small delay so it doesn't appear immediately on page load
+    if (user && !user.cookingModeSeen) {
       const timer = setTimeout(() => setShowPopover(true), 1000);
       return () => clearTimeout(timer);
     }
-  }, [isSupported, user]);
+  }, [user]);
 
   const markAsSeen = useCallback(() => {
-    if (user && !user.wakeLockSeen) {
-      setWakeLockSeen(user.id);
+    if (user && !user.cookingModeSeen) {
+      setCookingModeSeen(user.id);
     }
     setShowPopover(false);
   }, [user]);
 
-  const requestWakeLock = useCallback(async () => {
+  const enableCookingMode = useCallback(async () => {
     markAsSeen();
-    try {
-      const lock = await navigator.wakeLock.request('screen');
-      setWakeLock(lock);
+    setIsActive(true);
+    document.body.classList.add('cooking-mode');
 
-      lock.addEventListener('release', () => {
-        setWakeLock(null);
-      });
-    } catch (err) {
-      console.warn('Wake Lock request failed:', err);
+    // Try to acquire wake lock if supported
+    if ('wakeLock' in navigator) {
+      try {
+        const lock = await navigator.wakeLock.request('screen');
+        setWakeLock(lock);
+
+        lock.addEventListener('release', () => {
+          setWakeLock(null);
+        });
+      } catch (err) {
+        console.warn('Wake Lock request failed:', err);
+      }
     }
   }, [markAsSeen]);
 
-  const releaseWakeLock = useCallback(async () => {
+  const disableCookingMode = useCallback(async () => {
+    setIsActive(false);
+    document.body.classList.remove('cooking-mode');
+
     if (wakeLock) {
       await wakeLock.release();
       setWakeLock(null);
@@ -97,9 +107,15 @@ function WakeLock() {
 
   // Re-acquire wake lock when page becomes visible again
   useEffect(() => {
-    const handleVisibilityChange = () => {
-      if (wakeLock !== null && document.visibilityState === 'visible') {
-        requestWakeLock();
+    const handleVisibilityChange = async () => {
+      if (isActive && document.visibilityState === 'visible' && 'wakeLock' in navigator) {
+        try {
+          const lock = await navigator.wakeLock.request('screen');
+          setWakeLock(lock);
+          lock.addEventListener('release', () => setWakeLock(null));
+        } catch (err) {
+          console.warn('Wake Lock re-acquire failed:', err);
+        }
       }
     };
 
@@ -107,9 +123,16 @@ function WakeLock() {
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
-  }, [wakeLock, requestWakeLock]);
+  }, [isActive]);
 
-  // Clean up on unmount
+  // Clean up on unmount only
+  useEffect(() => {
+    return () => {
+      document.body.classList.remove('cooking-mode');
+    };
+  }, []);
+
+  // Release wake lock on unmount
   useEffect(() => {
     return () => {
       if (wakeLock) {
@@ -122,14 +145,13 @@ function WakeLock() {
     return null;
   }
 
-  const isActive = wakeLock !== null;
-  const shouldHighlight = !user?.wakeLockSeen && !isActive;
+  const shouldHighlight = !user?.cookingModeSeen && !isActive;
 
   const popoverContent = (
     <PopoverContent>
-      <PopoverTitle>Keep screen on</PopoverTitle>
+      <PopoverTitle>Cooking Mode</PopoverTitle>
       <PopoverText>
-        Tap here to prevent your screen from dimming while you cook!
+        Tap here to enable larger text and keep your screen on while you cook!
       </PopoverText>
       <Button size="small" type="primary" onClick={markAsSeen}>
         Got it
@@ -141,8 +163,8 @@ function WakeLock() {
     <IconButton
       $active={isActive}
       $highlight={shouldHighlight}
-      icon={isActive ? <BulbFilled /> : <BulbOutlined />}
-      onClick={isActive ? releaseWakeLock : requestWakeLock}
+      icon={isActive ? <FireFilled /> : <FireOutlined />}
+      onClick={isActive ? disableCookingMode : enableCookingMode}
     />
   );
 
@@ -160,10 +182,10 @@ function WakeLock() {
   }
 
   return (
-    <Tooltip title={isActive ? "Screen will stay on" : "Keep screen on"}>
+    <Tooltip title={isActive ? "Cooking mode on" : "Enable cooking mode"}>
       {button}
     </Tooltip>
   );
 }
 
-export default WakeLock;
+export default CookingMode;
